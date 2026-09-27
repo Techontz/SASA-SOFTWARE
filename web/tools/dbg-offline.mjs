@@ -1,0 +1,27 @@
+import { chromium } from '@playwright/test';
+const browser = await chromium.launch();
+const context = await browser.newContext({ viewport: { width: 1440, height: 950 } });
+const page = await context.newPage();
+page.on('console', m => console.log('CONSOLE', m.type(), m.text().slice(0,200)));
+page.on('pageerror', e => console.log('PAGEERROR', String(e).slice(0,200)));
+
+await page.goto('http://localhost:3010/sign-in');
+await page.fill('#email','field@sasa.test'); await page.fill('#password','password');
+await page.click('button[type=submit]');
+await page.waitForSelector('nav[aria-label="Main"]');
+await page.goto('http://localhost:3010/grievances/new'); await page.waitForTimeout(1500);
+await context.setOffline(true);
+await page.evaluate(()=>window.dispatchEvent(new Event('offline')));
+await page.goto('http://localhost:3010/grievances/new');
+await page.evaluate(()=>window.dispatchEvent(new Event('offline')));
+await page.waitForTimeout(1200);
+await page.fill('#title','Offline debug case');
+await page.fill('#complainant_name','A caller');
+await page.fill('#description','Written down on a tablet with no connection and queued until the signal returned.');
+await page.click('button:has-text("Open the case")');
+await page.waitForTimeout(2500);
+console.log('URL', page.url());
+const alerts = await page.locator('[role=alert], [role=status]').allInnerTexts();
+console.log('ALERTS', JSON.stringify(alerts));
+await page.screenshot({ path: '/tmp/sasa-shots/offline-debug.png' });
+await browser.close();

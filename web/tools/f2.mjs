@@ -1,0 +1,10 @@
+import { chromium } from '@playwright/test';
+const browser = await chromium.launch();
+const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
+page.on('response', r => { if (r.status() >= 400) console.log(r.status(), r.url()); });
+await page.goto('http://localhost:3010/sign-in', { waitUntil: 'domcontentloaded' });
+await page.fill('#email','project.admin@sasa.test'); await page.fill('#password','password');
+await page.click('button[type=submit]'); await page.waitForSelector('header');
+await page.goto('http://localhost:3010/engagements/calendar', { waitUntil: 'domcontentloaded' });
+await page.waitForTimeout(2500);
+await browser.close();

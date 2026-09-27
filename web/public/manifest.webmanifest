@@ -1,0 +1,23 @@
+{
+  "name": "SASA — Stakeholder Intelligence & Voice",
+  "short_name": "SASA",
+  "description": "Stakeholder register, engagement, grievances and reporting for infrastructure and extractive projects.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#f7f7f5",
+  "theme_color": "#0b2028",
+  "categories": ["business", "productivity", "utilities"],
+  "icons": [
+    { "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Log a grievance", "url": "/grievances/new", "description": "Record a concern raised through any channel" },
+    { "name": "Log an engagement", "url": "/engagements/log", "description": "Record a meeting and what was said" },
+    { "name": "Add a stakeholder", "url": "/stakeholders/new", "description": "Add a record to the register" }
+  ]
+}

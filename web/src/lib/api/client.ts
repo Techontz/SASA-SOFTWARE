@@ -1,0 +1,234 @@
+import type { ApiError } from "@/types/api";
+
+export const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8010/api/v1";
+
+const TOKEN_KEY = "sasa.token";
+const PROJECT_KEY = "sasa.project";
+
+/**
+ * The problem the request hit, in terms a person can act on.
+ * `offline` is the one the field officer sees most, and it is not a failure —
+ * it is the cue that the work was kept on the device.
+ */
+export class ApiRequestError extends Error {
+  constructor(
+    message: string,
+    public readonly status: number,
+    public readonly code: string,
+    public readonly validationErrors?: Record<string, string[]>,
+    public readonly requestId?: string,
+  ) {
+    super(message);
+    this.name = "ApiRequestError";
+  }
+
+  get isOffline(): boolean {
+    return this.status === 0;
+  }
+
+  get isUnauthenticated(): boolean {
+    return this.status === 401;
+  }
+
+  get isForbidden(): boolean {
+    return this.status === 403;
+  }
+
+  get isNotFound(): boolean {
+    return this.status === 404;
+  }
+
+  get isValidation(): boolean {
+    return this.status === 422;
+  }
+
+  /** Worth putting back on the queue rather than showing as a hard failure. */
+  get isRetryable(): boolean {
+    return this.status === 0 || this.status === 429 || this.status >= 500;
+  }
+}
+
+export const tokenStore = {
+  get(): string | null {
+    if (typeof window === "undefined") return null;
+    return window.localStorage.getItem(TOKEN_KEY);
+  },
+  set(token: string) {
+    window.localStorage.setItem(TOKEN_KEY, token);
+  },
+  clear() {
+    window.localStorage.removeItem(TOKEN_KEY);
+  },
+};
+
+export const projectStore = {
+  get(): number | null {
+    if (typeof window === "undefined") return null;
+    const value = window.localStorage.getItem(PROJECT_KEY);
+    return value ? Number(value) : null;
+  },
+  set(projectId: number) {
+    window.localStorage.setItem(PROJECT_KEY, String(projectId));
+  },
+  clear() {
+    window.localStorage.removeItem(PROJECT_KEY);
+  },
+};
+
+type Query = Record<string, string | number | boolean | null | undefined | Array<string | number>>;
+
+export interface RequestOptions {
+  method?: "GET" | "POST" | "PATCH" | "PUT" | "DELETE";
+  body?: unknown;
+  query?: Query;
+  /** Skip the project header — used by /auth and /projects. */
+  withoutProject?: boolean;
+  signal?: AbortSignal;
+  /** Multipart, for attachment uploads. */
+  formData?: FormData;
+  headers?: Record<string, string>;
+}
+
+export function buildUrl(path: string, query?: Query): string {
+  const url = new URL(
+    path.startsWith("http") ? path : `${API_BASE_URL}${path.startsWith("/") ? path : `/${path}`}`,
+  );
+
+  if (query) {
+    for (const [key, value] of Object.entries(query)) {
+      if (value === null || value === undefined || value === "") continue;
+      if (Array.isArray(value)) {
+        value.forEach((item) => url.searchParams.append(`${key}[]`, String(item)));
+      } else {
+        url.searchParams.set(key, String(value));
+      }
+    }
+  }
+
+  return url.toString();
+}
+
+let unauthenticatedHandler: (() => void) | null = null;
+
+/** The app registers what to do when a token stops being accepted. */
+export function onUnauthenticated(handler: () => void) {
+  unauthenticatedHandler = handler;
+}
+
+export async function apiRequest<T>(path: string, options: RequestOptions = {}): Promise<T> {
+  const { method = "GET", body, query, withoutProject, signal, formData, headers = {} } = options;
+
+  const requestHeaders: Record<string, string> = {
+    Accept: "application/json",
+    "X-Sasa-Device-Id": deviceIdentifier(),
+    ...headers,
+  };
+
+  const token = tokenStore.get();
+  if (token) requestHeaders.Authorization = `Bearer ${token}`;
+
+  const projectId = projectStore.get();
+  if (projectId && !withoutProject) requestHeaders["X-Sasa-Project"] = String(projectId);
+
+  if (!formData && body !== undefined) {
+    requestHeaders["Content-Type"] = "application/json";
+  }
+
+  let response: Response;
+
+  try {
+    response = await fetch(buildUrl(path, query), {
+      method,
+      headers: requestHeaders,
+      body: formData ?? (body !== undefined ? JSON.stringify(body) : undefined),
+      signal,
+      credentials: "omit",
+    });
+  } catch {
+    // fetch only rejects for network-level problems — which, for this product,
+    // usually means the officer is somewhere without a signal.
+    throw new ApiRequestError(
+      "You appear to be offline. Your work is saved on this device and will sync when the connection returns.",
+      0,
+      "offline",
+    );
+  }
+
+  if (response.status === 204) {
+    return undefined as T;
+  }
+
+  const contentType = response.headers.get("content-type") ?? "";
+  const isJson = contentType.includes("application/json");
+  const payload = isJson ? await response.json().catch(() => null) : null;
+
+  if (!response.ok) {
+    const error = (payload ?? {}) as ApiError;
+
+    if (response.status === 401) {
+      unauthenticatedHandler?.();
+    }
+
+    throw new ApiRequestError(
+      error.message ?? "Something went wrong. Please try again.",
+      response.status,
+      error.error ?? "request_failed",
+      error.errors,
+      error.request_id,
+    );
+  }
+
+  return payload as T;
+}
+
+function deviceIdentifier(): string {
+  if (typeof window === "undefined") return "server";
+  const key = "sasa.device-id";
+  let value = window.localStorage.getItem(key);
+  if (!value) {
+    value = `web-${crypto.randomUUID()}`;
+    window.localStorage.setItem(key, value);
+  }
+  return value;
+}
+
+/** Downloads go through a normal navigation so the browser handles the file. */
+export function downloadUrl(path: string, query?: Query): string {
+  const url = new URL(buildUrl(path, query));
+  const token = tokenStore.get();
+  const projectId = projectStore.get();
+
+  if (token) url.searchParams.set("_token", token);
+  if (projectId) url.searchParams.set("project_id", String(projectId));
+
+  return url.toString();
+}
+
+/** Fetch a file with the auth header and hand the browser a blob to save. */
+export async function downloadFile(path: string, filename: string, query?: Query): Promise<void> {
+  const token = tokenStore.get();
+  const projectId = projectStore.get();
+
+  const response = await fetch(buildUrl(path, query), {
+    headers: {
+      Accept: "*/*",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...(projectId ? { "X-Sasa-Project": String(projectId) } : {}),
+    },
+  });
+
+  if (!response.ok) {
+    throw new ApiRequestError("We could not prepare that download.", response.status, "download_failed");
+  }
+
+  const blob = await response.blob();
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+}

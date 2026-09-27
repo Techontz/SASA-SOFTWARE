@@ -1,0 +1,18 @@
+# macOS
+.DS_Store
+
+# Editors
+/.idea
+/.vscode
+/.zed
+*.swp
+
+# Local tooling output
+/web/test-results
+/web/playwright-report
+/web/blob-report
+
+# The source specification. Kept out of the repository deliberately: it is a
+# 32MB document that would live in git history permanently, and this repository
+# is public. It stays on the machines that need it.
+/DOCUMENTS/

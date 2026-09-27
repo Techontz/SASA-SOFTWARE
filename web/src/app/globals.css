@@ -1,0 +1,746 @@
+@import "tailwindcss";
+
+/* ==========================================================================
+   SASA design tokens
+   --------------------------------------------------------------------------
+   One palette, one spacing rhythm, one motion language, two themes. Nothing
+   in a component picks a colour, a radius or a duration that is not defined
+   here.
+
+   The identity is a deep navy foundation with a petrol-teal action colour and
+   a warm clay accent used sparingly for the single most important action on a
+   screen. Status colour is always paired with a word or an icon — never used
+   alone to carry meaning.
+
+   HOW THE TWO THEMES WORK
+   -----------------------
+   Tailwind v4 generates its colour utilities from `var(--color-*)`. So the
+   theme is switched by *redefining those same variables* under
+   `:root[data-theme="dark"]` — every existing `text-ink-500` or `bg-brand-50`
+   in the app flips with no change to the component. `:root[data-theme]` also
+   outranks the `:root` that `@theme` emits, so the override always wins.
+
+   Three families deliberately do NOT flip, because their role is fixed:
+
+     chrome-*    Navigation and dark panels. Navy in both themes, so SASA is
+                 recognisable either way. It is a little darker than the dark
+                 canvas so the sidebar still separates from the page.
+     primary /
+     accent-solid /
+     {status}-solid
+                 Solid filled actions and banners that carry white text. These
+                 must stay dark enough for that text in both themes, so they
+                 are tuned per theme rather than taken from a ramp.
+
+   Everything else — ink, brand, the status ramps, the surfaces — flips.
+   ========================================================================== */
+
+/* The theme is an attribute on <html>, not a media query, because the user
+   chooses it. `dark:` is available for the rare rule that cannot be expressed
+   as a token. */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+@theme {
+  /* ======================================================================
+     LIGHT THEME VALUES
+     These are the defaults: they generate the utilities, and they are what a
+     first-time visitor on a light system sees.
+     ====================================================================== */
+
+  /* --- Brand: petrol teal. A tint and text ramp — not a button colour. ---
+     50/100 are chip fills, 600–900 are the text on those chips, 200–500 are
+     borders and quiet marks. */
+  --color-brand-50:  #eef8f9;
+  --color-brand-100: #d5eef1;
+  --color-brand-200: #aedde3;
+  --color-brand-300: #79c2cd;
+  --color-brand-400: #43a0b0;
+  --color-brand-500: #2a8291;
+  --color-brand-600: #216b7a;
+  --color-brand-700: #1d5663;
+  --color-brand-800: #1c4754;
+  --color-brand-900: #163744;
+  --color-brand-950: #0d2330;
+
+  /* --- Accent: warm clay. One per screen, for the action that matters. --- */
+  --color-accent-50:  #fdf6ef;
+  --color-accent-100: #faead7;
+  --color-accent-200: #f3d2ad;
+  --color-accent-300: #ebb47b;
+  --color-accent-400: #e08d45;
+  --color-accent-500: #d67227;
+  --color-accent-600: #bd591d;
+  --color-accent-700: #9c421b;
+  --color-accent-800: #7e361d;
+  --color-accent-900: #672e1b;
+
+  /* --- Neutrals: blue-grey, so they sit with the navy rather than fighting
+     it. 900 is the heading colour, 500 is secondary text, 400 is decorative
+     (icons, rules) and is never used for text that must be read. --- */
+  --color-ink-50:  #f8fafc;
+  --color-ink-100: #f1f5f9;
+  --color-ink-200: #e4eaf1;
+  --color-ink-300: #cbd5e1;
+  /* Meets AA on the card and the canvas: it is the quietest text tone, not a
+     decorative one, because it kept being used for dates and pager labels. */
+  --color-ink-400: #5d7186;
+  --color-ink-500: #5a6e81;
+  --color-ink-600: #45586a;
+  --color-ink-700: #334454;
+  --color-ink-800: #1f2f3d;
+  --color-ink-900: #10202e;
+
+  /* --- Status ramps: 50/100 fill a chip, 600–900 write on it. ----------- */
+  --color-success-50:  #edfaf3;
+  --color-success-100: #d3f2e1;
+  --color-success-500: #12855a;
+  --color-success-600: #0e6d4a;
+  --color-success-700: #0b5439;
+  --color-success-800: #094630;
+  --color-success-900: #073726;
+
+  --color-warning-50:  #fff8ea;
+  --color-warning-100: #feeecc;
+  --color-warning-500: #b45309;
+  --color-warning-600: #96450a;
+  --color-warning-700: #7a3a0b;
+  --color-warning-800: #653210;
+  --color-warning-900: #522a10;
+
+  --color-danger-50:  #fef3f2;
+  --color-danger-100: #fee4e2;
+  --color-danger-500: #b42318;
+  --color-danger-600: #971d14;
+  --color-danger-700: #7a1811;
+  --color-danger-800: #651612;
+  --color-danger-900: #541411;
+
+  --color-info-50:  #eff6ff;
+  --color-info-100: #dbeafe;
+  --color-info-500: #175cd3;
+  --color-info-600: #1450b8;
+  --color-info-700: #113f92;
+  --color-info-800: #0f3578;
+  --color-info-900: #0d2c63;
+
+  /* --- Surfaces --------------------------------------------------------- */
+  --color-canvas: #f4f7fa;
+  --color-surface: #ffffff;
+  --color-surface-sunken: #f8fafc;
+  --color-surface-raised: #ffffff;
+  --color-hairline: #e4eaf1;
+  --color-hairline-strong: #cfdae6;
+
+  /* ======================================================================
+     FIXED FAMILIES — the same role in both themes
+     ====================================================================== */
+
+  /* --- Chrome: the sidebar, the mobile bar, drawers, the sign-in panel.
+     Navy in both themes. --- */
+  --color-chrome-deep: #08121f;
+  --color-chrome: #0d1b2c;
+  --color-chrome-raised: #16293c;
+  --color-chrome-line: #23384e;
+  --color-chrome-fg: #eef4fa;
+  --color-chrome-accent: #8fd0da;
+  --color-chrome-muted: #9db3ca;
+  --color-chrome-subtle: #7891ab;
+
+  /* --- Solid actions. White text sits on all of these at 4.5:1 or better,
+     in both themes. --- */
+  --color-primary: #1c4754;
+  --color-primary-hover: #163744;
+  --color-primary-active: #0d2330;
+  --color-on-primary: #ffffff;
+
+  --color-accent-solid: #bd591d;
+  --color-accent-solid-hover: #9c421b;
+  --color-accent-solid-active: #7e361d;
+
+  --color-danger-solid: #b42318;
+  --color-danger-solid-hover: #971d14;
+  --color-danger-solid-active: #7a1811;
+
+  --color-success-solid: #0e6d4a;
+  --color-warning-solid: #96450a;
+  --color-info-solid: #1450b8;
+
+  /* --- Radius: restrained. Nothing is a pill except a status chip. ------- */
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+
+  /* --- Shadows: one step of elevation, and it is subtle. Redefined for the
+     dark theme, where a drop shadow reads as a darker halo, not a lift. --- */
+  --shadow-card: 0 1px 2px rgba(16, 32, 46, 0.04), 0 1px 3px rgba(16, 32, 46, 0.05);
+  --shadow-raised: 0 2px 4px rgba(16, 32, 46, 0.05), 0 8px 20px rgba(16, 32, 46, 0.08);
+  --shadow-overlay: 0 16px 48px rgba(8, 18, 31, 0.18);
+
+  /* --- Motion: quick and quiet ------------------------------------------ */
+  --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+  --duration-fast: 120ms;
+  --duration-base: 180ms;
+  --duration-slow: 280ms;
+
+  /* --- Type -------------------------------------------------------------- */
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system,
+    "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+}
+
+/* ==========================================================================
+   Extra tokens that are not colour utilities — the ring focus colour, the
+   overlay scrim, and the selection tint. Declared outside @theme so Tailwind
+   does not generate utilities for them.
+   ========================================================================== */
+:root,
+:root[data-theme="light"] {
+  color-scheme: light;
+  --sasa-scrim: rgba(8, 18, 31, 0.44);
+  --sasa-focus-ring: rgba(42, 130, 145, 0.18);
+  --sasa-danger-ring: rgba(180, 35, 24, 0.16);
+  --sasa-selection: #aedde3;
+  --sasa-selection-fg: #0d2330;
+  /* The scanning sweep in the search overlay and the sync indicator. */
+  --sasa-scan: #2a8291;
+  --sasa-scan-trail: rgba(42, 130, 145, 0.14);
+}
+
+/* ==========================================================================
+   DARK THEME
+   --------------------------------------------------------------------------
+   A deep navy foundation, not black: the canvas is navy, cards are a lighter
+   navy so they lift off it, and the sidebar is darker again so the chrome
+   still reads as chrome. The ramps are inverted — ink-900 becomes the
+   brightest text, ink-50 the darkest fill — which is what lets every existing
+   `text-ink-500` and `bg-brand-50` in the app flip without being rewritten.
+   ========================================================================== */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  /* Brand, inverted: 50/100 are dark teal chip fills, 700–900 the bright
+     teal that writes on them. */
+  --color-brand-50:  #0f2b34;
+  --color-brand-100: #143945;
+  --color-brand-200: #1b4b59;
+  --color-brand-300: #2c7080;
+  --color-brand-400: #4d99a8;
+  --color-brand-500: #64b2c0;
+  --color-brand-600: #80c6d2;
+  --color-brand-700: #a0d9e3;
+  --color-brand-800: #bfe9f0;
+  --color-brand-900: #daf4f8;
+  --color-brand-950: #edfbfc;
+
+  /* Accent: 50–200 are dark clay fills, 300 upward stay light, because 300 is
+     used for light-on-navy text in both themes. */
+  --color-accent-50:  #2e1b0c;
+  --color-accent-100: #3d2410;
+  --color-accent-200: #573317;
+  --color-accent-300: #eeae72;
+  --color-accent-400: #e79a56;
+  --color-accent-500: #e08d45;
+  --color-accent-600: #eaa361;
+  --color-accent-700: #f0b884;
+  --color-accent-800: #f5cda8;
+  --color-accent-900: #f9e0c9;
+
+  /* Neutrals, inverted and navy-tinted. */
+  --color-ink-50:  #0f1d2f;
+  --color-ink-100: #172943;
+  --color-ink-200: #21364f;
+  --color-ink-300: #33495f;
+  --color-ink-400: #8099b3;
+  --color-ink-500: #97acc2;
+  --color-ink-600: #b7c7d7;
+  --color-ink-700: #d0dce7;
+  --color-ink-800: #e5edf4;
+  --color-ink-900: #f4f8fb;
+
+  --color-success-50:  #0c2b1f;
+  --color-success-100: #113b2a;
+  --color-success-500: #1f9e6b;
+  --color-success-600: #34b981;
+  --color-success-700: #5fd0a0;
+  --color-success-800: #93e3c1;
+  --color-success-900: #c3f2dd;
+
+  --color-warning-50:  #33240a;
+  --color-warning-100: #45300d;
+  --color-warning-500: #c9750f;
+  --color-warning-600: #e08c17;
+  --color-warning-700: #f0a93c;
+  --color-warning-800: #f7c576;
+  --color-warning-900: #fbdfae;
+
+  --color-danger-50:  #360f0f;
+  --color-danger-100: #491614;
+  --color-danger-500: #cf3b2c;
+  --color-danger-600: #ef6b5b;
+  --color-danger-700: #f47a6c;
+  --color-danger-800: #fba69c;
+  --color-danger-900: #fdcdc7;
+
+  --color-info-50:  #0d2038;
+  --color-info-100: #122d4d;
+  --color-info-500: #2a6fd8;
+  --color-info-600: #4a8bea;
+  --color-info-700: #77aaf2;
+  --color-info-800: #a8c8f7;
+  --color-info-900: #d0e1fb;
+
+  /* Surfaces: navy, and cards are lighter than the page. */
+  --color-canvas: #122136;
+  --color-surface: #19293e;
+  --color-surface-sunken: #14233a;
+  --color-surface-raised: #213652;
+  --color-hairline: #2b4058;
+  --color-hairline-strong: #3a5170;
+
+  /* Chrome goes darker than the canvas so the sidebar still separates. */
+  --color-chrome-deep: #050b14;
+  --color-chrome: #08111d;
+  --color-chrome-raised: #13243a;
+  --color-chrome-line: #203850;
+
+  /* Solid actions are brightened so they stand off the navy, and kept dark
+     enough to carry white text. */
+  --color-primary: #1f6d7d;
+  --color-primary-hover: #26798a;
+  --color-primary-active: #1a616f;
+
+  --color-accent-solid: #b5541b;
+  --color-accent-solid-hover: #bd591d;
+  --color-accent-solid-active: #a046
+
+  --color-danger-solid: #b7261a;
+  --color-danger-solid-hover: #cf3b2c;
+  --color-danger-solid-active: #e55444;
+
+  --color-success-solid: #10714d;
+  --color-warning-solid: #a8620c;
+  --color-info-solid: #1a58c4;
+
+  /* A drop shadow does not read as elevation on a dark surface; depth comes
+     from the lighter card plus a hairline, so the shadows go quiet. */
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.28);
+  --shadow-raised: 0 2px 6px rgba(0, 0, 0, 0.34), 0 10px 26px rgba(0, 0, 0, 0.3);
+  --shadow-overlay: 0 18px 52px rgba(0, 0, 0, 0.55);
+
+  --sasa-scrim: rgba(2, 7, 14, 0.66);
+  --sasa-focus-ring: rgba(100, 178, 192, 0.22);
+  --sasa-danger-ring: rgba(244, 122, 108, 0.2);
+  --sasa-selection: #1b4b59;
+  --sasa-selection-fg: #edfbfc;
+  --sasa-scan: #64b2c0;
+  --sasa-scan-trail: rgba(100, 178, 192, 0.16);
+}
+
+/* ==========================================================================
+   Base
+   ========================================================================== */
+
+@layer base {
+  * {
+    border-color: var(--color-hairline);
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
+    background-color: var(--color-canvas);
+  }
+
+  body {
+    background-color: var(--color-canvas);
+    color: var(--color-ink-800);
+    font-family: var(--font-sans);
+    /* 15px base: readable for users who are not software people, on a phone,
+       outdoors. 14px is a developer default, not a field default. */
+    font-size: 15px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-feature-settings: "cv05" 1, "ss01" 1;
+  }
+
+  /* Numbers in tables and KPIs must line up. */
+  table, .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+
+  h1, h2, h3, h4 {
+    letter-spacing: -0.015em;
+    color: var(--color-ink-900);
+    text-wrap: balance;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-brand-500);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+
+  /* Never remove the focus ring; move it instead. */
+  [data-focus-inset]:focus-visible {
+    outline-offset: -2px;
+  }
+
+  ::selection {
+    background: var(--sasa-selection);
+    color: var(--sasa-selection-fg);
+  }
+
+  /* Scrollbars that do not shout. */
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-ink-300);
+    border-radius: 999px;
+    border: 3px solid transparent;
+    background-clip: content-box;
+  }
+  ::-webkit-scrollbar-thumb:hover { background-color: var(--color-ink-400); background-clip: content-box; }
+
+  input, textarea, select, button { font: inherit; color: inherit; }
+
+  /* iOS zooms in on inputs below 16px. That is a real field problem. */
+  @media (max-width: 767px) {
+    input, textarea, select { font-size: 16px; }
+  }
+
+  /* The browser's own dark-mode form widgets (date pickers, selects) follow
+     color-scheme, which is set per theme above. */
+}
+
+/* ==========================================================================
+   Component primitives used across the app
+   ========================================================================== */
+
+@layer components {
+  .sasa-card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-hairline);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-card);
+    /* A grid or flex child defaults to min-width:auto, which lets one long
+       word push a card wider than the phone it is being read on. */
+    min-width: 0;
+  }
+
+  /* A card the user can click through to somewhere. */
+  .sasa-card-interactive {
+    transition: border-color var(--duration-base) var(--ease-out-soft),
+                box-shadow var(--duration-base) var(--ease-out-soft),
+                transform var(--duration-base) var(--ease-out-soft);
+  }
+
+  .sasa-card-interactive:hover {
+    border-color: var(--color-hairline-strong);
+    box-shadow: var(--shadow-raised);
+  }
+
+  .sasa-field {
+    width: 100%;
+    background: var(--color-surface);
+    border: 1px solid var(--color-ink-300);
+    border-radius: var(--radius-md);
+    padding: 0.625rem 0.75rem;
+    color: var(--color-ink-900);
+    transition: border-color var(--duration-fast) var(--ease-out-soft),
+                box-shadow var(--duration-fast) var(--ease-out-soft);
+  }
+
+  .sasa-field::placeholder { color: var(--color-ink-400); }
+
+  .sasa-field:hover:not(:disabled):not([aria-invalid="true"]) {
+    border-color: var(--color-ink-400);
+  }
+
+  .sasa-field:focus {
+    outline: none;
+    border-color: var(--color-brand-500);
+    box-shadow: 0 0 0 3px var(--sasa-focus-ring);
+  }
+
+  .sasa-field[aria-invalid="true"] {
+    border-color: var(--color-danger-500);
+  }
+
+  .sasa-field[aria-invalid="true"]:focus {
+    box-shadow: 0 0 0 3px var(--sasa-danger-ring);
+  }
+
+  .sasa-field:disabled {
+    background: var(--color-ink-100);
+    color: var(--color-ink-500);
+    cursor: not-allowed;
+  }
+
+  /* The eyebrow label above a section or a KPI. */
+  .sasa-eyebrow {
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--color-ink-500);
+  }
+
+  /* A heading that divides a long form or a detail page into named groups. */
+  .sasa-group-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    padding-bottom: 0.375rem;
+    border-bottom: 1px solid var(--color-hairline);
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-ink-500);
+  }
+
+  /*
+   * A horizontally scrollable region that says so.
+   *
+   * The two gradients pinned with `local` scroll away with the content; the two
+   * pinned with `scroll` stay put. The result is a shadow that appears on an
+   * edge only while there is more table past it — no JavaScript, no resize
+   * observer, and it is correct the moment the page paints.
+   */
+  .sasa-scroll-x {
+    background:
+      linear-gradient(to right, var(--color-surface) 30%, transparent) left center,
+      linear-gradient(to left, var(--color-surface) 30%, transparent) right center,
+      radial-gradient(farthest-side at 0 50%, rgba(16, 32, 46, 0.14), transparent) left center,
+      radial-gradient(farthest-side at 100% 50%, rgba(16, 32, 46, 0.14), transparent) right center;
+    background-repeat: no-repeat;
+    background-size: 42px 100%, 42px 100%, 15px 100%, 15px 100%;
+    background-attachment: local, local, scroll, scroll;
+  }
+
+  :root[data-theme="dark"] .sasa-scroll-x {
+    background-image:
+      linear-gradient(to right, var(--color-surface) 30%, transparent),
+      linear-gradient(to left, var(--color-surface) 30%, transparent),
+      radial-gradient(farthest-side at 0 50%, rgba(0, 0, 0, 0.5), transparent),
+      radial-gradient(farthest-side at 100% 50%, rgba(0, 0, 0, 0.5), transparent);
+  }
+
+  /* The scrim behind a modal or a drawer. */
+  .sasa-scrim {
+    position: fixed;
+    inset: 0;
+    background: var(--sasa-scrim);
+    backdrop-filter: blur(2px);
+  }
+}
+
+/* ==========================================================================
+   Motion — respected, and switched off for people who ask
+   ========================================================================== */
+
+@keyframes sasa-fade-up {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: none; }
+}
+
+@keyframes sasa-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes sasa-slide-in-right {
+  from { transform: translateX(100%); }
+  to   { transform: none; }
+}
+
+@keyframes sasa-slide-up {
+  from { transform: translateY(100%); }
+  to   { transform: none; }
+}
+
+@keyframes sasa-pop-in {
+  from { opacity: 0; transform: translateY(6px) scale(0.985); }
+  to   { opacity: 1; transform: none; }
+}
+
+@keyframes sasa-shimmer {
+  from { background-position: -320px 0; }
+  to   { background-position: 320px 0; }
+}
+
+@keyframes sasa-pulse-ring {
+  0%   { box-shadow: 0 0 0 0 rgba(214, 114, 39, 0.45); }
+  70%  { box-shadow: 0 0 0 8px rgba(214, 114, 39, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(214, 114, 39, 0); }
+}
+
+@keyframes sasa-sweep {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+@keyframes sasa-scanline {
+  0%   { transform: translateY(-100%); opacity: 0; }
+  12%  { opacity: 1; }
+  88%  { opacity: 1; }
+  100% { transform: translateY(100%); opacity: 0; }
+}
+
+.animate-fade-up { animation: sasa-fade-up var(--duration-base) var(--ease-out-soft) both; }
+.animate-fade-in { animation: sasa-fade-in var(--duration-base) var(--ease-out-soft) both; }
+.animate-pop-in { animation: sasa-pop-in var(--duration-base) var(--ease-out-soft) both; }
+.animate-slide-in-right { animation: sasa-slide-in-right var(--duration-slow) var(--ease-out-soft) both; }
+.animate-slide-up { animation: sasa-slide-up var(--duration-slow) var(--ease-out-soft) both; }
+.animate-pulse-ring { animation: sasa-pulse-ring 2s ease-out infinite; }
+
+/* --------------------------------------------------------------------------
+   The scanning ring
+   --------------------------------------------------------------------------
+   SASA's one signature loading mark: a ring with two halves sweeping round it,
+   so the motion reads as "looking through something" rather than "waiting".
+   It is used while the global search is querying, while a sync is pushing, and
+   while a long report is being generated — the places where the user is
+   waiting on work, not on a page.
+
+   Sized by font-size, so `style={{ fontSize: 8 }}` gives a 40px ring. The
+   label inside is for screen readers; the text indent hides it visually.
+   -------------------------------------------------------------------------- */
+.sasa-scanner,
+.sasa-scanner::before,
+.sasa-scanner::after { border-radius: 50%; }
+
+.sasa-scanner {
+  position: relative;
+  display: inline-block;
+  /* The ring itself is drawn in the colour of whatever is behind it, so the
+     two sweeping halves appear to travel inside a groove. */
+  color: var(--color-surface);
+  font-size: 9px;
+  width: 5em;
+  height: 5em;
+  box-shadow: inset 0 0 0 1em;
+  text-indent: -9999em;
+  overflow: hidden;
+  transform: translateZ(0);
+}
+
+.sasa-scanner::before,
+.sasa-scanner::after {
+  position: absolute;
+  content: "";
+  background: var(--sasa-scan);
+  width: 2.6em;
+  height: 5.1em;
+  top: -0.05em;
+}
+
+.sasa-scanner::before {
+  border-radius: 5.1em 0 0 5.1em;
+  left: -0.05em;
+  transform-origin: 2.6em 2.55em;
+  animation: sasa-sweep 1.8s infinite ease 0.9s;
+}
+
+.sasa-scanner::after {
+  border-radius: 0 5.1em 5.1em 0;
+  left: 2.55em;
+  transform-origin: 0 2.55em;
+  animation: sasa-sweep 1.8s infinite ease;
+}
+
+/* On the canvas rather than a card, the groove takes the page colour. */
+.sasa-scanner-on-canvas { color: var(--color-canvas); }
+.sasa-scanner-on-chrome { color: var(--color-chrome); }
+
+/* A sweep travelling down a panel while it is being searched or processed. */
+.sasa-scanline {
+  position: absolute;
+  inset-inline: 0;
+  top: 0;
+  height: 40%;
+  pointer-events: none;
+  background: linear-gradient(to bottom, transparent, var(--sasa-scan-trail), transparent);
+  animation: sasa-scanline 1.5s var(--ease-out-soft) infinite;
+}
+
+.sasa-skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--color-ink-100) 0%,
+    var(--color-ink-200) 40%,
+    var(--color-ink-100) 80%
+  );
+  background-size: 320px 100%;
+  animation: sasa-shimmer 1.4s linear infinite;
+  border-radius: var(--radius-sm);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  /* The scanner would freeze mid-sweep and read as broken, so instead of
+     stopping it, it turns very slowly. */
+  .sasa-scanner::before,
+  .sasa-scanner::after {
+    animation-duration: 6s !important;
+    animation-iteration-count: infinite !important;
+  }
+}
+
+/* ==========================================================================
+   Recharts
+   --------------------------------------------------------------------------
+   Recharts paints legend labels in the colour of the series they belong to, and
+   its tick labels inherit nothing. Identity is already carried by the swatch
+   beside the label, so the text itself takes a text token — which is also what
+   keeps it legible on both themes' surfaces.
+   ========================================================================== */
+.recharts-legend-item-text {
+  color: var(--color-ink-600) !important;
+  font-size: 12px;
+}
+
+.recharts-cartesian-axis-tick-value {
+  fill: var(--color-ink-500);
+}
+
+/* The active shape's halo, and the reference lines, follow the card colour so
+   they read as a gap rather than a stray mark. */
+.recharts-sector[stroke],
+.recharts-rectangle[stroke] {
+  stroke: var(--color-surface);
+}
+
+.recharts-tooltip-wrapper:focus { outline: none; }
+
+/* Printing a case file or a register page should produce something usable.
+   A report goes out on paper in one form regardless of the theme the person
+   who printed it happened to be using. */
+@media print {
+  .no-print { display: none !important; }
+  :root, :root[data-theme="dark"] {
+    color-scheme: light;
+    --color-canvas: #fff;
+    --color-surface: #fff;
+    --color-surface-sunken: #fff;
+    --color-surface-raised: #fff;
+    --color-hairline: #d7dee7;
+    --color-ink-900: #10202e;
+    --color-ink-800: #1f2f3d;
+    --color-ink-700: #334454;
+    --color-ink-600: #45586a;
+    --color-ink-500: #5a6e81;
+  }
+  body { background: #fff; font-size: 11pt; color: #10202e; }
+  .sasa-card { box-shadow: none; break-inside: avoid; }
+}
