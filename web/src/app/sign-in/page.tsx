@@ -94,7 +94,7 @@ export default function SignInPage() {
           </p>
           <p className="mt-5 text-[0.9375rem] leading-relaxed text-chrome-fg">
             One chain of records, from the stakeholder register to the engagement, the concern it raised,
-            the grievance it became, and the commitment that closed it — with the reporting to prove it.
+            the grievance it became, and the commitment that closed it, with the reporting to prove it.
           </p>
 
           <dl className="mt-10 grid grid-cols-2 gap-x-6 gap-y-6">
