@@ -33,8 +33,23 @@ export class ApiRequestError extends Error {
     this.name = "ApiRequestError";
   }
 
+  /**
+   * The device genuinely has no connection.
+   *
+   * Deliberately narrower than "the request failed at the network level". A
+   * browser cannot tell a CORS rejection from a dead network — both reject the
+   * fetch with no detail, by design — so the only honest discriminator is
+   * whether the device itself believes it is online. Telling someone with four
+   * bars that they are offline sends them to look for signal instead of at the
+   * thing that is actually broken.
+   */
   get isOffline(): boolean {
-    return this.status === 0;
+    return this.status === 0 && this.code === "offline";
+  }
+
+  /** The device has a connection but the API did not answer. */
+  get isUnreachable(): boolean {
+    return this.status === 0 && this.code !== "offline";
   }
 
   get isUnauthenticated(): boolean {
@@ -183,12 +198,24 @@ export async function apiRequest<T>(path: string, options: RequestOptions = {}):
       credentials: "omit",
     });
   } catch {
-    // fetch only rejects for network-level problems — which, for this product,
-    // usually means the officer is somewhere without a signal.
+    /*
+     * fetch rejects without detail for every network-level failure: no signal,
+     * DNS, TLS, a blocked CORS preflight. navigator.onLine is the one thing
+     * that separates "this device has no connection" from "the server did not
+     * answer", and they need different words — and send the reader to
+     * different places.
+     *
+     * Both keep status 0, so both stay retryable and the sync queue holds on
+     * to the work either way.
+     */
+    const deviceIsOffline = typeof navigator !== "undefined" && !navigator.onLine;
+
     throw new ApiRequestError(
-      "You appear to be offline. Your work is saved on this device and will sync when the connection returns.",
+      deviceIsOffline
+        ? "You appear to be offline. Your work is saved on this device and will sync when the connection returns."
+        : "We could not reach the SASA server. Your device has a connection, so this is a problem at the server end rather than with you.",
       0,
-      "offline",
+      deviceIsOffline ? "offline" : "unreachable",
     );
   }
 

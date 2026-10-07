@@ -57,7 +57,12 @@ export default function SignInPage() {
         setFormError(
           error.isOffline
             ? "You need a connection the first time you sign in on this device. After that, SASA works offline."
-            : error.message,
+            : error.isUnreachable
+              ? /* The device has signal, so this is not something the person
+                   can fix by moving. Say so, rather than sending them outside
+                   to look for a better connection. */
+                "We could not reach the SASA server. Your connection is working, so this is a problem at the server end — please tell your administrator."
+              : error.message,
         );
       } else {
         setFormError("We could not sign you in. Please try again.");
