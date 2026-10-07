@@ -30,7 +30,7 @@ export default function DashboardPage() {
   const { user, project, canAny } = useSession();
   const [period, setPeriod] = useState<Period>(() => presetPeriods()[1]);
 
-  const { data, isLoading, isError, refetch } = useLandingDashboard({
+  const { data, isLoading, isError, error, refetch } = useLandingDashboard({
     from: period.from,
     to: period.to,
   });
@@ -97,7 +97,7 @@ export default function DashboardPage() {
           </div>
         ) : isError ? (
           <Card>
-            <ErrorState onRetry={() => void refetch()} />
+            <ErrorState error={error} onRetry={() => void refetch()} />
           </Card>
         ) : (
           <CriticalActions actions={dashboard?.critical_actions ?? []} />

@@ -32,7 +32,7 @@ function GrievanceList() {
   const { can } = useSession();
   const toast = useToast();
   const state = useListState({ sort: "-received_at" });
-  const { data, isLoading, isError, refetch } = useGrievances(state.query);
+  const { data, isLoading, isError, error, refetch } = useGrievances(state.query);
   const { data: categories } = useGrievanceCategories();
 
   const rows = data?.data ?? [];
@@ -234,7 +234,7 @@ function GrievanceList() {
 
       {isError ? (
         <div className="sasa-card">
-          <ErrorState onRetry={() => void refetch()} />
+          <ErrorState error={error} onRetry={() => void refetch()} />
         </div>
       ) : isLoading ? (
         <div className="sasa-card">

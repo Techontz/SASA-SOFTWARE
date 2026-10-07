@@ -154,6 +154,10 @@ export function SessionProvider({ children }: { children: ReactNode }) {
       const response = await apiRequest<{ data: LoginResponse }>("/auth/login", {
         method: "POST",
         withoutProject: true,
+        /* The API answers a wrong password with 401. Without this, the global
+           handler would read that as an expired session, clear state and
+           navigate — discarding the error the person is waiting to see. */
+        allowUnauthenticated: true,
         body: { email, password, device_name: navigator.userAgent.slice(0, 100) },
       });
 

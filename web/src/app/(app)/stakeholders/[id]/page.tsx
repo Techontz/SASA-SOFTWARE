@@ -44,7 +44,7 @@ export default function StakeholderDetailPage() {
   const toast = useToast();
   const { can } = useSession();
 
-  const { data, isLoading, isError, refetch } = useStakeholder(id);
+  const { data, isLoading, isError, error, refetch } = useStakeholder(id);
   const { data: timeline } = useStakeholderTimeline(id);
   const { data: history } = useEntityHistory("Stakeholder", id);
 
@@ -55,7 +55,7 @@ export default function StakeholderDetailPage() {
   const [busy, setBusy] = useState(false);
 
   if (isLoading) return <LoadingState label="Opening the record" />;
-  if (isError || !data) return <ErrorState onRetry={() => void refetch()} />;
+  if (isError || !data) return <ErrorState error={error} onRetry={() => void refetch()} />;
 
   const stakeholder = data.data;
   const assessment = stakeholder.assessment;

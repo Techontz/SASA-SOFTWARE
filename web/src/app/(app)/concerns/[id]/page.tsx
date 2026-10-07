@@ -26,7 +26,7 @@ export default function ConcernDetailPage() {
   const toast = useToast();
   const queryClient = useQueryClient();
   const { can } = useSession();
-  const { data, isLoading, isError, refetch } = useConcern(id);
+  const { data, isLoading, isError, error, refetch } = useConcern(id);
   const { data: categories } = useGrievanceCategories();
 
   const [escalateOpen, setEscalateOpen] = useState(false);
@@ -34,7 +34,7 @@ export default function ConcernDetailPage() {
   const [form, setForm] = useState<Record<string, string>>({});
 
   if (isLoading) return <LoadingState label="Opening the concern" />;
-  if (isError || !data) return <ErrorState onRetry={() => void refetch()} />;
+  if (isError || !data) return <ErrorState error={error} onRetry={() => void refetch()} />;
 
   const concern = data.data;
 

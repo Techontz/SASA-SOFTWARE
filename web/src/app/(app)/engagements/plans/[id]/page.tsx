@@ -24,7 +24,7 @@ export default function EngagementPlanDetailPage() {
   const { can } = useSession();
   const toast = useToast();
   const queryClient = useQueryClient();
-  const { data, isLoading, isError, refetch } = useEngagementPlan(id);
+  const { data, isLoading, isError, error, refetch } = useEngagementPlan(id);
 
   const [statusOpen, setStatusOpen] = useState(false);
   const [status, setStatus] = useState("rescheduled");
@@ -33,7 +33,7 @@ export default function EngagementPlanDetailPage() {
   const [busy, setBusy] = useState(false);
 
   if (isLoading) return <LoadingState label="Opening the plan" />;
-  if (isError || !data) return <ErrorState onRetry={() => void refetch()} />;
+  if (isError || !data) return <ErrorState error={error} onRetry={() => void refetch()} />;
 
   const plan = data.data;
   const days = daysBetween(plan.target_date);

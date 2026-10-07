@@ -66,13 +66,13 @@ type Query = { from: string; to: string };
 /* ------------------------------------------------------------- executive */
 
 function ExecutiveDashboard({ query }: { query: Query }) {
-  const { data, isLoading, isError, refetch } = useExecutiveDashboard(query);
+  const { data, isLoading, isError, error, refetch } = useExecutiveDashboard(query);
   const dashboard = data?.data;
   /* A second single-series bar chart on the same screen takes the next slot in
      order, so the two are never the same colour. */
   const violetSlot = useSeriesColour(2);
 
-  if (isError) return <ErrorState onRetry={() => void refetch()} />;
+  if (isError) return <ErrorState error={error} onRetry={() => void refetch()} />;
 
   return (
     <div className="space-y-6">
@@ -139,10 +139,10 @@ function ExecutiveDashboard({ query }: { query: Query }) {
 /* ------------------------------------------------------------ timeliness */
 
 function TimelinessDashboard({ query }: { query: Query }) {
-  const { data, isLoading, isError, refetch } = useTimelinessDashboard(query);
+  const { data, isLoading, isError, error, refetch } = useTimelinessDashboard(query);
   const dashboard = data?.data;
 
-  if (isError) return <ErrorState onRetry={() => void refetch()} />;
+  if (isError) return <ErrorState error={error} onRetry={() => void refetch()} />;
 
   return (
     <div className="space-y-6">
@@ -273,10 +273,10 @@ function SlaBreakdownTable({
 /* --------------------------------------------------------------- severity */
 
 function SeverityDashboard({ query }: { query: Query }) {
-  const { data, isLoading, isError, refetch } = useSeverityDashboard(query);
+  const { data, isLoading, isError, error, refetch } = useSeverityDashboard(query);
   const dashboard = data?.data;
 
-  if (isError) return <ErrorState onRetry={() => void refetch()} />;
+  if (isError) return <ErrorState error={error} onRetry={() => void refetch()} />;
 
   return (
     <div className="space-y-6">
@@ -378,10 +378,10 @@ function SeverityDashboard({ query }: { query: Query }) {
 /* ------------------------------------------------------------- engagement */
 
 function EngagementDashboard({ query }: { query: Query }) {
-  const { data, isLoading, isError, refetch } = useEngagementDashboard(query);
+  const { data, isLoading, isError, error, refetch } = useEngagementDashboard(query);
   const dashboard = data?.data;
 
-  if (isError) return <ErrorState onRetry={() => void refetch()} />;
+  if (isError) return <ErrorState error={error} onRetry={() => void refetch()} />;
 
   const plannedVsActual = Object.entries(dashboard?.planned_vs_actual ?? {}).map(([key, value]) => ({
     name: humanise(key),
@@ -524,10 +524,10 @@ function DisaggregationDashboard({ query }: { query: Query }) {
   const [dimension, setDimension] = useState("gender");
   const [against, setAgainst] = useState("category");
 
-  const { data, isLoading, isError, refetch } = useDisaggregationDashboard({ ...query, dimension, against });
+  const { data, isLoading, isError, error, refetch } = useDisaggregationDashboard({ ...query, dimension, against });
   const dashboard = data?.data;
 
-  if (isError) return <ErrorState onRetry={() => void refetch()} />;
+  if (isError) return <ErrorState error={error} onRetry={() => void refetch()} />;
 
   return (
     <div className="space-y-6">

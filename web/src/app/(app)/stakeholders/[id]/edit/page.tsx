@@ -11,11 +11,11 @@ export default function EditStakeholderPage() {
   const params = useParams<{ id: string }>();
   const id = Number(params.id);
   const { can } = useSession();
-  const { data, isLoading, isError, refetch } = useStakeholder(id);
+  const { data, isLoading, isError, error, refetch } = useStakeholder(id);
 
   if (!can("stakeholder.update")) return <PermissionDenied what="editing stakeholders" />;
   if (isLoading) return <LoadingState label="Opening the record" />;
-  if (isError || !data) return <ErrorState onRetry={() => void refetch()} />;
+  if (isError || !data) return <ErrorState error={error} onRetry={() => void refetch()} />;
 
   return (
     <div className="mx-auto max-w-4xl">

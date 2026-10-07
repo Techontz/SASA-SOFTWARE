@@ -25,14 +25,14 @@ export default function CommitmentDetailPage() {
   const { can } = useSession();
   const toast = useToast();
   const queryClient = useQueryClient();
-  const { data, isLoading, isError, refetch } = useCommitment(id);
+  const { data, isLoading, isError, error, refetch } = useCommitment(id);
 
   const [drawer, setDrawer] = useState<"status" | "verify" | null>(null);
   const [form, setForm] = useState<Record<string, string>>({});
   const [busy, setBusy] = useState(false);
 
   if (isLoading) return <LoadingState label="Opening the commitment" />;
-  if (isError || !data) return <ErrorState onRetry={() => void refetch()} />;
+  if (isError || !data) return <ErrorState error={error} onRetry={() => void refetch()} />;
 
   const commitment = data.data;
 

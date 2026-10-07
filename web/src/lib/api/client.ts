@@ -1,7 +1,17 @@
 import type { ApiError } from "@/types/api";
 
+/**
+ * The one place the backend lives.
+ *
+ * NEXT_PUBLIC_* is inlined at build time, so a production build made without
+ * NEXT_PUBLIC_API_URL set would previously fall back to localhost and ship an
+ * app that fails every request on a user's machine with no clue why. It now
+ * resolves to an empty string in production, and the first request explains
+ * the misconfiguration instead.
+ */
 export const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8010/api/v1";
+  process.env.NEXT_PUBLIC_API_URL ??
+  (process.env.NODE_ENV === "production" ? "" : "http://localhost:8010/api/v1");
 
 const TOKEN_KEY = "sasa.token";
 const PROJECT_KEY = "sasa.project";
@@ -88,6 +98,16 @@ export interface RequestOptions {
   /** Multipart, for attachment uploads. */
   formData?: FormData;
   headers?: Record<string, string>;
+  /**
+   * Keep a 401 local to this call instead of tearing the session down.
+   *
+   * The live API answers a wrong password with 401 `invalid_credentials`,
+   * which is indistinguishable by status alone from an expired token. Without
+   * this, mistyping a password on the sign-in screen fires the global
+   * unauthenticated handler, which clears state and navigates — throwing away
+   * the very error message the person needs to read.
+   */
+  allowUnauthenticated?: boolean;
 }
 
 export function buildUrl(path: string, query?: Query): string {
@@ -117,7 +137,24 @@ export function onUnauthenticated(handler: () => void) {
 }
 
 export async function apiRequest<T>(path: string, options: RequestOptions = {}): Promise<T> {
-  const { method = "GET", body, query, withoutProject, signal, formData, headers = {} } = options;
+  const {
+    method = "GET",
+    body,
+    query,
+    withoutProject,
+    signal,
+    formData,
+    headers = {},
+    allowUnauthenticated = false,
+  } = options;
+
+  if (!API_BASE_URL) {
+    throw new ApiRequestError(
+      "This build has no API address configured. NEXT_PUBLIC_API_URL must be set when the application is built.",
+      0,
+      "api_url_missing",
+    );
+  }
 
   const requestHeaders: Record<string, string> = {
     Accept: "application/json",
@@ -166,7 +203,7 @@ export async function apiRequest<T>(path: string, options: RequestOptions = {}):
   if (!response.ok) {
     const error = (payload ?? {}) as ApiError;
 
-    if (response.status === 401) {
+    if (response.status === 401 && !allowUnauthenticated) {
       unauthenticatedHandler?.();
     }
 
@@ -193,33 +230,42 @@ function deviceIdentifier(): string {
   return value;
 }
 
-/** Downloads go through a normal navigation so the browser handles the file. */
-export function downloadUrl(path: string, query?: Query): string {
-  const url = new URL(buildUrl(path, query));
-  const token = tokenStore.get();
-  const projectId = projectStore.get();
-
-  if (token) url.searchParams.set("_token", token);
-  if (projectId) url.searchParams.set("project_id", String(projectId));
-
-  return url.toString();
-}
-
 /** Fetch a file with the auth header and hand the browser a blob to save. */
 export async function downloadFile(path: string, filename: string, query?: Query): Promise<void> {
   const token = tokenStore.get();
   const projectId = projectStore.get();
 
-  const response = await fetch(buildUrl(path, query), {
-    headers: {
-      Accept: "*/*",
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      ...(projectId ? { "X-Sasa-Project": String(projectId) } : {}),
-    },
-  });
+  let response: Response;
+
+  try {
+    response = await fetch(buildUrl(path, query), {
+      headers: {
+        Accept: "*/*",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        ...(projectId ? { "X-Sasa-Project": String(projectId) } : {}),
+      },
+      credentials: "omit",
+    });
+  } catch {
+    throw new ApiRequestError(
+      "You appear to be offline. Exports need a connection, because they are built on the server.",
+      0,
+      "offline",
+    );
+  }
+
+  if (response.status === 401) {
+    unauthenticatedHandler?.();
+  }
 
   if (!response.ok) {
-    throw new ApiRequestError("We could not prepare that download.", response.status, "download_failed");
+    throw new ApiRequestError(
+      response.status === 403
+        ? "You do not have permission to export this."
+        : "We could not prepare that download.",
+      response.status,
+      "download_failed",
+    );
   }
 
   const blob = await response.blob();

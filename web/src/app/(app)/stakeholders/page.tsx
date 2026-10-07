@@ -35,7 +35,7 @@ function StakeholderRegister() {
   const { can } = useSession();
   const toast = useToast();
   const state = useListState({ sort: "-created_at" });
-  const { data, isLoading, isError, refetch } = useStakeholders(state.query);
+  const { data, isLoading, isError, error, refetch } = useStakeholders(state.query);
 
   const rows = data?.data ?? [];
   const meta = data?.meta;
@@ -227,7 +227,7 @@ function StakeholderRegister() {
 
       {isError ? (
         <div className="sasa-card">
-          <ErrorState onRetry={() => void refetch()} />
+          <ErrorState error={error} onRetry={() => void refetch()} />
         </div>
       ) : isLoading ? (
         <div className="sasa-card">

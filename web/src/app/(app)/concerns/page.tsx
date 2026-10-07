@@ -23,7 +23,7 @@ export default function ConcernsPage() {
 
 function ConcernList() {
   const state = useListState({ sort: "-raised_on" });
-  const { data, isLoading, isError, refetch } = useConcerns(state.query);
+  const { data, isLoading, isError, error, refetch } = useConcerns(state.query);
   const { data: categories } = useGrievanceCategories();
 
   const rows = data?.data ?? [];
@@ -152,7 +152,7 @@ function ConcernList() {
 
       {isError ? (
         <div className="sasa-card">
-          <ErrorState onRetry={() => void refetch()} />
+          <ErrorState error={error} onRetry={() => void refetch()} />
         </div>
       ) : isLoading ? (
         <div className="sasa-card">

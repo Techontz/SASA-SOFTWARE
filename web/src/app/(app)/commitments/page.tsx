@@ -30,7 +30,7 @@ function CommitmentList() {
   const { can } = useSession();
   const toast = useToast();
   const state = useListState({ sort: "due_date" });
-  const { data, isLoading, isError, refetch } = useCommitments(state.query);
+  const { data, isLoading, isError, error, refetch } = useCommitments(state.query);
 
   const rows = data?.data ?? [];
   const meta = data?.meta;
@@ -182,7 +182,7 @@ function CommitmentList() {
 
       {isError ? (
         <div className="sasa-card">
-          <ErrorState onRetry={() => void refetch()} />
+          <ErrorState error={error} onRetry={() => void refetch()} />
         </div>
       ) : isLoading ? (
         <div className="sasa-card">

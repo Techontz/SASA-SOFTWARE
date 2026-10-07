@@ -16,10 +16,10 @@ export default function EngagementDetailPage() {
   const params = useParams<{ id: string }>();
   const id = Number(params.id);
   const { can } = useSession();
-  const { data, isLoading, isError, refetch } = useEngagement(id);
+  const { data, isLoading, isError, error, refetch } = useEngagement(id);
 
   if (isLoading) return <LoadingState label="Opening the engagement" />;
-  if (isError || !data) return <ErrorState onRetry={() => void refetch()} />;
+  if (isError || !data) return <ErrorState error={error} onRetry={() => void refetch()} />;
 
   const engagement = data.data;
   const attendance = engagement.attendance;

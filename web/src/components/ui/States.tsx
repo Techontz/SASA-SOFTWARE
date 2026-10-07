@@ -9,6 +9,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import type { ReactNode } from "react";
+import { ApiRequestError } from "@/lib/api/client";
 import { cn } from "@/lib/utils";
 import { Button } from "./Button";
 
@@ -44,12 +45,22 @@ export function ErrorState({
   description,
   onRetry,
   className,
+  error,
 }: {
   title?: string;
   description?: string;
   onRetry?: () => void;
   className?: string;
+  /**
+   * The failure itself, when the caller has it. The API's own message is
+   * written for the person reading it, so it is better than anything generic
+   * this component could say — and the request id is what support asks for
+   * first when someone reports that a screen would not load.
+   */
+  error?: unknown;
 }) {
+  const failure = error instanceof ApiRequestError ? error : null;
+
   return (
     <div className={cn("flex flex-col items-center justify-center px-6 py-14 text-center", className)}>
       <span className="flex h-14 w-14 items-center justify-center rounded-full bg-danger-50 text-danger-600">
@@ -57,12 +68,19 @@ export function ErrorState({
       </span>
       <h3 className="mt-4 text-base font-semibold text-ink-900">{title}</h3>
       <p className="mt-1.5 max-w-md text-sm text-ink-600">
-        {description ?? "Something went wrong on our side. Nothing you entered has been lost."}
+        {description ??
+          failure?.message ??
+          "Something went wrong on our side. Nothing you entered has been lost."}
       </p>
       {onRetry ? (
         <Button className="mt-5" variant="secondary" icon={<RefreshCw className="h-4 w-4" />} onClick={onRetry}>
           Try again
         </Button>
+      ) : null}
+      {failure?.requestId ? (
+        <p className="mt-4 font-mono text-[0.6875rem] text-ink-400">
+          Reference {failure.requestId}
+        </p>
       ) : null}
     </div>
   );

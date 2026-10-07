@@ -31,7 +31,7 @@ function EngagementList() {
   const { can } = useSession();
   const toast = useToast();
   const state = useListState({ sort: "-held_at" });
-  const { data, isLoading, isError, refetch } = useEngagements(state.query);
+  const { data, isLoading, isError, error, refetch } = useEngagements(state.query);
   const { data: configuration } = useConfiguration();
 
   const rows = data?.data ?? [];
@@ -199,7 +199,7 @@ function EngagementList() {
 
       {isError ? (
         <div className="sasa-card">
-          <ErrorState onRetry={() => void refetch()} />
+          <ErrorState error={error} onRetry={() => void refetch()} />
         </div>
       ) : isLoading ? (
         <div className="sasa-card">

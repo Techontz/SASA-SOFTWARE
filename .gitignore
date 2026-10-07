@@ -16,3 +16,7 @@
 # 32MB document that would live in git history permanently, and this repository
 # is public. It stays on the machines that need it.
 /DOCUMENTS/
+
+# Deployment archives. Build artefacts, often tens of megabytes, and they
+# bundle storage/app/private — which on this product means grievance exports.
+*.zip

@@ -36,13 +36,13 @@ import type { AiSuggestion, Grievance } from "@/types/api";
 export default function GrievanceDetailPage() {
   const params = useParams<{ id: string }>();
   const id = Number(params.id);
-  const { data, isLoading, isError, refetch } = useGrievance(id);
+  const { data, isLoading, isError, error, refetch } = useGrievance(id);
   const { can } = useSession();
   // Only requested when the user may actually read the audit trail.
   const { data: history } = useEntityHistory(can("audit.view") ? "Grievance" : null, id);
 
   if (isLoading) return <LoadingState label="Opening the case" />;
-  if (isError || !data) return <ErrorState onRetry={() => void refetch()} />;
+  if (isError || !data) return <ErrorState error={error} onRetry={() => void refetch()} />;
 
   const grievance = data.data;
 

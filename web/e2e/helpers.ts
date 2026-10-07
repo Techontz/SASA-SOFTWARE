@@ -33,15 +33,31 @@ export async function signIn(page: Page, email: string, password = "password") {
 /**
  * Wait until the service worker is actually controlling the page.
  *
- * Registration is not the same as control: a navigation made between the two
- * is not intercepted and so is never cached, and the screen is then missing
- * from the shell when the signal goes. Anything that warms the cache has to
- * wait for this first.
+ * Registration is not the same as control, and waiting longer does not bridge
+ * the gap: a document that finished loading before the worker activated is
+ * never claimed retroactively, and no second activation is coming. So this
+ * waits for an *active* worker, then reloads once if the current document is
+ * still uncontrolled — after which the browser serves it through the worker
+ * deterministically.
+ *
+ * Anything that warms the offline cache has to come after this, or its
+ * navigations are not intercepted and nothing reaches the shell cache.
  */
 export async function serviceWorkerReady(page: Page) {
-  await page.waitForFunction(() => navigator.serviceWorker?.controller !== null, undefined, {
-    timeout: 30_000,
-  });
+  await page.waitForFunction(
+    () => navigator.serviceWorker.getRegistration().then((r) => Boolean(r?.active)),
+    undefined,
+    { timeout: 30_000 },
+  );
+
+  const controlled = await page.evaluate(() => navigator.serviceWorker.controller !== null);
+
+  if (!controlled) {
+    await page.reload({ waitUntil: "domcontentloaded" });
+    await page.waitForFunction(() => navigator.serviceWorker.controller !== null, undefined, {
+      timeout: 30_000,
+    });
+  }
 }
 
 /** Wait for a screen to have finished its first data load. */

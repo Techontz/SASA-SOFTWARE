@@ -27,7 +27,7 @@ export default function EngagementPlansPage() {
 function PlanList() {
   const { can } = useSession();
   const state = useListState({ sort: "target_date" });
-  const { data, isLoading, isError, refetch } = useEngagementPlans(state.query);
+  const { data, isLoading, isError, error, refetch } = useEngagementPlans(state.query);
   const { data: configuration } = useConfiguration();
 
   const rows = data?.data ?? [];
@@ -162,7 +162,7 @@ function PlanList() {
 
       {isError ? (
         <div className="sasa-card">
-          <ErrorState onRetry={() => void refetch()} />
+          <ErrorState error={error} onRetry={() => void refetch()} />
         </div>
       ) : isLoading ? (
         <div className="sasa-card">
