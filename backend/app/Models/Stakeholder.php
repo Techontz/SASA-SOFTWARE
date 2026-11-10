@@ -25,7 +25,7 @@ class Stakeholder extends Model
     public const REFERENCE_KEY = 'stakeholder';
 
     public const TYPES = [
-        'individual', 'household', 'community_group', 'cso', 'government',
+        'individual', 'pap', 'household', 'community_group', 'cso', 'government',
         'traditional_leader', 'contractor', 'project_staff', 'business', 'vulnerable_group',
     ];
 

@@ -28,7 +28,7 @@ export default function EngagementDetailPage() {
     <div>
       <PageHeader
         backHref="/engagements"
-        eyebrow={`Module 2 · ${engagement.reference}`}
+        eyebrow={engagement.reference}
         title={engagement.topic}
         meta={
           <>

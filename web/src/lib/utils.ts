@@ -5,9 +5,20 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+/**
+ * Values that are acronyms read wrongly when sentence-cased ("Pap", "Cso"), so
+ * they get their proper form instead.
+ */
+const SPELLED_OUT: Record<string, string> = {
+  pap: "PAP (Project Affected Person)",
+  cso: "CSO",
+};
+
 /** "under_investigation" -> "Under investigation" */
 export function humanise(value: string | null | undefined): string {
   if (!value) return "—";
+  const known = SPELLED_OUT[value];
+  if (known) return known;
   const spaced = value.replace(/_/g, " ").trim();
   return spaced.charAt(0).toUpperCase() + spaced.slice(1);
 }

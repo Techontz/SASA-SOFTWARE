@@ -3,10 +3,11 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { EyeOff, Lock, Save, ShieldCheck, Sparkles, Users } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "@/components/ui/Button";
+import { AttachmentPicker, queueAttachments } from "@/components/app/AttachmentPicker";
 import { SavedOnDeviceNotice } from "@/components/app/SavedOnDeviceNotice";
 import {
   ChoiceCard,
@@ -75,6 +76,8 @@ export default function NewGrievancePage() {
   const { can, project } = useSession();
   const reference = useFieldReference();
   const [savedOffline, setSavedOffline] = useState(false);
+  const [files, setFiles] = useState<File[]>([]);
+  const [filesError, setFilesError] = useState<string | undefined>();
 
   const {
     register,
@@ -178,14 +181,25 @@ export default function NewGrievancePage() {
           }),
     };
 
+    if (files.length === 0) return;
+
     try {
+      const entityUuid = uuid();
       const result = await syncEngine().save<Grievance>({
         entity: "grievance",
         operation: "create",
         path: "/grievances",
         payload,
-        entityUuid: uuid(),
+        entityUuid,
       });
+
+      await queueAttachments({
+        entity: "grievance",
+        entityUuid,
+        serverId: result.saved === "server" && result.record ? result.record.id : null,
+        files,
+      });
+      setFiles([]);
 
       if (project) await localStore().removeDraft(draftKey, project.id);
 
@@ -210,16 +224,22 @@ export default function NewGrievancePage() {
     }
   });
 
+  /* Evidence is checked alongside the schema, so every missing thing shows at once. */
+  const submit = (event: FormEvent<HTMLFormElement>) => {
+    if (files.length === 0) setFilesError("Attach at least one file as evidence before opening the case.");
+    return onSubmit(event);
+  };
+
   return (
     <div className="mx-auto max-w-4xl">
       <PageHeader
         backHref="/grievances"
-        eyebrow="Module 3 · Grievances"
+        eyebrow="Grievances"
         title="Log a grievance"
         description="Record it the way it was told to you. Classification and severity can be confirmed afterwards — what matters now is that nothing is lost."
       />
 
-      <form onSubmit={onSubmit} className="space-y-5 pb-6" noValidate>
+      <form onSubmit={submit} className="space-y-5 pb-6" noValidate>
         {savedOffline ? (
           <SavedOnDeviceNotice
             what="Grievance"
@@ -493,6 +513,21 @@ export default function NewGrievancePage() {
               </Select>
             </Field>
           </FieldRow>
+        </FormSection>
+
+        <FormSection
+          title="Evidence"
+          description="Required. A case is not opened without something to support it."
+        >
+          <AttachmentPicker
+            files={files}
+            onChange={(next) => {
+              setFiles(next);
+              if (next.length > 0) setFilesError(undefined);
+            }}
+            error={filesError}
+            hint="Photos, videos, voice notes, letters or any document the complainant gave you. Attach at least one."
+          />
         </FormSection>
 
         <FormActions

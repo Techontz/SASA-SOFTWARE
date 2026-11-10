@@ -116,7 +116,7 @@ function GrievanceList() {
   return (
     <div>
       <PageHeader
-        eyebrow="Module 3 · Grievances"
+        eyebrow="Grievances"
         title="Grievance cases"
         description="Every channel produces one case, with one clock and one audit trail. The channel is recorded, but it changes nothing about how the case is worked."
         actions={

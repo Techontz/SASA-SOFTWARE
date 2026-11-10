@@ -98,7 +98,7 @@ function PlanList() {
   return (
     <div>
       <PageHeader
-        eyebrow="Module 2 · Stakeholder management"
+        eyebrow="Stakeholder management"
         title="Engagement plan"
         description="The schedule the log is measured against. Every plan is built from the register, using the communication frequency the priority score implies."
         actions={

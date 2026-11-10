@@ -283,10 +283,7 @@ function SidebarBrand({ compact }: { compact?: boolean }) {
       <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent-500 text-base font-bold text-white">
         S
       </span>
-      <span className="leading-tight">
-        <span className="block text-[1.0625rem] font-semibold tracking-tight text-white">SASA</span>
-        <span className="block text-[0.6875rem] tracking-wide text-chrome-muted">Stakeholder Intelligence</span>
-      </span>
+      <span className="text-[1.0625rem] font-semibold tracking-tight text-white">SASA</span>
     </Link>
   );
 }
@@ -295,7 +292,11 @@ function ProjectSwitcher() {
   const { project, projects, switchProject } = useSession();
   const [open, setOpen] = useState(false);
 
-  if (!project) return null;
+  /*
+   * The switcher exists to change tenant scope. Someone on a single project has
+   * nothing to switch to, so the box would only be noise in the sidebar.
+   */
+  if (!project || projects.length < 2) return null;
 
   return (
     <div className="relative px-3 pb-4">

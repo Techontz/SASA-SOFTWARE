@@ -110,3 +110,15 @@ export async function queuedOperationCount(page: Page): Promise<number> {
 export function uniqueName(prefix: string): string {
   return `${prefix} ${Date.now().toString().slice(-6)}`;
 }
+
+/**
+ * Engagements and grievances cannot be saved without evidence. A small PDF is
+ * enough to satisfy the form and exercises the real upload path.
+ */
+export async function attachEvidence(page: Page, name = "evidence.pdf") {
+  await page.setInputFiles("#attachments", {
+    name,
+    mimeType: "application/pdf",
+    buffer: Buffer.from("%PDF-1.4\n1 0 obj<<>>endobj\ntrailer<<>>\n%%EOF\n"),
+  });
+}

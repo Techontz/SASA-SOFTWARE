@@ -50,7 +50,7 @@ export default function GrievanceDetailPage() {
     <div>
       <PageHeader
         backHref="/grievances"
-        eyebrow={`Module 3 · Case ${grievance.reference}`}
+        eyebrow={`Grievances · Case ${grievance.reference}`}
         title={grievance.title}
         meta={
           <>

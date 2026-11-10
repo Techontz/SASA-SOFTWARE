@@ -95,7 +95,7 @@ export default function StakeholderDetailPage() {
     <div>
       <PageHeader
         backHref="/stakeholders"
-        eyebrow={`Module 1 · Register · ${stakeholder.reference}`}
+        eyebrow={`Register · ${stakeholder.reference}`}
         title={stakeholder.name}
         description={stakeholder.concerns_expectations ?? undefined}
         meta={

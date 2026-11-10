@@ -69,7 +69,7 @@ export function useFieldReference() {
     severityLevels: data?.severity_levels ?? [],
     channels: data?.channels ?? ["voice", "whatsapp", "sms", "web", "in_person", "email", "leader", "suggestion_box"],
     stakeholderTypes: data?.stakeholder_types ?? [
-      "individual", "household", "community_group", "cso", "government",
+      "individual", "pap", "household", "community_group", "cso", "government",
       "traditional_leader", "contractor", "project_staff", "business", "vulnerable_group",
     ],
     engagementMethods: list("engagement_methods", [

@@ -40,7 +40,7 @@ export default function AnalyticsPage() {
   return (
     <div>
       <PageHeader
-        eyebrow="Module 4 · Dashboards, analytics and reporting"
+        eyebrow="Dashboards, analytics and reporting"
         title="Analytics"
         description="Five views over the same live records. Every number carries its definition, and every one drills through to the records behind it."
         actions={<PeriodPicker period={period} onChange={setPeriod} />}

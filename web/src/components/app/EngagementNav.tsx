@@ -10,7 +10,7 @@ const TABS = [
   { href: "/engagements/calendar", label: "Calendar" },
 ];
 
-/** Module 2 has two halves — the plan and the log — and they belong together. */
+/** Stakeholder management has two halves — the plan and the log — and they belong together. */
 export function EngagementNav() {
   const pathname = usePathname();
 

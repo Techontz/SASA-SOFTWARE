@@ -61,7 +61,7 @@ export default function ReportsPage() {
   return (
     <div>
       <PageHeader
-        eyebrow="Module 4 · Dashboards, analytics and reporting"
+        eyebrow="Dashboards, analytics and reporting"
         title="Reports"
         description="Generated from live records — there is no second reporting database to reconcile. The same definition run twice a week apart legitimately produces different numbers, and both are traceable."
       />

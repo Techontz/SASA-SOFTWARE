@@ -3,10 +3,11 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Plus, Save, Trash2, Users } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useState, type FormEvent } from "react";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "@/components/ui/Button";
+import { AttachmentPicker, queueAttachments } from "@/components/app/AttachmentPicker";
 import { SavedOnDeviceNotice } from "@/components/app/SavedOnDeviceNotice";
 import { Checkbox, Field, FieldRow, FormActions, FormSection, Input, Select, Textarea } from "@/components/ui/Form";
 import { PageHeader } from "@/components/ui/DetailLayout";
@@ -85,6 +86,8 @@ function LogEngagementForm() {
   const { data: stakeholders } = useStakeholders({ per_page: 200, status: "active" });
   const reference = useFieldReference();
   const [savedOffline, setSavedOffline] = useState(false);
+  const [files, setFiles] = useState<File[]>([]);
+  const [filesError, setFilesError] = useState<string | undefined>();
 
   const draftKey = "engagement:new";
 
@@ -187,14 +190,25 @@ function LogEngagementForm() {
       })),
     };
 
+    if (files.length === 0) return;
+
     try {
+      const entityUuid = uuid();
       const result = await syncEngine().save<Engagement>({
         entity: "engagement",
         operation: "create",
         path: "/engagements",
         payload,
-        entityUuid: uuid(),
+        entityUuid,
       });
+
+      await queueAttachments({
+        entity: "engagement",
+        entityUuid,
+        serverId: result.saved === "server" && result.record ? result.record.id : null,
+        files,
+      });
+      setFiles([]);
 
       if (project) await localStore().removeDraft(draftKey, project.id);
 
@@ -223,16 +237,22 @@ function LogEngagementForm() {
 
   const { locations, members, categories, engagementMethods: methods, projectPhases: phases } = reference;
 
+  /* Evidence is checked alongside the schema, so every missing thing shows at once. */
+  const submit = (event: FormEvent<HTMLFormElement>) => {
+    if (files.length === 0) setFilesError("Attach at least one file — the minutes, the attendance list or a photo.");
+    return onSubmit(event);
+  };
+
   return (
     <div className="mx-auto max-w-4xl">
       <PageHeader
         backHref="/engagements"
-        eyebrow="Module 2 · Stakeholder management"
+        eyebrow="Stakeholder management"
         title="Log an engagement"
         description="Record what happened, who was there and what was said. Concerns and commitments captured here become records of their own — nobody types them twice."
       />
 
-      <form onSubmit={onSubmit} className="space-y-5 pb-6" noValidate>
+      <form onSubmit={submit} className="space-y-5 pb-6" noValidate>
         {savedOffline ? (
           <SavedOnDeviceNotice
             what="Engagement"
@@ -573,6 +593,21 @@ function LogEngagementForm() {
               ))}
             </div>
           )}
+        </FormSection>
+
+        <FormSection
+          title="Evidence"
+          description="Required. Every engagement on record needs something to show it happened."
+        >
+          <AttachmentPicker
+            files={files}
+            onChange={(next) => {
+              setFiles(next);
+              if (next.length > 0) setFilesError(undefined);
+            }}
+            error={filesError}
+            hint="Minutes of the meeting, the signed attendance list, photos, video or any other file. Attach at least one."
+          />
         </FormSection>
 
         <FormActions

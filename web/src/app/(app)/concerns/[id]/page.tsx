@@ -67,7 +67,7 @@ export default function ConcernDetailPage() {
     <div className="mx-auto max-w-5xl">
       <PageHeader
         backHref="/concerns"
-        eyebrow={`Module 2 · Concern · ${concern.reference}`}
+        eyebrow={`Concern · ${concern.reference}`}
         title={concern.title}
         meta={
           <>

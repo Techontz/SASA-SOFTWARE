@@ -43,7 +43,7 @@ export default function EngagementCalendarPage() {
   return (
     <div>
       <PageHeader
-        eyebrow="Module 2 · Stakeholder management"
+        eyebrow="Stakeholder management"
         title="Engagement calendar"
         description="What is planned, and when. Anything still showing as planned after its date has passed becomes a missed engagement on the dashboards."
       />

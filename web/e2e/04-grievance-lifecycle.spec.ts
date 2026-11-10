@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { ACCOUNTS, signIn, uniqueName } from "./helpers";
+import { ACCOUNTS, attachEvidence, signIn, uniqueName } from "./helpers";
 
 /**
  * ACCEPTANCE: given a grievance is submitted, the system assigns a case ID,
@@ -23,6 +23,7 @@ test.describe("the grievance lifecycle", () => {
       "Trucks pass every few minutes from early morning. The dust settles on the houses, the food and the washing.",
     );
     await page.fill("#desired_resolution", "Water the road, or move the haulage route away from the houses.");
+    await attachEvidence(page);
     await page.getByRole("button", { name: "Open the case" }).click();
 
     await expect(page).toHaveURL(/\/grievances\/\d+$/, { timeout: 40_000 });
@@ -98,5 +99,17 @@ test.describe("the grievance lifecycle", () => {
       await page.fill("#resolution", "Fixed");
       await expect(page.getByRole("button", { name: "Record resolution" })).toBeDisabled();
     }
+  });
+
+  test("a case is not opened without evidence", async ({ page }) => {
+    await signIn(page, ACCOUNTS.grievanceOfficer);
+    await page.goto("/grievances/new");
+
+    await page.fill("#complainant_name", "Neema Charles Mwita");
+    await page.fill("#description", "The haulage trucks pass every few minutes and the dust settles on the houses.");
+    await page.getByRole("button", { name: "Open the case" }).click();
+
+    await expect(page.getByText("Attach at least one file as evidence before opening the case.")).toBeVisible();
+    await expect(page).toHaveURL(/\/grievances\/new$/);
   });
 });

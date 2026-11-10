@@ -60,7 +60,7 @@ export default function EngagementPlanDetailPage() {
     <div>
       <PageHeader
         backHref="/engagements/plans"
-        eyebrow={`Module 2 · Planned · ${plan.reference}`}
+        eyebrow={`Planned · ${plan.reference}`}
         title={plan.title}
         description={plan.purpose ?? undefined}
         meta={

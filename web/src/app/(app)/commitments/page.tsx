@@ -87,7 +87,7 @@ function CommitmentList() {
   return (
     <div>
       <PageHeader
-        eyebrow="Module 2 · Stakeholder management"
+        eyebrow="Stakeholder management"
         title="Commitments"
         description="Every promise the project made, with an owner, a due date and evidence of delivery. A commitment made at a village meeting in March has to be traceable in October."
         actions={

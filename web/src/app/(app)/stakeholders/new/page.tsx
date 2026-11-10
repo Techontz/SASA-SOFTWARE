@@ -16,7 +16,7 @@ export default function NewStakeholderPage() {
     <div className="mx-auto max-w-4xl">
       <PageHeader
         backHref="/stakeholders"
-        eyebrow="Module 1 · Register"
+        eyebrow="Register"
         title="Add a stakeholder"
         description="Only the name and the type are required. Everything else can be filled in later — a partial record in the register is worth more than a complete one in a notebook."
       />

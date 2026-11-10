@@ -27,7 +27,7 @@ import { useSession } from "@/providers/SessionProvider";
  * different for each — without building six different applications.
  */
 export default function DashboardPage() {
-  const { user, project, canAny } = useSession();
+  const { user, canAny } = useSession();
   const [period, setPeriod] = useState<Period>(() => presetPeriods()[1]);
 
   const { data, isLoading, isError, error, refetch } = useLandingDashboard({
@@ -45,7 +45,6 @@ export default function DashboardPage() {
   return (
     <div className="pb-4">
       <PageHeader
-        eyebrow={project?.name}
         title={`${greeting}, ${firstName}`}
         description={dashboard?.question ?? "Loading your project…"}
         actions={<PeriodPicker period={period} onChange={setPeriod} />}

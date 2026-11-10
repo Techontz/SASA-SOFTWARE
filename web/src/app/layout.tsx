@@ -17,7 +17,7 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: {
-    default: "SASA — Stakeholder Intelligence & Voice",
+    default: "SASA",
     template: "%s · SASA",
   },
   description:

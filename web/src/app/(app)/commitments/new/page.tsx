@@ -105,7 +105,7 @@ export default function NewCommitmentPage() {
     <div className="mx-auto max-w-3xl">
       <PageHeader
         backHref="/commitments"
-        eyebrow="Module 2 · Stakeholder management"
+        eyebrow="Stakeholder management"
         title="Add a commitment"
         description="Most commitments are captured while logging an engagement. Use this for one made outside a meeting — in a letter, a call or a site visit."
       />

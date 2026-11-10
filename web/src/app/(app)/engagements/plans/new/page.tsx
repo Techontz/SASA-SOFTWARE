@@ -106,7 +106,7 @@ export default function NewEngagementPlanPage() {
     <div className="mx-auto max-w-4xl">
       <PageHeader
         backHref="/engagements/plans"
-        eyebrow="Module 2 · Stakeholder management"
+        eyebrow="Stakeholder management"
         title="Plan an engagement"
         description="Set what you intend to do and when. What actually happens is logged against it, and the gap between the two is what the dashboards report."
       />

@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { ACCOUNTS, queuedOperationCount, settle, signIn, uniqueName, serviceWorkerReady } from "./helpers";
+import { ACCOUNTS, attachEvidence, queuedOperationCount, settle, signIn, uniqueName, serviceWorkerReady } from "./helpers";
 
 /**
  * THE OFFLINE ACCEPTANCE TEST.
@@ -64,6 +64,7 @@ test.describe("working offline", () => {
       "#description",
       "Written down on a tablet with no connection and queued until the signal returned.",
     );
+    await attachEvidence(page);
     await page.getByRole("button", { name: "Open the case" }).click();
     await expect(page.getByText(/Grievance saved on this device/i).first()).toBeVisible({ timeout: 20_000 });
 

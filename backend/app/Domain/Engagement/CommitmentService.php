@@ -12,7 +12,7 @@ use App\Support\DomainRuleException;
 use Illuminate\Support\Facades\DB;
 
 /**
- * The commitments register — a first-class entity presented inside Module 2,
+ * The commitments register — a first-class entity presented inside Stakeholder management,
  * because it is the accountability tail of an engagement rather than a
  * separate discipline.
  */

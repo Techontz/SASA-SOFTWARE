@@ -90,7 +90,7 @@ function ConcernList() {
   return (
     <div>
       <PageHeader
-        eyebrow="Module 2 · Stakeholder management"
+        eyebrow="Stakeholder management"
         title="Concerns"
         description="What people raised in engagement, before it became a formal case. A concern recorded here is the earliest chance the project has to fix something."
       />

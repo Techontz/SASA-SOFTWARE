@@ -21,7 +21,7 @@ export default function EditStakeholderPage() {
     <div className="mx-auto max-w-4xl">
       <PageHeader
         backHref={`/stakeholders/${id}`}
-        eyebrow={`Module 1 · Register · ${data.data.reference}`}
+        eyebrow={`Register · ${data.data.reference}`}
         title={`Edit ${data.data.name}`}
         description="Changes are recorded in the audit trail with the previous value."
       />

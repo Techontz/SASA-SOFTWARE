@@ -57,7 +57,7 @@ export default function CommitmentDetailPage() {
     <div className="mx-auto max-w-5xl">
       <PageHeader
         backHref="/commitments"
-        eyebrow={`Module 2 · Commitment · ${commitment.reference}`}
+        eyebrow={`Commitment · ${commitment.reference}`}
         title={commitment.commitment_text}
         meta={
           <>

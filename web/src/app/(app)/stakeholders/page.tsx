@@ -19,7 +19,7 @@ import { useToast } from "@/providers/ToastProvider";
 import type { Stakeholder } from "@/types/api";
 
 const TYPE_OPTIONS = [
-  "individual", "household", "community_group", "cso", "government",
+  "individual", "pap", "household", "community_group", "cso", "government",
   "traditional_leader", "contractor", "project_staff", "business", "vulnerable_group",
 ].map((value) => ({ value, label: humanise(value) }));
 
@@ -124,7 +124,7 @@ function StakeholderRegister() {
   return (
     <div>
       <PageHeader
-        eyebrow="Module 1 · Register"
+        eyebrow="Register"
         title="Stakeholders"
         description="Every individual, household, group, organisation and authority tied to this project — with a transparent priority score and a review date on each."
         actions={

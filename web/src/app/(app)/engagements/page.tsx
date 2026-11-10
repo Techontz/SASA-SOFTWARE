@@ -119,7 +119,7 @@ function EngagementList() {
   return (
     <div>
       <PageHeader
-        eyebrow="Module 2 · Stakeholder management"
+        eyebrow="Stakeholder management"
         title="Engagements"
         description="Every consultation, meeting and disclosure, lodged as it happens — with a planned-versus-actual flag on each one."
         actions={
