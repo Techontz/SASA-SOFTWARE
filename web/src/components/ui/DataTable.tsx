@@ -83,7 +83,7 @@ export function DataTable<T>({
   return (
     <div className={cn("sasa-card overflow-hidden", className)}>
       {/* ---------- Desktop: a dense, readable table ---------- */}
-      <div className="sasa-scroll-x hidden overflow-x-auto md:block">
+      <div className="sasa-scroll-x hidden overflow-x-auto lg:block">
         <table className="w-full min-w-[720px] border-collapse text-sm">
           <thead>
             <tr className="border-b border-hairline bg-surface-sunken">
@@ -102,7 +102,7 @@ export function DataTable<T>({
                   }
                   style={column.width ? { width: column.width } : undefined}
                   className={cn(
-                    "px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.06em] text-ink-500",
+                    "px-4 py-3 text-left text-[0.6875rem] font-semibold uppercase tracking-[0.08em] text-ink-500 first:pl-6 last:pr-6",
                     column.align === "right" && "text-right",
                     column.hideBelow === "lg" && "hidden lg:table-cell",
                     column.hideBelow === "xl" && "hidden xl:table-cell",
@@ -145,7 +145,7 @@ export function DataTable<T>({
                     <td
                       key={column.key}
                       className={cn(
-                        "px-4 py-3.5 align-middle text-ink-700",
+                        "px-4 py-4 align-middle text-ink-700 first:pl-6 last:pr-6",
                         column.align === "right" && "text-right",
                         column.hideBelow === "lg" && "hidden lg:table-cell",
                         column.hideBelow === "xl" && "hidden xl:table-cell",
@@ -171,10 +171,10 @@ export function DataTable<T>({
       </div>
 
       {/* ---------- Mobile: cards, not a squeezed table ---------- */}
-      <ul className="divide-y divide-hairline md:hidden">
+      <ul className="divide-y divide-hairline lg:hidden">
         {rows.map((row) => {
           const target = href?.(row);
-          const content = <div className="px-4 py-4">{mobileCard(row)}</div>;
+          const content = <div className="px-4 py-4 sm:px-6">{mobileCard(row)}</div>;
 
           return (
             <li key={rowKey(row)}>

@@ -24,24 +24,24 @@ export function PageHeader({
   className?: string;
 }) {
   return (
-    <header className={cn("mb-6", className)}>
+    <header className={cn("mb-7 sm:mb-9", className)}>
       {backHref ? (
         <Link
           href={backHref}
-          className="mb-3 inline-flex items-center gap-1.5 text-sm font-medium text-ink-600 transition hover:text-brand-700"
+          className="group mb-4 inline-flex items-center gap-1.5 text-sm font-medium text-ink-600 transition hover:text-brand-700"
         >
-          <ArrowLeft className="h-4 w-4" aria-hidden />
+          <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-0.5" aria-hidden />
           Back
         </Link>
       ) : null}
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between lg:gap-8">
+      <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between md:gap-8">
         <div className="min-w-0">
-          {eyebrow ? <p className="sasa-eyebrow mb-1.5">{eyebrow}</p> : null}
-          <h1 className="text-[1.625rem] font-semibold leading-tight tracking-tight text-ink-900 sm:text-3xl">
+          {eyebrow ? <p className="sasa-eyebrow mb-2">{eyebrow}</p> : null}
+          <h1 className="text-[1.75rem] font-semibold leading-[1.12] tracking-[-0.028em] text-ink-900 sm:text-[2.25rem]">
             {title}
           </h1>
           {description ? (
-            <div className="mt-2 max-w-3xl text-[0.9375rem] leading-relaxed text-ink-600">{description}</div>
+            <div className="mt-3 max-w-3xl text-[0.9375rem] leading-relaxed text-ink-600 sm:text-base">{description}</div>
           ) : null}
           {meta ? <div className="mt-3 flex flex-wrap items-center gap-2">{meta}</div> : null}
         </div>

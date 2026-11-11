@@ -165,24 +165,30 @@
   --color-warning-solid: #96450a;
   --color-info-solid: #1450b8;
 
-  /* --- Radius: restrained. Nothing is a pill except a status chip. ------- */
-  --radius-xs: 4px;
-  --radius-sm: 6px;
-  --radius-md: 8px;
-  --radius-lg: 12px;
-  --radius-xl: 16px;
+  /* --- Radius: soft and consistent. Controls 10px, cards 16px, sheets 22px.
+     Nothing is a pill except a status chip. ------------------------------ */
+  --radius-xs: 6px;
+  --radius-sm: 8px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 22px;
+  --radius-2xl: 28px;
 
   /* --- Shadows: one step of elevation, and it is subtle. Redefined for the
      dark theme, where a drop shadow reads as a darker halo, not a lift. --- */
-  --shadow-card: 0 1px 2px rgba(16, 32, 46, 0.04), 0 1px 3px rgba(16, 32, 46, 0.05);
-  --shadow-raised: 0 2px 4px rgba(16, 32, 46, 0.05), 0 8px 20px rgba(16, 32, 46, 0.08);
-  --shadow-overlay: 0 16px 48px rgba(8, 18, 31, 0.18);
+  --shadow-card: 0 1px 1px rgba(16, 32, 46, 0.03), 0 2px 6px -1px rgba(16, 32, 46, 0.05);
+  --shadow-raised: 0 1px 2px rgba(16, 32, 46, 0.04), 0 14px 32px -12px rgba(16, 32, 46, 0.18);
+  --shadow-overlay: 0 2px 6px rgba(8, 18, 31, 0.06), 0 28px 64px -16px rgba(8, 18, 31, 0.32);
+  /* A one-pixel highlight on the top edge of a solid button: depth without a
+     gradient. */
+  --shadow-button: inset 0 1px 0 rgba(255, 255, 255, 0.14), 0 1px 2px rgba(16, 32, 46, 0.12);
 
   /* --- Motion: quick and quiet ------------------------------------------ */
   --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
   --duration-fast: 120ms;
   --duration-base: 180ms;
   --duration-slow: 280ms;
+  --duration-page: 320ms;
 
   /* --- Type -------------------------------------------------------------- */
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system,
@@ -326,8 +332,9 @@
   /* A drop shadow does not read as elevation on a dark surface; depth comes
      from the lighter card plus a hairline, so the shadows go quiet. */
   --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.28);
-  --shadow-raised: 0 2px 6px rgba(0, 0, 0, 0.34), 0 10px 26px rgba(0, 0, 0, 0.3);
-  --shadow-overlay: 0 18px 52px rgba(0, 0, 0, 0.55);
+  --shadow-raised: 0 2px 6px rgba(0, 0, 0, 0.34), 0 16px 36px -12px rgba(0, 0, 0, 0.5);
+  --shadow-overlay: 0 24px 64px -12px rgba(0, 0, 0, 0.65);
+  --shadow-button: inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 1px 2px rgba(0, 0, 0, 0.4);
 
   --sasa-scrim: rgba(2, 7, 14, 0.66);
   --sasa-focus-ring: rgba(100, 178, 192, 0.22);
@@ -364,6 +371,7 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     font-feature-settings: "cv05" 1, "ss01" 1;
+    text-rendering: optimizeLegibility;
   }
 
   /* Numbers in tables and KPIs must line up. */
@@ -372,7 +380,7 @@
   }
 
   h1, h2, h3, h4 {
-    letter-spacing: -0.015em;
+    letter-spacing: -0.018em;
     color: var(--color-ink-900);
     text-wrap: balance;
   }
@@ -440,6 +448,26 @@
   .sasa-card-interactive:hover {
     border-color: var(--color-hairline-strong);
     box-shadow: var(--shadow-raised);
+    transform: translateY(-1px);
+  }
+
+  /* Frosted chrome for the bars that sit over scrolling content. Falls back to
+     an opaque surface where backdrop-filter is not supported. */
+  .sasa-glass {
+    background: var(--color-surface);
+  }
+
+  @supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    .sasa-glass {
+      background: color-mix(in srgb, var(--color-surface) 76%, transparent);
+      -webkit-backdrop-filter: saturate(180%) blur(18px);
+      backdrop-filter: saturate(180%) blur(18px);
+    }
+  }
+
+  /* Each screen arrives with a short rise, not a cut. */
+  .sasa-page {
+    animation: sasa-fade-up var(--duration-page) var(--ease-out-soft) both;
   }
 
   .sasa-field {
@@ -447,7 +475,8 @@
     background: var(--color-surface);
     border: 1px solid var(--color-ink-300);
     border-radius: var(--radius-md);
-    padding: 0.625rem 0.75rem;
+    min-height: 2.75rem;
+    padding: 0.625rem 0.875rem;
     color: var(--color-ink-900);
     transition: border-color var(--duration-fast) var(--ease-out-soft),
                 box-shadow var(--duration-fast) var(--ease-out-soft);
@@ -462,7 +491,7 @@
   .sasa-field:focus {
     outline: none;
     border-color: var(--color-brand-500);
-    box-shadow: 0 0 0 3px var(--sasa-focus-ring);
+    box-shadow: 0 0 0 4px var(--sasa-focus-ring);
   }
 
   .sasa-field[aria-invalid="true"] {
@@ -483,7 +512,7 @@
   .sasa-eyebrow {
     font-size: 0.6875rem;
     font-weight: 600;
-    letter-spacing: 0.07em;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
     color: var(--color-ink-500);
   }

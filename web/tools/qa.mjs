@@ -46,10 +46,13 @@ const pages = [
 const BASE = process.env.QA_BASE_URL ?? 'http://localhost:3010';
 
 const [,, user = 'project.admin@sasa.test', mode = 'desktop', theme = 'light'] = process.argv;
-const viewport = mode === 'mobile' ? { width: 390, height: 844 } : { width: 1440, height: 1000 };
+const viewport =
+  mode === 'mobile' ? { width: 390, height: 844 }
+  : mode === 'tablet' ? { width: 820, height: 1180 }
+  : { width: 1440, height: 1000 };
 
 const browser = await chromium.launch();
-const page = await browser.newPage({ viewport, deviceScaleFactor: 2, isMobile: mode === 'mobile', hasTouch: mode === 'mobile' });
+const page = await browser.newPage({ viewport, deviceScaleFactor: 2, isMobile: mode !== 'desktop', hasTouch: mode !== 'desktop' });
 
 const problems = [];
 page.on('pageerror', e => problems.push(`PAGE ERROR ${page.url()}: ${String(e).slice(0,200)}`));

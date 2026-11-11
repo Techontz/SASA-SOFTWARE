@@ -54,7 +54,7 @@ export function KpiCard({
       <div className="mt-auto flex items-baseline gap-1.5 pt-4">
         <span
           className={cn(
-            "tabular font-semibold tracking-tight text-ink-900",
+            "tabular font-semibold tracking-[-0.03em] text-ink-900",
             emphasis === "primary" ? "text-[2.5rem] leading-none" : "text-[2rem] leading-none",
             kpi.value === null && "text-ink-400",
           )}
@@ -85,14 +85,14 @@ export function KpiCard({
   const target = href ?? (kpi.drill ? `/${kpi.drill}` : null);
 
   if (!target) {
-    return <div className={cn("sasa-card flex flex-col p-5", className)}>{body}</div>;
+    return <div className={cn("sasa-card flex flex-col p-5 sm:p-6", className)}>{body}</div>;
   }
 
   return (
     <Link
       href={target}
       className={cn(
-        "sasa-card group relative flex flex-col p-5 transition-all duration-[var(--duration-base)] hover:-translate-y-0.5 hover:border-brand-300 hover:shadow-[var(--shadow-raised)]",
+        "sasa-card group relative flex flex-col p-5 transition-[transform,box-shadow,border-color] duration-[var(--duration-base)] ease-[var(--ease-out-soft)] hover:-translate-y-0.5 hover:border-brand-300 hover:shadow-[var(--shadow-raised)] sm:p-6",
         className,
       )}
     >

@@ -53,11 +53,14 @@ export function AppShell({ children }: { children: ReactNode }) {
 
       <div className="flex">
         {/* ------------------------------ desktop sidebar ------------------ */}
-        <aside className="sticky top-0 hidden h-dvh w-[17rem] shrink-0 flex-col border-r border-chrome-line bg-chrome lg:flex">
+        {/* Tablet gets an icon rail; a laptop and up gets the full sidebar. */}
+        <aside className="sticky top-0 hidden h-dvh w-[4.75rem] shrink-0 flex-col border-r border-chrome-line bg-chrome md:flex lg:w-[17rem]">
           <SidebarBrand />
-          <ProjectSwitcher />
+          <div className="hidden lg:block">
+            <ProjectSwitcher />
+          </div>
 
-          <nav className="flex-1 overflow-y-auto px-3 pb-4" aria-label="Main">
+          <nav className="flex-1 overflow-y-auto overflow-x-hidden px-3 pb-4" aria-label="Main">
             {PRIMARY_NAVIGATION.map((group) => {
               const items = group.items.filter(allowed);
               if (items.length === 0) return null;
@@ -65,11 +68,14 @@ export function AppShell({ children }: { children: ReactNode }) {
               return (
                 <div key={group.label ?? "primary"} className="mb-5">
                   {group.label ? (
-                    <p className="px-3 pb-2 pt-2 text-[0.6875rem] font-semibold uppercase tracking-[0.09em] text-chrome-subtle">
-                      {group.label}
-                    </p>
+                    <>
+                      <p className="hidden px-3 pb-2 pt-2 text-[0.6875rem] font-semibold uppercase tracking-[0.1em] text-chrome-subtle lg:block">
+                        {group.label}
+                      </p>
+                      <div className="mx-auto mb-3 mt-1 h-px w-8 bg-chrome-line lg:hidden" aria-hidden />
+                    </>
                   ) : null}
-                  <ul className="space-y-0.5">
+                  <ul className="space-y-1">
                     {items.map((item) => {
                       const active = isActivePath(pathname, item.href);
                       const Icon = item.icon;
@@ -79,18 +85,30 @@ export function AppShell({ children }: { children: ReactNode }) {
                           <Link
                             href={item.href}
                             aria-current={active ? "page" : undefined}
+                            title={item.label}
                             className={cn(
-                              "group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
+                              "group relative flex items-center justify-center gap-3 rounded-[var(--radius-md)] px-3 py-2.5 text-sm font-medium transition-[background-color,color] duration-[var(--duration-base)] lg:justify-start",
                               active
                                 ? "bg-chrome-raised text-chrome-fg"
-                                : "text-chrome-muted hover:bg-chrome-raised hover:text-chrome-fg",
+                                : "text-chrome-muted hover:bg-chrome-raised/70 hover:text-chrome-fg",
                             )}
                           >
-                            <Icon
-                              className={cn("h-[18px] w-[18px] shrink-0", active ? "text-accent-300" : "text-chrome-subtle group-hover:text-chrome-fg")}
+                            {/* The active marker: a short bar on the leading edge. */}
+                            <span
+                              className={cn(
+                                "absolute left-0 top-1/2 h-5 w-[3px] -translate-y-1/2 rounded-r-full bg-accent-300 transition-opacity duration-[var(--duration-base)]",
+                                active ? "opacity-100" : "opacity-0",
+                              )}
                               aria-hidden
                             />
-                            {item.label}
+                            <Icon
+                              className={cn(
+                                "h-[18px] w-[18px] shrink-0 transition-colors",
+                                active ? "text-accent-300" : "text-chrome-subtle group-hover:text-chrome-fg",
+                              )}
+                              aria-hidden
+                            />
+                            <span className="hidden truncate lg:inline">{item.label}</span>
                           </Link>
                         </li>
                       );
@@ -106,22 +124,22 @@ export function AppShell({ children }: { children: ReactNode }) {
 
         {/* ------------------------------ main column ---------------------- */}
         <div className="flex min-w-0 flex-1 flex-col">
-          <header className="sticky top-0 z-30 border-b border-hairline bg-surface/90 backdrop-blur">
-            <div className="flex h-16 min-w-0 items-center gap-3 px-4 sm:px-6">
+          <header className="sasa-glass sticky top-0 z-30 border-b border-hairline">
+            <div className="flex h-16 min-w-0 items-center gap-3 px-4 sm:px-6 lg:px-8">
               <button
                 type="button"
                 onClick={() => setNavOpen(true)}
-                className="-ml-2 flex h-10 w-10 items-center justify-center rounded-lg text-ink-700 transition hover:bg-ink-100 lg:hidden"
+                className="-ml-2 flex h-10 w-10 items-center justify-center rounded-[var(--radius-md)] text-ink-700 transition hover:bg-ink-100 md:hidden"
                 aria-label="Open menu"
               >
                 <Menu className="h-5 w-5" aria-hidden />
               </button>
 
-              <div className="min-w-0 flex-1 lg:hidden">
+              <div className="min-w-0 flex-1 md:max-w-[14rem] lg:hidden">
                 <MobileProjectLabel />
               </div>
 
-              <div className="hidden flex-1 lg:block">
+              <div className="hidden min-w-0 flex-1 md:block">
                 <GlobalSearch />
               </div>
 
@@ -134,7 +152,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                 </div>
                 <NotificationCenter />
                 <ThemeToggle />
-                <div className="hidden lg:block">
+                <div className="hidden md:block">
                   {quickActions.length > 0 ? (
                     <div className="relative">
                       <Button
@@ -143,7 +161,8 @@ export function AppShell({ children }: { children: ReactNode }) {
                         onClick={() => setActionsOpen(!actionsOpen)}
                         aria-expanded={actionsOpen}
                       >
-                        New
+                        <span className="hidden lg:inline">New</span>
+                        <span className="sr-only lg:hidden">New</span>
                         <ChevronDown className="h-4 w-4" aria-hidden />
                       </Button>
                       {actionsOpen ? (
@@ -177,13 +196,16 @@ export function AppShell({ children }: { children: ReactNode }) {
               </div>
             </div>
 
-            <div className="border-t border-hairline px-4 py-2 lg:hidden">
+            <div className="border-t border-hairline px-4 py-2 md:hidden">
               <GlobalSearch />
             </div>
           </header>
 
-          <main className="min-w-0 flex-1 px-4 pb-28 pt-6 sm:px-6 lg:px-8 lg:pb-12">
-            <div className="mx-auto w-full max-w-[86rem]">{children}</div>
+          <main className="min-w-0 flex-1 px-4 pb-28 pt-6 sm:px-6 sm:pt-8 md:pb-12 lg:px-10 lg:pt-10">
+            {/* Keyed on the path so each screen gets its entrance. */}
+            <div key={pathname} className="sasa-page mx-auto w-full max-w-[86rem]">
+              {children}
+            </div>
           </main>
         </div>
       </div>
@@ -192,7 +214,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       <MobileNav quickActionHref={quickActions[0]?.href} />
 
       {navOpen ? (
-        <div className="fixed inset-0 z-[70] lg:hidden">
+        <div className="fixed inset-0 z-[70] md:hidden">
           <div className="animate-fade-in sasa-scrim absolute inset-0" onClick={() => setNavOpen(false)} aria-hidden />
           <div className="animate-slide-in-right absolute inset-y-0 right-0 flex w-[19rem] max-w-[85vw] flex-col bg-chrome">
             <div className="flex items-center justify-between px-4 py-4">
@@ -279,11 +301,17 @@ export function AppShell({ children }: { children: ReactNode }) {
 
 function SidebarBrand({ compact }: { compact?: boolean }) {
   return (
-    <Link href="/" className={cn("flex items-center gap-3", compact ? "" : "px-5 py-5")}>
-      <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent-500 text-base font-bold text-white">
+    <Link
+      href="/"
+      className={cn("flex items-center gap-3", compact ? "" : "justify-center px-3 py-5 lg:justify-start lg:px-5")}
+      aria-label="SASA home"
+    >
+      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[var(--radius-md)] bg-accent-solid text-base font-bold text-on-primary shadow-[var(--shadow-button)]">
         S
       </span>
-      <span className="text-[1.0625rem] font-semibold tracking-tight text-white">SASA</span>
+      <span className={cn("text-[1.0625rem] font-semibold tracking-tight text-white", compact ? "" : "hidden lg:inline")}>
+        SASA
+      </span>
     </Link>
   );
 }
@@ -376,22 +404,23 @@ function UserMenu() {
         type="button"
         onClick={() => setOpen((value) => !value)}
         aria-expanded={open}
-        className="flex w-full items-center gap-3 rounded-lg px-2 py-2 text-left transition hover:bg-chrome-raised"
+        aria-label={`Account menu for ${user.name}`}
+        className="flex w-full items-center justify-center gap-3 rounded-[var(--radius-md)] px-2 py-2 text-left transition hover:bg-chrome-raised lg:justify-start"
       >
-        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-semibold text-on-primary">
+        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-semibold text-on-primary ring-2 ring-chrome-line">
           {initials(user.name)}
         </span>
-        <span className="min-w-0 flex-1">
+        <span className="min-w-0 flex-1 md:hidden lg:block">
           <span className="block truncate text-sm font-medium text-white">{user.name}</span>
           <span className="block truncate text-xs text-chrome-muted">{user.job_title ?? user.email}</span>
         </span>
-        <ChevronDown className={cn("h-4 w-4 shrink-0 text-chrome-muted transition", open && "rotate-180")} aria-hidden />
+        <ChevronDown className={cn("h-4 w-4 shrink-0 text-chrome-muted transition md:hidden lg:block", open && "rotate-180")} aria-hidden />
       </button>
 
       {open ? (
         <>
           <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} aria-hidden />
-          <div className="animate-fade-up absolute bottom-full left-3 right-3 z-50 mb-1 overflow-hidden rounded-lg border border-hairline bg-surface p-1.5 shadow-[var(--shadow-overlay)]">
+          <div className="animate-fade-up absolute bottom-full left-3 right-3 z-50 mb-1 overflow-hidden rounded-[var(--radius-lg)] border border-hairline bg-surface p-1.5 shadow-[var(--shadow-overlay)] md:right-auto md:w-56 lg:right-3 lg:w-auto">
             <Link href="/account" className="block rounded-md px-2.5 py-2 text-sm text-ink-800 transition hover:bg-ink-100">
               My account
             </Link>
@@ -428,7 +457,7 @@ function MobileNav({ quickActionHref }: { quickActionHref?: string }) {
 
   return (
     <nav
-      className="fixed inset-x-0 bottom-0 z-40 border-t border-hairline bg-surface/95 pb-[env(safe-area-inset-bottom)] backdrop-blur lg:hidden"
+      className="sasa-glass fixed inset-x-0 bottom-0 z-40 border-t border-hairline pb-[env(safe-area-inset-bottom)] md:hidden"
       aria-label="Primary"
     >
       <div className="grid grid-cols-5 items-end">
@@ -465,10 +494,17 @@ function MobileNavLink({ item, active }: { item: NavItem; active: boolean }) {
       href={item.href}
       aria-current={active ? "page" : undefined}
       className={cn(
-        "flex min-h-[3.75rem] flex-col items-center justify-center gap-1 px-1 py-2 text-[0.6875rem] font-medium transition",
-        active ? "text-brand-700" : "text-ink-500",
+        "relative flex min-h-[3.75rem] flex-col items-center justify-center gap-1 px-1 py-2 text-[0.6875rem] font-medium transition-colors",
+        active ? "text-brand-700" : "text-ink-500 active:text-ink-700",
       )}
     >
+      <span
+        className={cn(
+          "absolute top-0 h-[3px] w-8 rounded-b-full bg-brand-500 transition-opacity",
+          active ? "opacity-100" : "opacity-0",
+        )}
+        aria-hidden
+      />
       <Icon className={cn("h-5 w-5", active && "text-brand-600")} aria-hidden />
       {item.label}
     </Link>

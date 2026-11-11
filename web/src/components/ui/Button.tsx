@@ -19,17 +19,17 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 /* One accent action per screen. Everything else is secondary or quiet. */
 const VARIANTS: Record<Variant, string> = {
   primary:
-    "bg-primary text-on-primary shadow-[var(--shadow-card)] hover:bg-primary-hover active:bg-primary-active disabled:bg-ink-200 disabled:text-ink-400 disabled:shadow-none",
+    "bg-primary text-on-primary shadow-[var(--shadow-button)] hover:bg-primary-hover active:bg-primary-active disabled:bg-ink-200 disabled:text-ink-400 disabled:shadow-none",
   accent:
-    "bg-accent-solid text-on-primary shadow-[var(--shadow-card)] hover:bg-accent-solid-hover active:bg-accent-solid-active disabled:bg-ink-200 disabled:text-ink-400 disabled:shadow-none",
+    "bg-accent-solid text-on-primary shadow-[var(--shadow-button)] hover:bg-accent-solid-hover active:bg-accent-solid-active disabled:bg-ink-200 disabled:text-ink-400 disabled:shadow-none",
   secondary:
-    "border border-ink-300 bg-surface text-ink-800 hover:border-ink-400 hover:bg-ink-50 active:bg-ink-100 disabled:border-ink-200 disabled:text-ink-400",
+    "border border-hairline-strong bg-surface text-ink-800 shadow-[var(--shadow-card)] hover:border-ink-300 hover:bg-ink-50 active:bg-ink-100 disabled:border-ink-200 disabled:text-ink-400 disabled:shadow-none",
   ghost:
     "text-ink-700 hover:bg-ink-100 active:bg-ink-200 disabled:text-ink-400",
   quiet:
     "text-brand-700 hover:bg-brand-50 hover:text-brand-800 active:bg-brand-100 disabled:text-ink-400",
   danger:
-    "bg-danger-solid text-on-primary hover:bg-danger-solid-hover active:bg-danger-solid-active disabled:bg-ink-200 disabled:text-ink-400",
+    "bg-danger-solid text-on-primary shadow-[var(--shadow-button)] hover:bg-danger-solid-hover active:bg-danger-solid-active disabled:bg-ink-200 disabled:text-ink-400",
 };
 
 /* 44px minimum on the primary sizes — a field officer taps this with a thumb. */
@@ -48,7 +48,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
       ref={ref}
       disabled={disabled || loading}
       className={cn(
-        "inline-flex select-none items-center justify-center font-medium transition-colors duration-[var(--duration-fast)]",
+        "inline-flex select-none items-center justify-center whitespace-nowrap font-medium tracking-[-0.005em] transition-[background-color,border-color,color,box-shadow,transform] duration-[var(--duration-fast)] ease-[var(--ease-out-soft)] active:scale-[0.98] disabled:active:scale-100",
         "disabled:cursor-not-allowed",
         VARIANTS[variant],
         SIZES[size],

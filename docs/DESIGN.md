@@ -224,3 +224,24 @@ which is what proves there is no flash.
 - **Never tell a user their work is saved when it is only on the device.** The
   sync engine returns `saved: "server" | "device"` and the UI must say which.
   This is a design rule as much as a data one.
+
+---
+
+## Three layouts, not two
+
+| Width | Shell | Tables |
+|---|---|---|
+| under 768px (phones) | Top bar with menu, search row, glass tab bar at the bottom | Card list |
+| 768–1023px (tablets) | Icon rail sidebar (labels as tooltips), search in the top bar, no tab bar | Card list |
+| 1024px and up | Full sidebar with project switcher and labels | Table |
+
+`node tools/qa.mjs <account> tablet <theme>` checks the middle one at iPad
+portrait size (820×1180).
+
+## Surfaces and motion
+
+Controls are 10px radius, cards 16px, sheets 22px. Solid buttons carry
+`--shadow-button` — a one-pixel top highlight — and press down slightly
+(`scale(0.98)`). Bars that sit over scrolling content use `.sasa-glass`
+(frosted, with an opaque fallback). Each screen enters with `.sasa-page`, a
+short rise keyed on the route; reduced-motion users get an instant cut.
