@@ -45,6 +45,8 @@ class ProjectMemberController extends Controller
             ],
             'role' => ['id' => $m->role->id, 'key' => $m->role->key, 'name' => $m->role->name],
             'handling_groups' => $m->handling_groups ?? [],
+            // ESHS: set for contractor personnel, who then see only their company's anomalies.
+            'contractor_name' => $m->contractor_name,
             'status' => $m->status,
             'joined_at' => $m->joined_at?->toIso8601String(),
         ]));
@@ -63,6 +65,7 @@ class ProjectMemberController extends Controller
             'role_id' => ['required', 'integer', 'exists:roles,id'],
             'handling_groups' => ['nullable', 'array'],
             'handling_groups.*' => ['string', 'max:60'],
+            'contractor_name' => ['nullable', 'string', 'max:160'],
         ]);
 
         $role = Role::findOrFail($data['role_id']);
@@ -86,7 +89,7 @@ class ProjectMemberController extends Controller
                 ]
             );
 
-            return ProjectMembership::updateOrCreate(
+            $membership = ProjectMembership::updateOrCreate(
                 ['project_id' => $this->project()->id, 'user_id' => $user->id],
                 [
                     'organisation_id' => $this->project()->organisation_id,
@@ -97,6 +100,12 @@ class ProjectMemberController extends Controller
                     'created_by' => $request->user()->id,
                 ]
             );
+
+            if (array_key_exists('contractor_name', $data)) {
+                $membership->forceFill(['contractor_name' => $this->contractorName($data['contractor_name'])])->save();
+            }
+
+            return $membership;
         });
 
         $this->audit->record(
@@ -122,10 +131,17 @@ class ProjectMemberController extends Controller
             'role_id' => ['sometimes', 'integer', 'exists:roles,id'],
             'handling_groups' => ['sometimes', 'nullable', 'array'],
             'status' => ['sometimes', 'in:active,suspended'],
+            'contractor_name' => ['sometimes', 'nullable', 'string', 'max:160'],
         ]);
 
-        $before = ['role_id' => $membership->role_id, 'handling_groups' => $membership->handling_groups, 'status' => $membership->status];
-        $membership->update($data);
+        $before = ['role_id' => $membership->role_id, 'handling_groups' => $membership->handling_groups, 'status' => $membership->status, 'contractor_name' => $membership->contractor_name];
+        $membership->fill(collect($data)->except('contractor_name')->all());
+
+        if (array_key_exists('contractor_name', $data)) {
+            $membership->forceFill(['contractor_name' => $this->contractorName($data['contractor_name'])]);
+        }
+
+        $membership->save();
 
         $this->audit->record(
             action: 'membership.changed',
@@ -136,6 +152,14 @@ class ProjectMemberController extends Controller
         );
 
         return ApiResponse::data($membership->fresh(['user:id,name,email', 'role:id,key,name']));
+    }
+
+    /** Blank means "not a contractor": that person is not limited to one company. */
+    private function contractorName(?string $name): ?string
+    {
+        $name = trim((string) $name);
+
+        return $name === '' ? null : $name;
     }
 
     public function destroy(ProjectMembership $membership)

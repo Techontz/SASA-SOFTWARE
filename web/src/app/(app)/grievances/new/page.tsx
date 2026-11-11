@@ -129,6 +129,15 @@ export default function NewGrievancePage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [project?.id]);
 
+  // Opened from a PAP record ("Log a grievance for this PAP"): pre-link the
+  // case to that PAP's stakeholder record. Applied after any draft restore.
+  useEffect(() => {
+    const stakeholderId = new URLSearchParams(window.location.search).get("stakeholder_id");
+    if (!stakeholderId || !/^\d+$/.test(stakeholderId)) return;
+    const timer = setTimeout(() => setValue("stakeholder_id", stakeholderId, { shouldDirty: true }), 300);
+    return () => clearTimeout(timer);
+  }, [project?.id, setValue]);
+
   useEffect(() => {
     if (!isDirty) return;
     const handler = (event: BeforeUnloadEvent) => {

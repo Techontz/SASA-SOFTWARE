@@ -27,7 +27,23 @@ const pages = [
   ['/notifications', 'notifications'],
   ['/account', 'account'],
   ['/projects', 'projects'],
+  ['/paps', 'paps'],
+  ['/paps/new', 'pap-new'],
+  ['/paps/1', 'pap-detail'],
+  ['/paps/1/edit', 'pap-edit'],
+  ['/paps/consultations', 'pap-consultations'],
+  ['/paps/consultations/new', 'pap-consultation-new'],
+  ['/eshs', 'eshs'],
+  ['/eshs/new', 'eshs-new'],
+  ['/eshs/1', 'eshs-detail'],
+  ['/eshs/settings', 'eshs-settings'],
+  ['/incidents', 'incidents'],
+  ['/incidents/new', 'incident-new'],
+  ['/incidents/1', 'incident-detail'],
+  ['/incidents/settings', 'incident-settings'],
 ];
+
+const BASE = process.env.QA_BASE_URL ?? 'http://localhost:3010';
 
 const [,, user = 'project.admin@sasa.test', mode = 'desktop', theme = 'light'] = process.argv;
 const viewport = mode === 'mobile' ? { width: 390, height: 844 } : { width: 1440, height: 1000 };
@@ -51,7 +67,7 @@ await page.addInitScript((t) => {
   document.addEventListener('DOMContentLoaded', () => document.head.appendChild(hide));
 }, theme);
 
-await page.goto('http://localhost:3010/sign-in', { waitUntil: 'domcontentloaded' });
+await page.goto(BASE + '/sign-in', { waitUntil: 'domcontentloaded' });
 await page.fill('#email', user);
 await page.fill('#password', 'password');
 await page.click('button[type=submit]');
@@ -65,7 +81,7 @@ if (applied !== theme) problems.push(`THEME not applied: wanted ${theme}, got ${
 
 for (const [path, name] of pages) {
   try {
-    await page.goto('http://localhost:3010' + path, { waitUntil: 'domcontentloaded', timeout: 40000 });
+    await page.goto(BASE + path, { waitUntil: 'domcontentloaded', timeout: 40000 });
     await page.waitForTimeout(2200);
     await page.screenshot({ path: `${shots}/${name}.png`, fullPage: false });
     // Check for horizontal overflow, which is the classic mobile failure.

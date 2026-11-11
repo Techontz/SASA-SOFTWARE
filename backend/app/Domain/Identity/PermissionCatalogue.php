@@ -57,6 +57,24 @@ final class PermissionCatalogue
             $p('grievance.view_restricted', 'Grievances', 'See restricted categories', 'See cases in restricted categories such as SEA/SH, retaliation and ethics, regardless of handling group.', true),
             $p('grievance.export', 'Grievances', 'Export cases', 'Download case data. Identity is stripped unless you can see confidential cases.'),
 
+            // --- PAP Master Register ------------------------------------------
+            $p('pap.view', 'PAP register', 'See the PAP master register', 'Open Project Affected Person records: profile, land, assets, valuation, entitlements, relocation and livelihood restoration.'),
+            $p('pap.manage', 'PAP register', 'Record and update PAPs', 'Add PAPs and fill in their survey, inventory, valuation, entitlement, relocation and livelihood records.'),
+            $p('pap.view_sensitive', 'PAP register', 'See PAP identity numbers and bank details', 'Receive National ID numbers, bank account and mobile money numbers. Without this the keys are absent from every response.', true),
+            $p('pap.manage_payments', 'PAP register', 'Record compensation payments', 'Approve and record compensation payments to PAPs.', true),
+            $p('pap.export', 'PAP register', 'Export the PAP register', 'Download PAP register data. Sensitive fields are stripped unless you can see them.'),
+
+            // --- ESHS contractor assurance -------------------------------------
+            $p('eshs.view', 'ESHS assurance', 'See ESHS anomalies', 'Open the contractor assurance log and its dashboard.'),
+            $p('eshs.raise', 'ESHS assurance', 'Raise ESHS anomalies', 'Report an observation, non-conformance or incident against a contractor. Client and supervision team only.'),
+            $p('eshs.respond', 'ESHS assurance', 'Respond as the contractor', 'Update progress on a contractor action and upload closure evidence for verification.'),
+            $p('eshs.verify', 'ESHS assurance', 'Verify and close anomalies', 'Check the contractor\'s closure evidence and close the anomaly. Supervision team only.'),
+
+            // --- Incident notification ------------------------------------------
+            $p('incident.view', 'Incidents', 'See incident notifications', 'Open incident notification reports.'),
+            $p('incident.report', 'Incidents', 'Report an incident', 'Submit an incident notification report with evidence.'),
+            $p('incident.manage', 'Incidents', 'Manage incidents', 'Review, classify and close incident notifications.'),
+
             // --- Reporting ----------------------------------------------------
             $p('dashboard.view', 'Reporting', 'See dashboards', 'Open the dashboards for this project.'),
             $p('dashboard.view_disaggregation', 'Reporting', 'See disaggregation', 'Open the disaggregation dashboard and its cross-tabs.'),
@@ -114,6 +132,7 @@ final class PermissionCatalogue
                 'description' => 'Consumes the reporting and makes the decisions cases escalate to.',
                 'escalation_rank' => 5,
                 'permissions' => array_merge($view, [
+                    'pap.view', 'eshs.view', 'incident.view', 'pap.export',
                     'dashboard.view_disaggregation', 'report.generate', 'grievance.escalate',
                     'stakeholder.export', 'grievance.export', 'audit.view',
                 ]),
@@ -125,6 +144,7 @@ final class PermissionCatalogue
                 'description' => 'Owns delivery: decides on escalations, commitments and corrective actions.',
                 'escalation_rank' => 8,
                 'permissions' => array_merge($view, [
+                    'pap.view', 'pap.manage', 'pap.export', 'pap.manage_payments', 'pap.view_sensitive', 'eshs.view', 'eshs.raise', 'eshs.verify', 'incident.view', 'incident.report', 'incident.manage',
                     'stakeholder.create', 'stakeholder.update', 'engagement.plan', 'engagement.log',
                     'concern.manage', 'concern.escalate', 'commitment.manage', 'commitment.verify',
                     'grievance.assign', 'grievance.escalate', 'grievance.resolve', 'grievance.close',
@@ -138,6 +158,7 @@ final class PermissionCatalogue
                 'description' => 'Owns the case load end to end: classification, investigation, resolution and closure.',
                 'escalation_rank' => 20,
                 'permissions' => array_merge($view, [
+                    'pap.view',
                     'stakeholder.create', 'stakeholder.update',
                     'concern.manage', 'concern.escalate', 'commitment.manage',
                     'grievance.create', 'grievance.update', 'grievance.classify', 'grievance.assign',
@@ -153,6 +174,7 @@ final class PermissionCatalogue
                 'description' => 'Owns the register and the engagement programme; raises concerns and commitments.',
                 'escalation_rank' => 30,
                 'permissions' => array_merge($view, [
+                    'pap.view', 'pap.manage', 'pap.export',
                     'stakeholder.create', 'stakeholder.update', 'stakeholder.archive',
                     'stakeholder.override_priority', 'stakeholder.merge', 'stakeholder.export',
                     'engagement.plan', 'engagement.log', 'engagement.archive',
@@ -167,6 +189,7 @@ final class PermissionCatalogue
                 'description' => 'Handles worker grievances: labour, pay, contracts and workplace conduct.',
                 'escalation_rank' => 25,
                 'permissions' => array_merge($view, [
+                    'eshs.view', 'eshs.raise', 'incident.view', 'incident.report',
                     'grievance.create', 'grievance.update', 'grievance.classify', 'grievance.acknowledge',
                     'grievance.investigate', 'grievance.resolve', 'grievance.escalate',
                     'grievance.view_confidential', 'commitment.manage', 'report.generate', 'ai.review',
@@ -179,6 +202,7 @@ final class PermissionCatalogue
                 'description' => 'Handles environment, health and safety cases and their corrective actions.',
                 'escalation_rank' => 25,
                 'permissions' => array_merge($view, [
+                    'eshs.view', 'eshs.raise', 'eshs.verify', 'incident.view', 'incident.report', 'incident.manage',
                     'grievance.create', 'grievance.update', 'grievance.classify', 'grievance.acknowledge',
                     'grievance.investigate', 'grievance.resolve', 'grievance.escalate',
                     'commitment.manage', 'commitment.verify', 'report.generate', 'ai.review',
@@ -191,10 +215,19 @@ final class PermissionCatalogue
                 'description' => 'Handles security-related cases and incidents involving project security.',
                 'escalation_rank' => 25,
                 'permissions' => array_merge($view, [
+                    'eshs.view', 'eshs.raise', 'incident.view', 'incident.report', 'incident.manage',
                     'grievance.create', 'grievance.update', 'grievance.classify',
                     'grievance.investigate', 'grievance.escalate', 'report.generate',
                 ]),
                 'handling_groups' => ['general'],
+            ],
+            [
+                'key' => 'contractor',
+                'name' => 'Contractor',
+                'description' => 'Contractor personnel. Responds to ESHS anomalies and uploads closure evidence; cannot raise or close them.',
+                'escalation_rank' => 50,
+                'permissions' => ['eshs.view', 'eshs.respond', 'incident.view', 'incident.report', 'project.view'],
+                'handling_groups' => [],
             ],
             [
                 'key' => 'field_officer',
@@ -207,6 +240,7 @@ final class PermissionCatalogue
                     'concern.view', 'concern.manage',
                     'commitment.view', 'commitment.manage',
                     'grievance.view', 'grievance.create',
+                    'pap.view', 'pap.manage', 'incident.view', 'incident.report',
                     'dashboard.view', 'project.view',
                 ],
                 'handling_groups' => ['general'],
@@ -217,6 +251,7 @@ final class PermissionCatalogue
                 'description' => 'Verifies what happened. Can read everything on the project and change nothing.',
                 'escalation_rank' => 60,
                 'permissions' => array_merge($view, [
+                    'pap.view', 'eshs.view', 'incident.view',
                     'dashboard.view_disaggregation', 'audit.view', 'report.generate',
                     'stakeholder.export', 'grievance.export',
                 ]),

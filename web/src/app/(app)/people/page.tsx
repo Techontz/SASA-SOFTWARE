@@ -1,7 +1,7 @@
 "use client";
 
 import { useQueryClient } from "@tanstack/react-query";
-import { Mail, ShieldCheck, UserPlus } from "lucide-react";
+import { HardHat, Mail, ShieldCheck, UserPlus } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { Card, CardBody } from "@/components/ui/Card";
@@ -11,6 +11,7 @@ import { Field, Input, Select } from "@/components/ui/Form";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { LoadingState, PermissionDenied } from "@/components/ui/States";
 import { apiRequest } from "@/lib/api/client";
+import { useEshsOptions } from "@/lib/api/eshs";
 import { useProjectMembers } from "@/lib/api/hooks";
 import { formatRelative, initials } from "@/lib/utils";
 import { useSession } from "@/providers/SessionProvider";
@@ -29,11 +30,15 @@ export default function PeoplePage() {
   const toast = useToast();
   const queryClient = useQueryClient();
   const { data, isLoading } = useProjectMembers();
+  const eshsOptions = useEshsOptions(can("eshs.view"));
+  const contractorChoices = eshsOptions.data?.data.contractors ?? [];
 
   const [inviteOpen, setInviteOpen] = useState(false);
   const [roles, setRoles] = useState<RoleRow[]>([]);
   const [form, setForm] = useState<Record<string, string>>({});
   const [busy, setBusy] = useState(false);
+  const [contractorFor, setContractorFor] = useState<{ id: number; name: string } | null>(null);
+  const [contractorName, setContractorName] = useState("");
 
   if (!can("user.view")) return <PermissionDenied what="project members" />;
 
@@ -56,6 +61,7 @@ export default function PeoplePage() {
           job_title: form.job_title,
           role_id: Number(form.role_id),
           handling_groups: form.handling_groups ? [form.handling_groups] : ["general"],
+          contractor_name: form.contractor_name || null,
         },
       });
 
@@ -65,6 +71,30 @@ export default function PeoplePage() {
       setForm({});
     } catch (error) {
       toast.error("We could not add them", error instanceof Error ? error.message : undefined);
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  /* ESHS: a contractor's people see only their own company's anomalies. */
+  const saveContractor = async () => {
+    if (!contractorFor) return;
+    setBusy(true);
+    try {
+      await apiRequest(`/members/${contractorFor.id}`, {
+        method: "PATCH",
+        body: { contractor_name: contractorName.trim() || null },
+      });
+      await queryClient.invalidateQueries({ queryKey: ["project-members"] });
+      toast.success(
+        "Contractor saved",
+        contractorName.trim()
+          ? `${contractorFor.name} now sees only ${contractorName.trim()}'s ESHS anomalies.`
+          : `${contractorFor.name} is no longer limited to one contractor.`,
+      );
+      setContractorFor(null);
+    } catch (error) {
+      toast.error("Nothing was saved", error instanceof Error ? error.message : undefined);
     } finally {
       setBusy(false);
     }
@@ -113,6 +143,24 @@ export default function PeoplePage() {
                     <ShieldCheck className="h-3 w-3" aria-hidden />
                     Restricted handling
                   </span>
+                ) : null}
+                {member.contractor_name ? (
+                  <span className="inline-flex items-center gap-1.5 rounded-full bg-accent-50 px-2.5 py-1 text-xs font-medium text-accent-800">
+                    <HardHat className="h-3 w-3" aria-hidden />
+                    Contractor: {member.contractor_name}
+                  </span>
+                ) : null}
+                {can("user.manage") && (member.role.key === "contractor" || member.contractor_name) ? (
+                  <Button
+                    variant="quiet"
+                    size="sm"
+                    onClick={() => {
+                      setContractorFor({ id: member.id, name: member.user.name });
+                      setContractorName(member.contractor_name ?? "");
+                    }}
+                  >
+                    {member.contractor_name ? "Change contractor" : "Set contractor"}
+                  </Button>
                 ) : null}
                 <StatusBadge status={member.user.status} size="sm" />
                 <span className="w-32 shrink-0 text-right text-xs text-ink-500">
@@ -197,8 +245,70 @@ export default function PeoplePage() {
               <option value="restricted_handling">Restricted handling</option>
             </Select>
           </Field>
+          <Field
+            label="Contractor company"
+            optional
+            htmlFor="member-contractor"
+            hint="For contractor personnel only. They will see ESHS anomalies for this company and no other."
+          >
+            <ContractorInput
+              id="member-contractor"
+              value={form.contractor_name ?? ""}
+              choices={contractorChoices}
+              onChange={(value) => setForm((current) => ({ ...current, contractor_name: value }))}
+            />
+          </Field>
         </div>
+      </Drawer>
+
+      <Drawer
+        open={contractorFor !== null}
+        onClose={() => setContractorFor(null)}
+        title="Contractor company"
+        description="A person linked to a contractor sees that company's ESHS anomalies and no other. Leave blank to remove the limit."
+        width="sm"
+        footer={
+          <>
+            <Button variant="secondary" onClick={() => setContractorFor(null)}>Cancel</Button>
+            <Button variant="primary" loading={busy} onClick={() => void saveContractor()}>
+              Save
+            </Button>
+          </>
+        }
+      >
+        <Field label={`Contractor for ${contractorFor?.name ?? ""}`} optional htmlFor="member-contractor-edit">
+          <ContractorInput id="member-contractor-edit" value={contractorName} choices={contractorChoices} onChange={setContractorName} />
+        </Field>
       </Drawer>
     </div>
   );
+}
+
+/** The project's ESHS contractor list when there is one; free text otherwise. */
+function ContractorInput({
+  id,
+  value,
+  choices,
+  onChange,
+}: {
+  id: string;
+  value: string;
+  choices: string[];
+  onChange: (value: string) => void;
+}) {
+  if (choices.length > 0) {
+    return (
+      <Select id={id} value={value} onChange={(event) => onChange(event.target.value)}>
+        <option value="">Not a contractor</option>
+        {choices.map((choice) => (
+          <option key={choice} value={choice}>
+            {choice}
+          </option>
+        ))}
+        {value && !choices.includes(value) ? <option value={value}>{value}</option> : null}
+      </Select>
+    );
+  }
+
+  return <Input id={id} value={value} onChange={(event) => onChange(event.target.value)} />;
 }

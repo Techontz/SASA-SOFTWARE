@@ -59,6 +59,9 @@ class AppServiceProvider extends ServiceProvider
             'commitment' => Commitment::class,
             'grievance' => Grievance::class,
             'grievance_follow_up' => GrievanceFollowUp::class,
+            'pap' => \App\Models\Pap::class,
+            'eshs_anomaly' => \App\Models\EshsAnomaly::class,
+            'incident' => \App\Models\Incident::class,
             'attachment' => Attachment::class,
             'user' => User::class,
         ]);

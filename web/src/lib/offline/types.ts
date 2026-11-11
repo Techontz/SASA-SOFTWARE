@@ -23,7 +23,10 @@ export type LocalEntity =
   | "concern"
   | "commitment"
   | "grievance"
-  | "grievance_follow_up";
+  | "grievance_follow_up"
+  | "pap"
+  | "eshs_anomaly"
+  | "incident";
 
 export type OperationType = "create" | "update";
 

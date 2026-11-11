@@ -33,16 +33,16 @@ import type {
   TimelinessDashboard,
 } from "@/types/api";
 
-type Query = Record<string, string | number | boolean | null | undefined>;
+export type Query = Record<string, string | number | boolean | null | undefined>;
 
 /** Strip empty filters so the query key and the request URL stay stable. */
-function clean(query: Query = {}): Query {
+export function clean(query: Query = {}): Query {
   return Object.fromEntries(
     Object.entries(query).filter(([, value]) => value !== "" && value !== null && value !== undefined),
   );
 }
 
-function list<T>(path: string, key: string) {
+export function list<T>(path: string, key: string) {
   return (query: Query = {}, options?: Partial<UseQueryOptions<Paginated<T>>>) =>
     useQuery<Paginated<T>>({
       queryKey: [key, clean(query)],
@@ -51,7 +51,7 @@ function list<T>(path: string, key: string) {
     });
 }
 
-function detail<T>(path: (id: number | string) => string, key: string) {
+export function detail<T>(path: (id: number | string) => string, key: string) {
   return (id: number | string | null | undefined, options?: Partial<UseQueryOptions<{ data: T }>>) =>
     useQuery<{ data: T }>({
       queryKey: [key, id],
@@ -213,6 +213,8 @@ export function useProjectMembers() {
           user: { id: number; name: string; email: string; status: string; job_title: string | null; last_login_at: string | null; phone: string | null };
           role: { id: number; key: string; name: string };
           handling_groups: string[];
+          /** ESHS: set for contractor personnel, who then see only their company's anomalies. */
+          contractor_name?: string | null;
           status: string;
           joined_at: string | null;
         }>;

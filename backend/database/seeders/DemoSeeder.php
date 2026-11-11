@@ -71,6 +71,9 @@ class DemoSeeder extends Seeder
         // Only the first project gets a full operational history — a demo that
         // fills three projects with identical noise teaches nothing.
         $this->call(DemoOperationsSeeder::class);
+        $this->call(PapDemoSeeder::class);
+        $this->call(EshsDemoSeeder::class);
+        $this->call(IncidentDemoSeeder::class);
 
         $this->command?->newLine();
         $this->command?->info('Demo organisation: '.$this->organisation->name);
@@ -114,6 +117,7 @@ class DemoSeeder extends Seeder
             ['name' => 'Zainabu Hamisi', 'email' => 'field@sasa.test', 'role' => 'field_officer', 'title' => 'Field officer'],
             ['name' => 'Mariam Juma', 'email' => 'field2@sasa.test', 'role' => 'field_officer', 'title' => 'Field officer'],
             ['name' => 'Robert Chenge', 'email' => 'auditor@sasa.test', 'role' => 'auditor', 'title' => 'Lender representative (read-only)'],
+            ['name' => 'Kisare Lutambi', 'email' => 'contractor@sasa.test', 'role' => 'contractor', 'title' => 'Contractor HSE lead', 'contractor' => EshsDemoSeeder::CONTRACTORS[0]],
         ];
 
         $created = [];
@@ -146,7 +150,7 @@ class DemoSeeder extends Seeder
             foreach ($projects as $index => $project) {
                 // The auditor sees only the first project — role is per project,
                 // which is exactly the point.
-                if ($definition['role'] === 'auditor' && $index > 0) {
+                if (in_array($definition['role'], ['auditor', 'contractor'], true) && $index > 0) {
                     continue;
                 }
 
@@ -155,7 +159,7 @@ class DemoSeeder extends Seeder
                     ? $this->roles['auditor']
                     : $role;
 
-                ProjectMembership::updateOrCreate(
+                $membership = ProjectMembership::updateOrCreate(
                     ['project_id' => $project->id, 'user_id' => $user->id],
                     [
                         'organisation_id' => $this->organisation->id,
@@ -166,6 +170,11 @@ class DemoSeeder extends Seeder
                         'joined_at' => now()->subMonths(6),
                     ]
                 );
+
+                // Contractor personnel see only their own company's ESHS anomalies.
+                if (isset($definition['contractor'])) {
+                    $membership->forceFill(['contractor_name' => $definition['contractor']])->save();
+                }
             }
 
             $created[$definition['email']] = ['role' => $role->name, 'email' => $definition['email']];

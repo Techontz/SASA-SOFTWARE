@@ -3,6 +3,7 @@
 namespace App\Http\Resources;
 
 use App\Domain\Stakeholder\PriorityCalculator;
+use App\Models\Pap;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -82,6 +83,12 @@ class StakeholderResource extends JsonResource
             'review_due' => $this->review_date !== null && $this->review_date->isPast(),
             'last_engaged_on' => $this->last_engaged_on?->toDateString(),
             'merged_into_id' => $this->merged_into_id,
+            // A PAP's stakeholder record is maintained from the PAP register.
+            'managed_by_pap' => $this->when($this->type === 'pap', function () {
+                $pap = Pap::query()->where('stakeholder_id', $this->id)->first(['id', 'reference']);
+
+                return $pap ? ['id' => $pap->id, 'reference' => $pap->reference] : null;
+            }),
             'owner' => $this->whenLoaded('owner', fn () => $this->owner ? ['id' => $this->owner->id, 'name' => $this->owner->name] : null),
 
             'client_uuid' => $this->client_uuid,

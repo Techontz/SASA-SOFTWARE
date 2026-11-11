@@ -178,6 +178,11 @@ Route::prefix('v1')->group(function () {
                 Route::post('{grievance}/communications', [GrievanceController::class, 'sendCommunication']);
             });
 
+            // --- PAP Master Register, ESHS assurance, incident notification ---
+            require __DIR__.'/api/pap.php';
+            require __DIR__.'/api/eshs.php';
+            require __DIR__.'/api/incidents.php';
+
             // --- Search and saved views ---------------------------------------
             Route::get('search', SearchController::class);
             Route::apiResource('saved-views', SavedViewController::class)->except(['show']);

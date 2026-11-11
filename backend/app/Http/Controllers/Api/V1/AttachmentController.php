@@ -9,11 +9,15 @@ use App\Models\Attachment;
 use App\Models\Commitment;
 use App\Models\Concern;
 use App\Models\Engagement;
+use App\Models\EshsAnomaly;
 use App\Models\Grievance;
+use App\Models\Incident;
+use App\Models\Pap;
 use App\Models\Stakeholder;
 use App\Support\ApiResponse;
 use App\Support\DomainRuleException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rule;
 
 class AttachmentController extends Controller
@@ -24,6 +28,9 @@ class AttachmentController extends Controller
         'concern' => Concern::class,
         'commitment' => Commitment::class,
         'grievance' => Grievance::class,
+        'pap' => Pap::class,
+        'eshs_anomaly' => EshsAnomaly::class,
+        'incident' => Incident::class,
     ];
 
     public function __construct(private readonly AttachmentService $attachments) {}
@@ -103,7 +110,13 @@ class AttachmentController extends Controller
         abort_unless($attachment->project_id === $this->project()->id, 404);
 
         $attachable = $attachment->attachable;
-        $this->authorize('update', $attachable);
+
+        // A policy may narrow removal below upload (ESHS: a contractor cannot
+        // remove the supervision team's evidence). Otherwise update governs both.
+        $policy = Gate::getPolicyFor($attachable);
+        $policy && method_exists($policy, 'removeAttachment')
+            ? $this->authorize('removeAttachment', [$attachable, $attachment])
+            : $this->authorize('update', $attachable);
 
         $this->attachments->archive($attachment);
 

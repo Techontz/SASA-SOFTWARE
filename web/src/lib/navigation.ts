@@ -6,6 +6,9 @@ import {
   CalendarClock,
   ClipboardCheck,
   FileText,
+  HardHat,
+  Siren,
+  UserRoundCog,
   FolderKanban,
   Handshake,
   LayoutDashboard,
@@ -48,6 +51,14 @@ export const PRIMARY_NAVIGATION: NavGroup[] = [
       { href: "/grievances", label: "Grievances", icon: ClipboardCheck, permissions: ["grievance.view"], description: "Cases and their SLA" },
       { href: "/commitments", label: "Commitments", icon: Handshake, permissions: ["commitment.view"], description: "What was promised" },
       { href: "/reports", label: "Reports", icon: FileText, permissions: ["report.generate"], description: "Generated from live data" },
+    ],
+  },
+  {
+    label: "Safeguards",
+    items: [
+      { href: "/paps", label: "PAP register", icon: UserRoundCog, permissions: ["pap.view"], description: "Project Affected Persons" },
+      { href: "/eshs", label: "ESHS assurance", icon: HardHat, permissions: ["eshs.view"], description: "Contractor anomalies and closure" },
+      { href: "/incidents", label: "Incidents", icon: Siren, permissions: ["incident.view"], description: "Incident notifications" },
     ],
   },
   {
@@ -111,6 +122,14 @@ export const QUICK_ACTIONS: QuickAction[] = [
     description: "Add a person, household, group or authority to the register",
     icon: Users,
     permissions: ["stakeholder.create"],
+    tone: "brand",
+  },
+  {
+    href: "/incidents/new",
+    label: "Report an incident",
+    description: "Notify an injury, spill, loss, security or social incident",
+    icon: Siren,
+    permissions: ["incident.report"],
     tone: "brand",
   },
   {

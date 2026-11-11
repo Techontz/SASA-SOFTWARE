@@ -28,6 +28,7 @@ import { apiRequest } from "@/lib/api/client";
 import { useEntityHistory, useStakeholder, useStakeholderTimeline } from "@/lib/api/hooks";
 import { formatDate, formatDateTime, formatRelative, humanise, languageName } from "@/lib/utils";
 import { useSession } from "@/providers/SessionProvider";
+import type { StakeholderPapLink } from "@/types/pap";
 import { useToast } from "@/providers/ToastProvider";
 
 const TIMELINE_ICON = {
@@ -59,6 +60,7 @@ export default function StakeholderDetailPage() {
 
   const stakeholder = data.data;
   const assessment = stakeholder.assessment;
+  const managedByPap = (stakeholder as typeof stakeholder & StakeholderPapLink).managed_by_pap ?? null;
 
   const override = async () => {
     setBusy(true);
@@ -137,6 +139,20 @@ export default function StakeholderDetailPage() {
           </>
         }
       />
+
+      {managedByPap ? (
+        <div className="mb-6 flex items-start gap-3 rounded-xl border border-brand-100 bg-brand-50 p-4 text-sm text-brand-800">
+          <Users className="mt-0.5 h-5 w-5 shrink-0" aria-hidden />
+          <p>
+            Managed from the PAP register as{" "}
+            <Link href={`/paps/${managedByPap.id}`} className="font-semibold underline underline-offset-2">
+              {managedByPap.reference}
+            </Link>
+            . Name, contact, location and vulnerability are kept in step from there — edit them on the PAP record, or
+            your change here will be replaced on the next PAP update.
+          </p>
+        </div>
+      ) : null}
 
       {/* --------------------- contact strip --------------------- */}
       <div className="mb-6 grid gap-3 sm:grid-cols-3">
