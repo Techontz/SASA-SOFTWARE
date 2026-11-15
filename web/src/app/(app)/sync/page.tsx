@@ -35,7 +35,7 @@ export default function SyncPage() {
   const toast = useToast();
   const queryClient = useQueryClient();
   const { can, project } = useSession();
-  const { data: conflicts } = useSyncConflicts("open");
+  const { data: conflicts } = useSyncConflicts("open", can("sync.resolve_conflicts"));
 
   const [storage, setStorage] = useState<{ usageBytes: number | null; quotaBytes: number | null }>({
     usageBytes: null,

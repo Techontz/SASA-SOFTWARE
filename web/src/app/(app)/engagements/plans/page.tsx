@@ -11,7 +11,7 @@ import { FilterBar } from "@/components/ui/FilterBar";
 import { PriorityBadge, StatusBadge } from "@/components/ui/StatusBadge";
 import { EmptyState, ErrorState, TableSkeleton } from "@/components/ui/States";
 import { useListState } from "@/hooks/useListState";
-import { useConfiguration, useEngagementPlans } from "@/lib/api/hooks";
+import { useReferenceLists, useEngagementPlans } from "@/lib/api/hooks";
 import { daysBetween, formatDate, humanise } from "@/lib/utils";
 import { useSession } from "@/providers/SessionProvider";
 import type { EngagementPlan } from "@/types/api";
@@ -28,7 +28,7 @@ function PlanList() {
   const { can } = useSession();
   const state = useListState({ sort: "target_date" });
   const { data, isLoading, isError, error, refetch } = useEngagementPlans(state.query);
-  const { data: configuration } = useConfiguration();
+  const { data: configuration } = useReferenceLists();
 
   const rows = data?.data ?? [];
   const meta = data?.meta;
@@ -151,7 +151,7 @@ function PlanList() {
             {
               key: "method",
               label: "Method",
-              options: (configuration?.data.lists.engagement_methods ?? []).map((value) => ({ value, label: humanise(value) })),
+              options: (configuration?.engagement_methods ?? []).map((value) => ({ value, label: humanise(value) })),
             },
           ]}
           values={state.filterValues}

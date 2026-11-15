@@ -11,7 +11,7 @@ import { SavedOnDeviceNotice } from "@/components/app/SavedOnDeviceNotice";
 import { Field, FieldRow, FormActions, FormSection, Input, Select, Textarea } from "@/components/ui/Form";
 import { PageHeader } from "@/components/ui/DetailLayout";
 import { PermissionDenied } from "@/components/ui/States";
-import { useLocations, useProjectMembers, useStakeholders } from "@/lib/api/hooks";
+import { useLocations, useAssignableMembers, useStakeholders } from "@/lib/api/hooks";
 import { syncEngine } from "@/lib/offline/syncEngine";
 import { uuid } from "@/lib/utils";
 import { useSession } from "@/providers/SessionProvider";
@@ -39,7 +39,7 @@ export default function NewCommitmentPage() {
   const toast = useToast();
   const sync = useSync();
   const { can } = useSession();
-  const { data: members } = useProjectMembers();
+  const { data: members } = useAssignableMembers();
   const { data: stakeholders } = useStakeholders({ per_page: 200, status: "active" });
   const { data: locationData } = useLocations();
 
@@ -152,9 +152,9 @@ export default function NewCommitmentPage() {
           <FieldRow>
             <Field label="Owner" optional htmlFor="owner_id">
               <Select id="owner_id" placeholder="Unassigned" {...register("owner_id")}>
-                {(members?.data ?? []).map((member) => (
-                  <option key={member.user.id} value={member.user.id}>
-                    {member.user.name} — {member.role.name}
+                {(members ?? []).map((member) => (
+                  <option key={member.id} value={member.id}>
+                    {member.role ? `${member.name} — ${member.role}` : member.name}
                   </option>
                 ))}
               </Select>

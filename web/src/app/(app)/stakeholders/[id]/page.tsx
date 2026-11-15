@@ -47,7 +47,7 @@ export default function StakeholderDetailPage() {
 
   const { data, isLoading, isError, error, refetch } = useStakeholder(id);
   const { data: timeline } = useStakeholderTimeline(id);
-  const { data: history } = useEntityHistory("Stakeholder", id);
+  const { data: history } = useEntityHistory(can("audit.view") ? "Stakeholder" : null, id);
 
   const [overrideOpen, setOverrideOpen] = useState(false);
   const [archiveOpen, setArchiveOpen] = useState(false);
@@ -386,7 +386,9 @@ export default function StakeholderDetailPage() {
               </Card>
             ),
           },
-          {
+          // The audit trail is for people with audit access; nobody else
+          // sees an empty tab that would only ever say "not allowed".
+          ...(can("audit.view") ? [{
             key: "history",
             label: "Record history",
             content: (
@@ -409,7 +411,7 @@ export default function StakeholderDetailPage() {
                 </CardBody>
               </Card>
             ),
-          },
+          }] : []),
         ]}
       />
 

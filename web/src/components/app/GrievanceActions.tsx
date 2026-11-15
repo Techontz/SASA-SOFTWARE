@@ -16,7 +16,7 @@ import { Button } from "@/components/ui/Button";
 import { Drawer } from "@/components/ui/Drawer";
 import { Field, Select, Textarea } from "@/components/ui/Form";
 import { apiRequest } from "@/lib/api/client";
-import { useProjectMembers } from "@/lib/api/hooks";
+import { useAssignableMembers } from "@/lib/api/hooks";
 import { useSession } from "@/providers/SessionProvider";
 import { useToast } from "@/providers/ToastProvider";
 import type { Grievance } from "@/types/api";
@@ -43,7 +43,7 @@ export function GrievanceActions({ grievance }: { grievance: Grievance }) {
   const { can } = useSession();
   const toast = useToast();
   const queryClient = useQueryClient();
-  const { data: members } = useProjectMembers();
+  const { data: members } = useAssignableMembers();
 
   const [action, setAction] = useState<ActionKey | null>(null);
   const [busy, setBusy] = useState(false);
@@ -182,9 +182,9 @@ export function GrievanceActions({ grievance }: { grievance: Grievance }) {
           <Field label="Owner" required htmlFor="assignee">
             <Select id="assignee" value={form.assigned_to_id ?? ""} onChange={(event) => set("assigned_to_id", event.target.value)}>
               <option value="">Unassigned</option>
-              {(members?.data ?? []).map((member) => (
-                <option key={member.user.id} value={member.user.id}>
-                  {member.user.name} — {member.role.name}
+              {(members ?? []).map((member) => (
+                <option key={member.id} value={member.id}>
+                  {member.role ? `${member.name} — ${member.role}` : member.name}
                 </option>
               ))}
             </Select>
@@ -521,9 +521,9 @@ export function GrievanceActions({ grievance }: { grievance: Grievance }) {
           <Field label="To whom" optional htmlFor="escalate-to">
             <Select id="escalate-to" value={form.escalated_to_id ?? ""} onChange={(event) => set("escalated_to_id", event.target.value)}>
               <option value="">Whoever the escalation rules name</option>
-              {(members?.data ?? []).map((member) => (
-                <option key={member.user.id} value={member.user.id}>
-                  {member.user.name} — {member.role.name}
+              {(members ?? []).map((member) => (
+                <option key={member.id} value={member.id}>
+                  {member.role ? `${member.name} — ${member.role}` : member.name}
                 </option>
               ))}
             </Select>

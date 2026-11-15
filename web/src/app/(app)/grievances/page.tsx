@@ -12,7 +12,7 @@ import { SeverityBadge, StatusBadge } from "@/components/ui/StatusBadge";
 import { EmptyState, ErrorState, TableSkeleton } from "@/components/ui/States";
 import { useListState } from "@/hooks/useListState";
 import { downloadFile } from "@/lib/api/client";
-import { useGrievanceCategories, useGrievances } from "@/lib/api/hooks";
+import { useCategoryOptions, useGrievances } from "@/lib/api/hooks";
 import { daysBetween, formatDate, humanise } from "@/lib/utils";
 import { useSession } from "@/providers/SessionProvider";
 import { useToast } from "@/providers/ToastProvider";
@@ -33,7 +33,7 @@ function GrievanceList() {
   const toast = useToast();
   const state = useListState({ sort: "-received_at" });
   const { data, isLoading, isError, error, refetch } = useGrievances(state.query);
-  const { data: categories } = useGrievanceCategories();
+  const { data: categories } = useCategoryOptions();
 
   const rows = data?.data ?? [];
   const meta = data?.meta;
@@ -108,7 +108,7 @@ function GrievanceList() {
     }
   };
 
-  const categoryOptions = (categories?.data ?? []).map((category) => ({
+  const categoryOptions = (categories ?? []).map((category) => ({
     value: String(category.id),
     label: category.name,
   }));

@@ -61,6 +61,44 @@ export function ErrorState({
 }) {
   const failure = error instanceof ApiRequestError ? error : null;
 
+  // "Not part of your role" and "not found" are answers, not faults: they get
+  // a calm explanation, no retry button and no support code.
+  if (failure?.status === 403) {
+    return (
+      <EmptyState
+        icon={Lock}
+        title="Not part of your role"
+        description={description ?? "Your account does not include this. If you need it for your work, ask your project administrator."}
+        className={className}
+      />
+    );
+  }
+  if (failure?.status === 404) {
+    return (
+      <EmptyState
+        title="We could not find this"
+        description={description ?? "It may have been archived or moved to another project."}
+        className={className}
+      />
+    );
+  }
+  if (failure?.isOffline) {
+    return (
+      <EmptyState
+        icon={WifiOff}
+        title="You are offline"
+        description="This needs a connection. Anything you record offline is kept on this device and syncs when the signal returns."
+        action={onRetry ? <Button variant="secondary" icon={<RefreshCw className="h-4 w-4" />} onClick={onRetry}>Try again</Button> : undefined}
+        className={className}
+      />
+    );
+  }
+
+  // A 4xx message from the API is written for the person reading it. A server
+  // fault's is not, so it is replaced with a plain sentence.
+  const readable = failure && failure.status >= 400 && failure.status < 500 ? failure.message : null;
+  const serverFault = !failure || failure.status === 0 || failure.status >= 500;
+
   return (
     <div className={cn("flex flex-col items-center justify-center px-6 py-14 text-center", className)}>
       <span className="flex h-14 w-14 items-center justify-center rounded-full bg-danger-50 text-danger-600">
@@ -69,17 +107,17 @@ export function ErrorState({
       <h3 className="mt-4 text-base font-semibold text-ink-900">{title}</h3>
       <p className="mt-1.5 max-w-md text-sm text-ink-600">
         {description ??
-          failure?.message ??
-          "Something went wrong on our side. Nothing you entered has been lost."}
+          readable ??
+          "Something went wrong on our side. Nothing you entered has been lost — please try again in a moment."}
       </p>
       {onRetry ? (
         <Button className="mt-5" variant="secondary" icon={<RefreshCw className="h-4 w-4" />} onClick={onRetry}>
           Try again
         </Button>
       ) : null}
-      {failure?.requestId ? (
-        <p className="mt-4 font-mono text-[0.6875rem] text-ink-400">
-          Reference {failure.requestId}
+      {serverFault && failure?.requestId ? (
+        <p className="mt-4 text-[0.6875rem] text-ink-400">
+          If this keeps happening, give support this code: <span className="font-mono">{failure.requestId.slice(0, 8)}</span>
         </p>
       ) : null}
     </div>

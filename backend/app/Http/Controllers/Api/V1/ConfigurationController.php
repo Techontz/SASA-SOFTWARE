@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Domain\Configuration\ConfigurationKeys;
 use App\Domain\Configuration\ConfigurationRegistry;
+use App\Domain\Configuration\ReferenceLists;
 use App\Domain\Identity\PermissionCatalogue;
 use App\Domain\Notification\NotificationEvents;
 use App\Http\Controllers\Controller;
@@ -12,7 +13,6 @@ use App\Models\Holiday;
 use App\Models\NotificationRule;
 use App\Models\Role;
 use App\Models\SlaPolicy;
-use App\Models\Stakeholder;
 use App\Models\WorkingCalendar;
 use App\Support\ApiResponse;
 use Illuminate\Http\Request;
@@ -45,22 +45,7 @@ class ConfigurationController extends Controller
                 'calendar' => config('sasa.calendar'),
                 'sla' => config('sasa.sla'),
             ],
-            'lists' => [
-                'stakeholder_types' => $this->configuration->get('stakeholder_types', $project->organisation_id, $project->id, Stakeholder::TYPES),
-                'engagement_methods' => $this->configuration->get('engagement_methods', $project->organisation_id, $project->id, [
-                    'community_meeting', 'focus_group', 'household_visit', 'public_hearing',
-                    'radio_programme', 'phone_call', 'written_disclosure', 'workshop', 'site_walkover',
-                ]),
-                'project_phases' => $this->configuration->get('project_phases', $project->organisation_id, $project->id, [
-                    'pre_construction', 'construction', 'operation', 'decommissioning',
-                ]),
-                'languages' => $this->configuration->get('languages', $project->organisation_id, $project->id, ['sw', 'en']),
-                'vulnerability_categories' => $this->configuration->get('vulnerability_categories', $project->organisation_id, $project->id, [
-                    'elderly', 'disability', 'female_headed_household', 'child_headed_household',
-                    'landless', 'chronically_ill', 'displaced', 'indigenous', 'linguistic_minority', 'low_income',
-                ]),
-                'disaggregation_dimensions' => $this->configuration->get('disaggregation_dimensions', $project->organisation_id, $project->id, $this->defaultDimensions()),
-            ],
+            'lists' => app(ReferenceLists::class)->for($project),
         ]);
     }
 
@@ -364,23 +349,6 @@ class ConfigurationController extends Controller
         );
 
         return ApiResponse::data($rule->fresh());
-    }
-
-    private function defaultDimensions(): array
-    {
-        return [
-            ['key' => 'gender', 'label' => 'Gender', 'sensitive' => false, 'enabled' => true, 'options' => ['female', 'male', 'other', 'prefer_not_to_say']],
-            ['key' => 'age_band', 'label' => 'Age band', 'sensitive' => false, 'enabled' => true, 'options' => ['under_18', '18_35', '36_60', 'over_60']],
-            ['key' => 'disability', 'label' => 'Disability status', 'sensitive' => true, 'enabled' => true, 'options' => ['yes', 'no', 'prefer_not_to_say']],
-            ['key' => 'employment', 'label' => 'Employment status', 'sensitive' => false, 'enabled' => true, 'options' => ['employed_by_project', 'contractor', 'self_employed', 'farmer', 'unemployed', 'student', 'retired']],
-            ['key' => 'language', 'label' => 'Language', 'sensitive' => false, 'enabled' => true, 'options' => []],
-            ['key' => 'marital_status', 'label' => 'Marital status', 'sensitive' => true, 'enabled' => false, 'options' => ['single', 'married', 'widowed', 'separated', 'orphan']],
-            ['key' => 'migrant_status', 'label' => 'Migrant or refugee status', 'sensitive' => true, 'enabled' => false, 'options' => ['resident', 'internal_migrant', 'refugee', 'prefer_not_to_say']],
-            ['key' => 'economic_status', 'label' => 'Economic status', 'sensitive' => true, 'enabled' => false, 'options' => ['low', 'medium', 'high', 'prefer_not_to_say']],
-            // Deliberately off by default: collecting this lawfully, voluntarily
-            // and safely is a decision for the project, not a default.
-            ['key' => 'gender_identity', 'label' => 'Gender identity or sexual orientation', 'sensitive' => true, 'enabled' => false, 'options' => []],
-        ];
     }
 
     private function can(string $permission): void

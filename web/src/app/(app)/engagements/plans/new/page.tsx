@@ -10,7 +10,7 @@ import { Checkbox, Field, FieldRow, FormActions, FormSection, Input, Select, Tex
 import { PageHeader } from "@/components/ui/DetailLayout";
 import { PermissionDenied } from "@/components/ui/States";
 import { apiRequest } from "@/lib/api/client";
-import { useConfiguration, useLocations, useProjectMembers, useStakeholders } from "@/lib/api/hooks";
+import { useReferenceLists, useLocations, useAssignableMembers, useStakeholders } from "@/lib/api/hooks";
 import { humanise } from "@/lib/utils";
 import { useSession } from "@/providers/SessionProvider";
 import { useToast } from "@/providers/ToastProvider";
@@ -49,9 +49,9 @@ export default function NewEngagementPlanPage() {
   const toast = useToast();
   const { can } = useSession();
   const { data: stakeholders } = useStakeholders({ per_page: 200, status: "active" });
-  const { data: members } = useProjectMembers();
+  const { data: members } = useAssignableMembers();
   const { data: locationData } = useLocations();
-  const { data: configuration } = useConfiguration();
+  const { data: configuration } = useReferenceLists();
 
   const {
     register,
@@ -138,7 +138,7 @@ export default function NewEngagementPlanPage() {
           <FieldRow columns={3}>
             <Field label="Method" optional htmlFor="method">
               <Select id="method" placeholder="Not decided" {...register("method")}>
-                {(configuration?.data.lists.engagement_methods ?? []).map((method) => (
+                {(configuration?.engagement_methods ?? []).map((method) => (
                   <option key={method} value={method}>
                     {humanise(method)}
                   </option>
@@ -147,7 +147,7 @@ export default function NewEngagementPlanPage() {
             </Field>
             <Field label="Project phase" optional htmlFor="project_phase">
               <Select id="project_phase" placeholder="Not recorded" {...register("project_phase")}>
-                {(configuration?.data.lists.project_phases ?? []).map((phase) => (
+                {(configuration?.project_phases ?? []).map((phase) => (
                   <option key={phase} value={phase}>
                     {humanise(phase)}
                   </option>
@@ -198,9 +198,9 @@ export default function NewEngagementPlanPage() {
           <FieldRow>
             <Field label="Owner" optional htmlFor="owner_id" hint="Who is accountable for making it happen.">
               <Select id="owner_id" placeholder="Unassigned" {...register("owner_id")}>
-                {(members?.data ?? []).map((member) => (
-                  <option key={member.user.id} value={member.user.id}>
-                    {member.user.name}
+                {(members ?? []).map((member) => (
+                  <option key={member.id} value={member.id}>
+                    {member.name}
                   </option>
                 ))}
               </Select>

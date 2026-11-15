@@ -140,10 +140,11 @@ export function useGrievanceCategories() {
 
 // -------------------------------------------------------------- dashboards
 
-export function useLandingDashboard(query: Query = {}) {
+export function useLandingDashboard(query: Query = {}, enabled = true) {
   return useQuery({
     queryKey: ["dashboard", "landing", clean(query)],
     queryFn: () => apiRequest<{ data: LandingDashboard }>("/dashboard/landing", { query: clean(query) }),
+    enabled,
   });
 }
 
@@ -238,6 +239,27 @@ export function useBootstrap() {
   });
 }
 
+/**
+ * Reference data every member of a project may read — the option lists, the
+ * category tree and who can be picked as an owner. It comes from the device
+ * bootstrap rather than the configuration and people endpoints, which are
+ * for the people who manage them.
+ */
+export function useReferenceLists() {
+  const { data, ...rest } = useBootstrap();
+  return { ...rest, data: data?.data.lists };
+}
+
+export function useCategoryOptions() {
+  const { data, ...rest } = useBootstrap();
+  return { ...rest, data: data?.data.categories };
+}
+
+export function useAssignableMembers() {
+  const { data, ...rest } = useBootstrap();
+  return { ...rest, data: data?.data.members };
+}
+
 export function useSavedViews(entity?: string) {
   return useQuery({
     queryKey: ["saved-views", entity],
@@ -276,10 +298,11 @@ export function useReportTemplates() {
   });
 }
 
-export function useSyncConflicts(status = "open") {
+export function useSyncConflicts(status = "open", enabled = true) {
   return useQuery({
     queryKey: ["sync-conflicts", status],
     queryFn: () => apiRequest<{ data: Paginated<SyncConflictRecord> }>("/sync/conflicts", { query: { status } }),
+    enabled,
   });
 }
 

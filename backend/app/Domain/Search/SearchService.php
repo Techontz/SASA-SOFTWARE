@@ -3,6 +3,7 @@
 namespace App\Domain\Search;
 
 use App\Domain\Grievance\GrievanceVisibility;
+use App\Domain\Tenancy\TenantContext;
 use App\Models\Commitment;
 use App\Models\Engagement;
 use App\Models\Grievance;
@@ -17,7 +18,10 @@ use App\Models\Stakeholder;
  */
 final class SearchService
 {
-    public function __construct(private readonly GrievanceVisibility $visibility) {}
+    public function __construct(
+        private readonly GrievanceVisibility $visibility,
+        private readonly TenantContext $context,
+    ) {}
 
     public function search(int $projectId, string $term, int $limitPerGroup = 5): array
     {
@@ -27,14 +31,26 @@ final class SearchService
             return ['query' => $term, 'groups' => []];
         }
 
+        // A record type the person may not open is not searched at all, so a
+        // contractor's search never surfaces the stakeholder register.
+        $groups = [];
+
+        if ($this->context->can('stakeholder.view')) {
+            $groups[] = $this->group('stakeholders', 'Stakeholders', $this->stakeholders($projectId, $term, $limitPerGroup));
+        }
+        if ($this->context->can('grievance.view')) {
+            $groups[] = $this->group('grievances', 'Grievances', $this->grievances($projectId, $term, $limitPerGroup));
+        }
+        if ($this->context->can('engagement.view')) {
+            $groups[] = $this->group('engagements', 'Engagements', $this->engagements($projectId, $term, $limitPerGroup));
+        }
+        if ($this->context->can('commitment.view')) {
+            $groups[] = $this->group('commitments', 'Commitments', $this->commitments($projectId, $term, $limitPerGroup));
+        }
+
         return [
             'query' => $term,
-            'groups' => array_values(array_filter([
-                $this->group('stakeholders', 'Stakeholders', $this->stakeholders($projectId, $term, $limitPerGroup)),
-                $this->group('grievances', 'Grievances', $this->grievances($projectId, $term, $limitPerGroup)),
-                $this->group('engagements', 'Engagements', $this->engagements($projectId, $term, $limitPerGroup)),
-                $this->group('commitments', 'Commitments', $this->commitments($projectId, $term, $limitPerGroup)),
-            ], fn ($group) => $group['results'] !== [])),
+            'groups' => array_values(array_filter($groups, fn ($group) => $group['results'] !== [])),
         ];
     }
 

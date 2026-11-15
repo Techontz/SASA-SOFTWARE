@@ -13,7 +13,7 @@ import { StatusBadge } from "@/components/ui/StatusBadge";
 import { EmptyState, ErrorState, TableSkeleton } from "@/components/ui/States";
 import { useListState } from "@/hooks/useListState";
 import { downloadFile } from "@/lib/api/client";
-import { useConfiguration, useEngagements } from "@/lib/api/hooks";
+import { useReferenceLists, useEngagements } from "@/lib/api/hooks";
 import { formatDate, formatNumber, humanise } from "@/lib/utils";
 import { useSession } from "@/providers/SessionProvider";
 import { useToast } from "@/providers/ToastProvider";
@@ -32,7 +32,7 @@ function EngagementList() {
   const toast = useToast();
   const state = useListState({ sort: "-held_at" });
   const { data, isLoading, isError, error, refetch } = useEngagements(state.query);
-  const { data: configuration } = useConfiguration();
+  const { data: configuration } = useReferenceLists();
 
   const rows = data?.data ?? [];
   const meta = data?.meta;
@@ -111,7 +111,7 @@ function EngagementList() {
     },
   ];
 
-  const methods = (configuration?.data.lists.engagement_methods ?? []).map((value) => ({
+  const methods = (configuration?.engagement_methods ?? []).map((value) => ({
     value,
     label: humanise(value),
   }));
@@ -188,7 +188,7 @@ function EngagementList() {
             {
               key: "project_phase",
               label: "Phase",
-              options: (configuration?.data.lists.project_phases ?? []).map((value) => ({ value, label: humanise(value) })),
+              options: (configuration?.project_phases ?? []).map((value) => ({ value, label: humanise(value) })),
             },
           ]}
           values={state.filterValues}

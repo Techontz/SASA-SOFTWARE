@@ -18,7 +18,7 @@ import { PageHeader } from "@/components/ui/DetailLayout";
 import { KpiCard, KpiCardSkeleton } from "@/components/ui/KpiCard";
 import { ErrorState } from "@/components/ui/States";
 import { useLandingDashboard } from "@/lib/api/hooks";
-import { QUICK_ACTIONS } from "@/lib/navigation";
+import { PRIMARY_NAVIGATION, QUICK_ACTIONS } from "@/lib/navigation";
 import { cn, formatRelative, humanise } from "@/lib/utils";
 import { useSession } from "@/providers/SessionProvider";
 
@@ -27,13 +27,14 @@ import { useSession } from "@/providers/SessionProvider";
  * different for each — without building six different applications.
  */
 export default function DashboardPage() {
-  const { user, canAny } = useSession();
+  const { user, can, canAny } = useSession();
   const [period, setPeriod] = useState<Period>(() => presetPeriods()[1]);
+  const canSeeDashboard = can("dashboard.view");
 
-  const { data, isLoading, isError, error, refetch } = useLandingDashboard({
-    from: period.from,
-    to: period.to,
-  });
+  const { data, isLoading, isError, error, refetch } = useLandingDashboard(
+    { from: period.from, to: period.to },
+    canSeeDashboard,
+  );
 
   const dashboard = data?.data;
   const quickActions = QUICK_ACTIONS.filter((action) => !action.permissions?.length || canAny(...action.permissions));
@@ -41,6 +42,10 @@ export default function DashboardPage() {
   const firstName = user?.name.split(" ")[0] ?? "there";
   const hour = new Date().getHours();
   const greeting = hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
+
+  if (!canSeeDashboard) {
+    return <WorkHome greeting={`${greeting}, ${firstName}`} quickActions={quickActions} />;
+  }
 
   return (
     <div className="pb-4">
@@ -51,39 +56,7 @@ export default function DashboardPage() {
       />
 
       {/* --------------------------- quick actions --------------------- */}
-      {quickActions.length > 0 ? (
-        <div className="mb-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-5">
-          {quickActions.map((action) => {
-            const Icon = action.icon;
-
-            return (
-              <Link
-                key={action.href}
-                href={action.href}
-                className={cn(
-                  "group flex items-start gap-3.5 rounded-xl border p-4 transition-all duration-[var(--duration-base)] hover:-translate-y-0.5 hover:shadow-[var(--shadow-card)]",
-                  action.tone === "accent"
-                    ? "border-accent-200 bg-accent-50 hover:border-accent-400"
-                    : "border-hairline bg-surface hover:border-brand-300",
-                )}
-              >
-                <span
-                  className={cn(
-                    "flex h-10 w-10 shrink-0 items-center justify-center rounded-lg",
-                    action.tone === "accent" ? "bg-accent-600 text-white" : "bg-brand-100 text-brand-700",
-                  )}
-                >
-                  <Icon className="h-5 w-5" aria-hidden />
-                </span>
-                <span className="min-w-0">
-                  <span className="block font-medium text-ink-900">{action.label}</span>
-                  <span className="mt-0.5 block text-sm leading-snug text-ink-600">{action.description}</span>
-                </span>
-              </Link>
-            );
-          })}
-        </div>
-      ) : null}
+      <QuickActionGrid actions={quickActions} />
 
       {/* --------------------------- what needs attention --------------- */}
       <section className="mb-8">
@@ -180,6 +153,92 @@ export default function DashboardPage() {
           </ul>
         </Card>
       </div>
+    </div>
+  );
+}
+
+function QuickActionGrid({ actions }: { actions: typeof QUICK_ACTIONS }) {
+  if (actions.length === 0) return null;
+
+  return (
+    <div className="mb-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-5">
+      {actions.map((action) => {
+        const Icon = action.icon;
+
+        return (
+          <Link
+            key={action.href}
+            href={action.href}
+            className={cn(
+              "group flex items-start gap-3.5 rounded-xl border p-4 transition-all duration-[var(--duration-base)] hover:-translate-y-0.5 hover:shadow-[var(--shadow-card)]",
+              action.tone === "accent"
+                ? "border-accent-200 bg-accent-50 hover:border-accent-400"
+                : "border-hairline bg-surface hover:border-brand-300",
+            )}
+          >
+            <span
+              className={cn(
+                "flex h-10 w-10 shrink-0 items-center justify-center rounded-lg",
+                action.tone === "accent" ? "bg-accent-solid text-white" : "bg-brand-100 text-brand-700",
+              )}
+            >
+              <Icon className="h-5 w-5" aria-hidden />
+            </span>
+            <span className="min-w-0">
+              <span className="block font-medium text-ink-900">{action.label}</span>
+              <span className="mt-0.5 block text-sm leading-snug text-ink-600">{action.description}</span>
+            </span>
+          </Link>
+        );
+      })}
+    </div>
+  );
+}
+
+/**
+ * Home for a role without the project dashboard — a contractor, for one. It
+ * shows what they can do and where their work lives, and never asks the API
+ * for figures it would refuse.
+ */
+function WorkHome({ greeting, quickActions }: { greeting: string; quickActions: typeof QUICK_ACTIONS }) {
+  const { canAny } = useSession();
+  const areas = PRIMARY_NAVIGATION.flatMap((group) => group.items).filter(
+    (item) => item.href !== "/" && item.description && (!item.permissions?.length || canAny(...item.permissions)),
+  );
+
+  return (
+    <div className="pb-4">
+      <PageHeader title={greeting} description="Here is what you can do on this project." />
+
+      <QuickActionGrid actions={quickActions} />
+
+      {areas.length > 0 ? (
+        <section className="mb-8">
+          <h2 className="mb-3 text-[1.0625rem] font-semibold text-ink-900">Your work</h2>
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {areas.map((area) => {
+              const Icon = area.icon;
+
+              return (
+                <Link
+                  key={area.href}
+                  href={area.href}
+                  className="group flex items-center gap-3.5 rounded-xl border border-hairline bg-surface p-4 transition-all duration-[var(--duration-base)] hover:-translate-y-0.5 hover:border-brand-300 hover:shadow-[var(--shadow-card)]"
+                >
+                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-brand-100 text-brand-700">
+                    <Icon className="h-5 w-5" aria-hidden />
+                  </span>
+                  <span className="min-w-0 flex-1">
+                    <span className="block font-medium text-ink-900">{area.label}</span>
+                    <span className="mt-0.5 block text-sm leading-snug text-ink-600">{area.description}</span>
+                  </span>
+                  <ArrowRight className="h-4 w-4 shrink-0 text-ink-400 transition group-hover:translate-x-0.5 group-hover:text-ink-700" aria-hidden />
+                </Link>
+              );
+            })}
+          </div>
+        </section>
+      ) : null}
     </div>
   );
 }

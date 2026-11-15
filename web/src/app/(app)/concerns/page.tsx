@@ -9,7 +9,7 @@ import { FilterBar } from "@/components/ui/FilterBar";
 import { PriorityBadge, StatusBadge } from "@/components/ui/StatusBadge";
 import { EmptyState, ErrorState, TableSkeleton } from "@/components/ui/States";
 import { useListState } from "@/hooks/useListState";
-import { useConcerns, useGrievanceCategories } from "@/lib/api/hooks";
+import { useConcerns, useCategoryOptions } from "@/lib/api/hooks";
 import { formatDate, truncate } from "@/lib/utils";
 import type { Concern } from "@/types/api";
 
@@ -24,7 +24,7 @@ export default function ConcernsPage() {
 function ConcernList() {
   const state = useListState({ sort: "-raised_on" });
   const { data, isLoading, isError, error, refetch } = useConcerns(state.query);
-  const { data: categories } = useGrievanceCategories();
+  const { data: categories } = useCategoryOptions();
 
   const rows = data?.data ?? [];
   const meta = data?.meta;
@@ -141,7 +141,7 @@ function ConcernList() {
             {
               key: "grievance_category_id",
               label: "Topic",
-              options: (categories?.data ?? []).map((category) => ({ value: String(category.id), label: category.name })),
+              options: (categories ?? []).map((category) => ({ value: String(category.id), label: category.name })),
             },
           ]}
           values={state.filterValues}

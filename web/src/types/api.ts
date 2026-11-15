@@ -738,7 +738,8 @@ export interface BootstrapPayload {
   server_time: string;
   categories: GrievanceCategory[];
   locations: LocationRow[];
-  members: Array<{ id: number; name: string }>;
+  members: Array<{ id: number; name: string; role: string | null }>;
+  lists: ConfigurationBundle["lists"];
   severity_levels: Array<{ level: number; label: string; description: string }>;
   stakeholder_types: string[];
   channels: string[];

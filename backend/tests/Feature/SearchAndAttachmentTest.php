@@ -51,6 +51,24 @@ class SearchAndAttachmentTest extends TestCase
         $this->assertNotEmpty($groups['stakeholders']['results'][0]['href']);
     }
 
+    public function test_search_only_returns_record_types_the_role_may_open(): void
+    {
+        $contractor = $this->makeUser('contractor');
+
+        app(StakeholderService::class)->create($this->project, [
+            'name' => 'Igoma Ward Office', 'type' => 'community_group',
+        ]);
+        app(CommitmentService::class)->create($this->project, [
+            'commitment_text' => 'Fence the Igoma borrow pit.',
+            'due_date' => now()->addDays(10)->toDateString(),
+        ]);
+
+        $response = $this->asUser($contractor)->getJson('/api/v1/search?q=Igoma');
+
+        $response->assertOk();
+        $this->assertSame([], $response->json('data.groups'));
+    }
+
     public function test_search_by_reference_finds_the_record(): void
     {
         $officer = $this->makeUser('community_relations_officer');

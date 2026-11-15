@@ -45,6 +45,14 @@ export function AppShell({ children }: { children: ReactNode }) {
   const setActionsOpen = (open: boolean) => setActionsOpenAt(open ? pathname : null);
 
   const allowed = (item: NavItem) => !item.permissions?.length || canAny(...item.permissions);
+  // A role without the project dashboard lands on a plain home page, so the
+  // menu calls it that rather than promising a dashboard it will not see.
+  const hasDashboard = canAny("dashboard.view");
+  const shown = (items: NavItem[]) =>
+    items.filter(allowed).map((item) => (item.href === "/" && !hasDashboard ? { ...item, label: "Home" } : item));
+  // Search covers the register, cases, engagements and commitments; a role
+  // that can open none of them has nothing to search.
+  const canSearch = canAny("stakeholder.view", "grievance.view", "engagement.view", "commitment.view");
   const quickActions = QUICK_ACTIONS.filter((action) => !action.permissions?.length || canAny(...action.permissions));
 
   return (
@@ -62,7 +70,7 @@ export function AppShell({ children }: { children: ReactNode }) {
 
           <nav className="flex-1 overflow-y-auto overflow-x-hidden px-3 pb-4" aria-label="Main">
             {PRIMARY_NAVIGATION.map((group) => {
-              const items = group.items.filter(allowed);
+              const items = shown(group.items);
               if (items.length === 0) return null;
 
               return (
@@ -140,7 +148,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               </div>
 
               <div className="hidden min-w-0 flex-1 md:block">
-                <GlobalSearch />
+                {canSearch ? <GlobalSearch /> : null}
               </div>
 
               <div className="ml-auto flex shrink-0 items-center gap-1.5 sm:gap-2">
@@ -196,9 +204,11 @@ export function AppShell({ children }: { children: ReactNode }) {
               </div>
             </div>
 
-            <div className="border-t border-hairline px-4 py-2 md:hidden">
-              <GlobalSearch />
-            </div>
+            {canSearch ? (
+              <div className="border-t border-hairline px-4 py-2 md:hidden">
+                <GlobalSearch />
+              </div>
+            ) : null}
           </header>
 
           <main className="min-w-0 flex-1 px-4 pb-28 pt-6 sm:px-6 sm:pt-8 md:pb-12 lg:px-10 lg:pt-10">
@@ -231,7 +241,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             <ProjectSwitcher />
             <nav className="flex-1 overflow-y-auto px-3 pb-4" aria-label="Main">
               {PRIMARY_NAVIGATION.map((group) => {
-                const items = group.items.filter(allowed);
+                const items = shown(group.items);
                 if (items.length === 0) return null;
 
                 return (
@@ -451,7 +461,17 @@ function MobileNav({ quickActionHref }: { quickActionHref?: string }) {
   const router = useRouter();
   const { canAny } = useSession();
 
-  const items = MOBILE_NAVIGATION.filter((item) => !item.permissions?.length || canAny(...item.permissions));
+  const permitted = (item: NavItem) => !item.permissions?.length || canAny(...item.permissions);
+  // The standard tabs are the register, engagements and cases. A role that
+  // has none of them (a contractor) gets its own modules in those slots
+  // instead of a bar with one button on it.
+  const items = MOBILE_NAVIGATION.filter(permitted);
+  for (const item of PRIMARY_NAVIGATION.flatMap((group) => group.items)) {
+    if (items.length >= 4) break;
+    if (item.href !== "/" && item.href !== "/sync" && permitted(item) && !items.some((existing) => existing.href === item.href)) {
+      items.push({ ...item, label: item.label.split(" ")[0] });
+    }
+  }
   const left = items.slice(0, 2);
   const right = items.slice(2, 4);
 

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Domain\Configuration\ConfigurationRegistry;
+use App\Domain\Configuration\ReferenceLists;
 use App\Domain\Sync\SyncService;
 use App\Http\Controllers\Controller;
 use App\Models\Grievance;
@@ -102,10 +103,20 @@ class SyncController extends Controller
                 ->where('status', 'active')
                 ->orderBy('path')
                 ->get(['id', 'parent_id', 'level', 'name', 'path', 'latitude', 'longitude']),
-            'members' => $project->members()
-                ->where('project_memberships.status', 'active')
-                ->get(['users.id', 'users.name'])
-                ->map(fn ($user) => ['id' => $user->id, 'name' => $user->name]),
+            // Names and roles only — enough to pick an owner or assignee.
+            // Contact details stay behind user.view on /members.
+            'members' => $project->memberships()
+                ->where('status', 'active')
+                ->with(['user:id,name', 'role:id,name'])
+                ->get()
+                ->filter(fn ($membership) => $membership->user !== null)
+                ->map(fn ($membership) => [
+                    'id' => $membership->user->id,
+                    'name' => $membership->user->name,
+                    'role' => $membership->role?->name,
+                ])
+                ->sortBy('name')->values(),
+            'lists' => app(ReferenceLists::class)->for($project),
             'severity_levels' => collect(config('sasa.grievances.severity_levels'))
                 ->map(fn ($level, $key) => ['level' => (int) $key, 'label' => $level['label'], 'description' => $level['description']])
                 ->values(),

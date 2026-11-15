@@ -13,7 +13,7 @@ import { Field, Select } from "@/components/ui/Form";
 import { PriorityBadge, StatusBadge } from "@/components/ui/StatusBadge";
 import { ErrorState, LoadingState } from "@/components/ui/States";
 import { apiRequest } from "@/lib/api/client";
-import { useConcern, useGrievanceCategories } from "@/lib/api/hooks";
+import { useConcern, useCategoryOptions } from "@/lib/api/hooks";
 import { formatDate } from "@/lib/utils";
 import { useSession } from "@/providers/SessionProvider";
 import { useToast } from "@/providers/ToastProvider";
@@ -27,7 +27,7 @@ export default function ConcernDetailPage() {
   const queryClient = useQueryClient();
   const { can } = useSession();
   const { data, isLoading, isError, error, refetch } = useConcern(id);
-  const { data: categories } = useGrievanceCategories();
+  const { data: categories } = useCategoryOptions();
 
   const [escalateOpen, setEscalateOpen] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -187,7 +187,7 @@ export default function ConcernDetailPage() {
               onChange={(event) => setForm((current) => ({ ...current, category_id: event.target.value }))}
             >
               <option value="">Not classified</option>
-              {(categories?.data ?? []).map((category) => (
+              {(categories ?? []).map((category) => (
                 <option key={category.id} value={category.id}>
                   {category.name}
                 </option>
