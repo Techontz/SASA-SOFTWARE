@@ -15,6 +15,7 @@ import { ApiRequestError } from "@/lib/api/client";
 import { uploadEshsFile, useEshsOptions, useRaiseEshsAnomaly } from "@/lib/api/eshs";
 import { useLocations } from "@/lib/api/hooks";
 import { subcategoriesFor } from "@/lib/eshs";
+import { useRequiredFields } from "@/lib/requiredFields";
 import { useSession } from "@/providers/SessionProvider";
 import { useSync } from "@/providers/SyncProvider";
 import { useToast } from "@/providers/ToastProvider";
@@ -53,6 +54,7 @@ export default function NewEshsAnomalyPage() {
   const { data: locationData } = useLocations();
   const raise = useRaiseEshsAnomaly();
   const [files, setFiles] = useState<File[]>([]);
+  const { need, withRequired } = useRequiredFields<FormValues>("eshs_anomaly");
 
   const {
     register,
@@ -62,7 +64,7 @@ export default function NewEshsAnomalyPage() {
     setError,
     formState: { errors, isSubmitting },
   } = useForm<FormValues>({
-    resolver: zodResolver(schema),
+    resolver: withRequired(zodResolver(schema)),
     defaultValues: { raised_on: today(), risk_rating: "medium", category: "", subcategory: "" },
   });
 
@@ -157,8 +159,8 @@ export default function NewEshsAnomalyPage() {
             <Field label="Date raised" required error={errors.raised_on?.message} htmlFor="raised_on">
               <Input id="raised_on" type="date" max={today()} invalid={Boolean(errors.raised_on)} {...register("raised_on")} />
             </Field>
-            <Field label="Area / location" optional htmlFor="location_id">
-              <Select id="location_id" placeholder="Not recorded" {...register("location_id")}>
+            <Field label="Area / location" {...need("location_id")} error={errors.location_id?.message} htmlFor="location_id">
+              <Select id="location_id" placeholder="Choose a place" invalid={Boolean(errors.location_id)} {...register("location_id")}>
                 {(locationData?.data ?? []).map((location) => (
                   <option key={location.id} value={location.id}>
                     {location.path ?? location.name}
@@ -239,8 +241,8 @@ export default function NewEshsAnomalyPage() {
             </Field>
           </FieldRow>
 
-          <Field label="Root cause" optional error={errors.root_cause?.message} htmlFor="root_cause">
-            <Select id="root_cause" placeholder="Not yet known" {...register("root_cause")}>
+          <Field label="Root cause" {...need("root_cause")} error={errors.root_cause?.message} htmlFor="root_cause">
+            <Select id="root_cause" placeholder="Choose a root cause" invalid={Boolean(errors.root_cause)} {...register("root_cause")}>
               {lists.root_causes.map((group) => (
                 <optgroup key={group.group} label={group.group}>
                   {group.causes.map((cause) => (
@@ -290,15 +292,15 @@ export default function NewEshsAnomalyPage() {
             </Field>
           </FieldRow>
 
-          <Field label="Action by contractor" optional htmlFor="contractor_action" hint="What the contractor must do to put it right.">
-            <Textarea id="contractor_action" rows={3} {...register("contractor_action")} />
+          <Field label="Action by contractor" {...need("contractor_action")} error={errors.contractor_action?.message} htmlFor="contractor_action" hint="What the contractor must do to put it right.">
+            <Textarea id="contractor_action" rows={3} invalid={Boolean(errors.contractor_action)} {...register("contractor_action")} />
           </Field>
 
           <FieldRow columns={3}>
-            <Field label="Action owner" optional htmlFor="action_owner_name">
-              <Input id="action_owner_name" placeholder="Kisare Lutambi" {...register("action_owner_name")} />
+            <Field label="Action owner" {...need("action_owner_name")} error={errors.action_owner_name?.message} htmlFor="action_owner_name">
+              <Input id="action_owner_name" placeholder="Kisare Lutambi" invalid={Boolean(errors.action_owner_name)} {...register("action_owner_name")} />
             </Field>
-            <Field label="Owner e-mail" optional error={errors.action_owner_email?.message} htmlFor="action_owner_email">
+            <Field label="Owner e-mail" {...need("action_owner_email")} error={errors.action_owner_email?.message} htmlFor="action_owner_email">
               <Input
                 id="action_owner_email"
                 type="email"
@@ -307,13 +309,13 @@ export default function NewEshsAnomalyPage() {
                 {...register("action_owner_email")}
               />
             </Field>
-            <Field label="Owner phone" optional htmlFor="action_owner_phone">
-              <Input id="action_owner_phone" type="tel" placeholder="+255 764 309 306" {...register("action_owner_phone")} />
+            <Field label="Owner phone" {...need("action_owner_phone")} error={errors.action_owner_phone?.message} htmlFor="action_owner_phone">
+              <Input id="action_owner_phone" type="tel" placeholder="+255 764 309 306" invalid={Boolean(errors.action_owner_phone)} {...register("action_owner_phone")} />
             </Field>
           </FieldRow>
 
-          <Field label="Target date" optional htmlFor="target_date" hint="After this date an open anomaly counts as overdue.">
-            <Input id="target_date" type="date" {...register("target_date")} />
+          <Field label="Target date" {...need("target_date")} error={errors.target_date?.message} htmlFor="target_date" hint="After this date an open anomaly counts as overdue.">
+            <Input id="target_date" type="date" invalid={Boolean(errors.target_date)} {...register("target_date")} />
           </Field>
         </FormSection>
 

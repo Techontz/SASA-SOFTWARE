@@ -3,7 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AlertTriangle, Save, Users } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "@/components/ui/Button";
@@ -14,6 +14,7 @@ import { ApiRequestError, apiRequest } from "@/lib/api/client";
 import { usePriorityModel } from "@/lib/api/hooks";
 import { useFieldReference } from "@/hooks/useFieldReference";
 import { localStore } from "@/lib/offline/dexieStore";
+import { useRequiredFields } from "@/lib/requiredFields";
 import { syncEngine } from "@/lib/offline/syncEngine";
 import { humanise, uuid, languageName } from "@/lib/utils";
 import { useSession } from "@/providers/SessionProvider";
@@ -75,6 +76,18 @@ export function StakeholderForm({ stakeholder }: { stakeholder?: Stakeholder }) 
   const [savedOffline, setSavedOffline] = useState(false);
   const draftKey = stakeholder ? `stakeholder:${stakeholder.id}` : "stakeholder:new";
 
+  /* A priority dimension the project has weighted at zero is switched off in
+     the form, so it cannot also be demanded of the person filling it in. */
+  const modelWeights = priorityModel?.data.settings.weights;
+  const skipSwitchedOff = useCallback(
+    (field: string) => {
+      const weight = (modelWeights as Record<string, number> | undefined)?.[field];
+      return weight === 0;
+    },
+    [modelWeights],
+  );
+  const { need, withRequired } = useRequiredFields<FormValues>("stakeholder", { skip: skipSwitchedOff });
+
   const {
     register,
     handleSubmit,
@@ -83,7 +96,7 @@ export function StakeholderForm({ stakeholder }: { stakeholder?: Stakeholder }) 
     reset,
     formState: { errors, isSubmitting, isDirty },
   } = useForm<FormValues>({
-    resolver: zodResolver(schema),
+    resolver: withRequired(zodResolver(schema)),
     defaultValues: {
       name: stakeholder?.name ?? "",
       type: stakeholder?.type ?? "",
@@ -346,8 +359,8 @@ export function StakeholderForm({ stakeholder }: { stakeholder?: Stakeholder }) 
 
       <FormSection title="How to reach them" description="Used for engagement invitations and grievance follow-up.">
         <FieldRow>
-          <Field label="Phone" optional htmlFor="phone" hint="Also used to spot duplicate records.">
-            <Input id="phone" type="tel" inputMode="tel" placeholder="+255 754 000 000" {...register("phone")} />
+          <Field label="Phone" {...need("phone")} error={errors.phone?.message} htmlFor="phone" hint="Also used to spot duplicate records.">
+            <Input id="phone" type="tel" inputMode="tel" placeholder="+255 754 000 000" invalid={Boolean(errors.phone)} {...register("phone")} />
           </Field>
           <Field label="Second phone" optional htmlFor="alternate_phone">
             <Input id="alternate_phone" type="tel" inputMode="tel" {...register("alternate_phone")} />
@@ -358,8 +371,8 @@ export function StakeholderForm({ stakeholder }: { stakeholder?: Stakeholder }) 
           <Field label="Email" optional error={errors.email?.message} htmlFor="email">
             <Input id="email" type="email" autoCapitalize="none" invalid={Boolean(errors.email)} {...register("email")} />
           </Field>
-          <Field label="Preferred language" optional htmlFor="preferred_language">
-            <Select id="preferred_language" placeholder="Not recorded" {...register("preferred_language")}>
+          <Field label="Preferred language" {...need("preferred_language")} error={errors.preferred_language?.message} htmlFor="preferred_language">
+            <Select id="preferred_language" placeholder="Choose a language" invalid={Boolean(errors.preferred_language)} {...register("preferred_language")}>
               {languages.map((language) => (
                 <option key={language} value={language}>
                   {languageName(language)}
@@ -370,8 +383,8 @@ export function StakeholderForm({ stakeholder }: { stakeholder?: Stakeholder }) 
         </FieldRow>
 
         <FieldRow>
-          <Field label="Preferred way to be contacted" optional htmlFor="preferred_contact_method">
-            <Select id="preferred_contact_method" placeholder="Not recorded" {...register("preferred_contact_method")}>
+          <Field label="Preferred way to be contacted" {...need("preferred_contact_method")} error={errors.preferred_contact_method?.message} htmlFor="preferred_contact_method">
+            <Select id="preferred_contact_method" placeholder="Choose how" invalid={Boolean(errors.preferred_contact_method)} {...register("preferred_contact_method")}>
               <option value="in_person">In person</option>
               <option value="phone">Phone call</option>
               <option value="sms">SMS</option>
@@ -380,8 +393,8 @@ export function StakeholderForm({ stakeholder }: { stakeholder?: Stakeholder }) 
               <option value="through_leader">Through a local leader</option>
             </Select>
           </Field>
-          <Field label="Where they are" optional htmlFor="primary_location_id" hint="Village, ward or district from the project's location list.">
-            <Select id="primary_location_id" placeholder="Not recorded" {...register("primary_location_id")}>
+          <Field label="Where they are" {...need("primary_location_id")} error={errors.primary_location_id?.message} htmlFor="primary_location_id" hint="Village, ward or district from the project's location list.">
+            <Select id="primary_location_id" placeholder="Choose a place" invalid={Boolean(errors.primary_location_id)} {...register("primary_location_id")}>
               {locations.map((location) => (
                 <option key={location.id} value={location.id}>
                   {location.path ?? location.name}
@@ -391,8 +404,8 @@ export function StakeholderForm({ stakeholder }: { stakeholder?: Stakeholder }) 
           </Field>
         </FieldRow>
 
-        <Field label="Physical address" optional htmlFor="physical_address">
-          <Textarea id="physical_address" rows={2} {...register("physical_address")} />
+        <Field label="Physical address" {...need("physical_address")} error={errors.physical_address?.message} htmlFor="physical_address">
+          <Textarea id="physical_address" rows={2} invalid={Boolean(errors.physical_address)} {...register("physical_address")} />
         </Field>
       </FormSection>
 
@@ -417,11 +430,12 @@ export function StakeholderForm({ stakeholder }: { stakeholder?: Stakeholder }) 
               <Field
                 key={dimension}
                 label={humanise(dimension)}
-                optional
+                {...(weight === 0 ? { optional: true } : need(dimension))}
+                error={errors[dimension]?.message}
                 htmlFor={dimension}
                 hint={weight === 0 ? "Switched off in this project's configuration." : `Weight ×${weight}`}
               >
-                <Select id={dimension} placeholder="Not assessed" disabled={weight === 0} {...register(dimension)}>
+                <Select id={dimension} placeholder="Not assessed" disabled={weight === 0} invalid={Boolean(errors[dimension])} {...register(dimension)}>
                   <option value="high">High (3)</option>
                   <option value="medium">Medium (2)</option>
                   <option value="low">Low (1)</option>
@@ -440,11 +454,11 @@ export function StakeholderForm({ stakeholder }: { stakeholder?: Stakeholder }) 
       </FormSection>
 
       <FormSection title="What matters to them" description="What they told you, in the words they used where you can.">
-        <Field label="Concerns and expectations" optional htmlFor="concerns_expectations">
-          <Textarea id="concerns_expectations" rows={4} placeholder="What they raised, and what they expect from the project." {...register("concerns_expectations")} />
+        <Field label="Concerns and expectations" {...need("concerns_expectations")} error={errors.concerns_expectations?.message} htmlFor="concerns_expectations">
+          <Textarea id="concerns_expectations" rows={4} placeholder="What they raised, and what they expect from the project." invalid={Boolean(errors.concerns_expectations)} {...register("concerns_expectations")} />
         </Field>
-        <Field label="Internal notes" optional htmlFor="notes" hint="Visible to project members, not to the stakeholder.">
-          <Textarea id="notes" rows={3} {...register("notes")} />
+        <Field label="Internal notes" {...need("notes")} error={errors.notes?.message} htmlFor="notes" hint="Visible to project members, not to the stakeholder.">
+          <Textarea id="notes" rows={3} invalid={Boolean(errors.notes)} {...register("notes")} />
         </Field>
       </FormSection>
 

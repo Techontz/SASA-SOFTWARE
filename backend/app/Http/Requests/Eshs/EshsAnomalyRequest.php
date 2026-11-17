@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Eshs;
 
+use App\Domain\Configuration\RequiredFields;
 use App\Domain\Eshs\EshsConfiguration;
 use App\Domain\Tenancy\TenantContext;
 use App\Models\EshsAnomaly;
@@ -35,7 +36,7 @@ class EshsAnomalyRequest extends FormRequest
         $contractors = $config->contractors($project);
         $subcontractors = $config->subcontractors($project);
 
-        return [
+        return app(RequiredFields::class)->apply([
             'raised_on' => [$required, 'date', 'before_or_equal:today'],
             'location_id' => ['nullable', 'integer', Rule::exists('locations', 'id')->where('organisation_id', $project->organisation_id)],
             'contractor' => array_merge([$required, 'string', 'max:160'], $contractors ? [Rule::in($contractors)] : []),
@@ -52,12 +53,12 @@ class EshsAnomalyRequest extends FormRequest
             'action_owner_email' => ['nullable', 'email', 'max:255'],
             'action_owner_phone' => ['nullable', 'string', 'max:40'],
             'target_date' => ['nullable', 'date'],
-        ];
+        ], $project, 'eshs_anomaly', partial: $this->isMethod('PATCH'));
     }
 
     public function messages(): array
     {
-        return [
+        return app(RequiredFields::class)->messages($this->project(), 'eshs_anomaly') + [
             'contractor.in' => 'Choose a contractor from this project\'s list.',
             'subcontractor.in' => 'Choose a subcontractor from this project\'s list.',
             'description.required' => 'Describe what was found — what, where and why it matters.',

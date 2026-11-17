@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { ACCOUNTS, signIn, uniqueName } from "./helpers";
+import { ACCOUNTS, signIn, uniqueName, completeMandatoryFields } from "./helpers";
 
 /**
  * ACCEPTANCE: given an authorised user submits a stakeholder, the system
@@ -24,6 +24,7 @@ test.describe("the stakeholder register", () => {
     // The score is worked out live, before anything is saved.
     await expect(page.getByText("9", { exact: true }).first()).toBeVisible();
 
+    await completeMandatoryFields(page);
     await page.getByRole("button", { name: /Add to the register/ }).click();
 
     await expect(page).toHaveURL(/\/stakeholders\/\d+$/, { timeout: 30_000 });

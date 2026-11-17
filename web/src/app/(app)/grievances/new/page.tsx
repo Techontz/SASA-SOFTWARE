@@ -3,13 +3,14 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { EyeOff, Lock, Save, ShieldCheck, Sparkles, Users } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect, useState, type FormEvent } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { useCallback, useEffect, useState, type FormEvent } from "react";
+import { Controller, useForm, type Resolver } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "@/components/ui/Button";
 import { AttachmentPicker, queueAttachments } from "@/components/app/AttachmentPicker";
 import { SavedOnDeviceNotice } from "@/components/app/SavedOnDeviceNotice";
 import {
+  Checkbox,
   ChoiceCard,
   Field,
   FieldRow,
@@ -24,6 +25,7 @@ import { PermissionDenied } from "@/components/ui/States";
 import { ApiRequestError } from "@/lib/api/client";
 import { useFieldReference } from "@/hooks/useFieldReference";
 import { localStore } from "@/lib/offline/dexieStore";
+import { isBlank, useRequiredFields } from "@/lib/requiredFields";
 import { syncEngine } from "@/lib/offline/syncEngine";
 import { humanise, uuid } from "@/lib/utils";
 import { useSession } from "@/providers/SessionProvider";
@@ -31,8 +33,7 @@ import { useSync } from "@/providers/SyncProvider";
 import { useToast } from "@/providers/ToastProvider";
 import type { Grievance } from "@/types/api";
 
-const schema = z
-  .object({
+const schema = z.object({
     channel: z.string().min(1, "How did this reach you?"),
     confidentiality: z.enum(["normal", "confidential", "anonymous"]),
     received_at: z.string().min(1, "When was it received?"),
@@ -40,9 +41,12 @@ const schema = z
     complainant_name: z.string().optional(),
     complainant_phone: z.string().optional(),
     complainant_email: z.string().optional(),
+    complainant_has_no_email: z.boolean().optional(),
     complainant_type: z.string().optional(),
     complainant_language: z.string().optional(),
     preferred_contact_method: z.string().optional(),
+    /** "Already in the register?" — asked in the form only; "no" is an answer. */
+    in_register: z.enum(["", "yes", "no"]).optional(),
     stakeholder_id: z.string().optional(),
     location_id: z.string().optional(),
     location_text: z.string().optional(),
@@ -55,19 +59,46 @@ const schema = z
     desired_resolution: z.string().optional(),
     demographics_gender: z.string().optional(),
     demographics_age_band: z.string().optional(),
-  })
-  .refine(
-    (values) =>
-      values.confidentiality === "anonymous" ||
-      Boolean(values.complainant_name?.trim()) ||
-      Boolean(values.complainant_phone?.trim()),
-    {
-      message: "Record a name or a phone number, or mark the case anonymous.",
-      path: ["complainant_name"],
-    },
-  );
+  });
 
 type FormValues = z.infer<typeof schema>;
+
+/** API field → this form's field, where they differ. */
+const FIELD_NAMES = {
+  "demographics.gender": "demographics_gender",
+  stakeholder_id: "in_register",
+} as const;
+
+const MESSAGES = {
+  complainant_email: "Add their e-mail, or tick that they have none.",
+  stakeholder_id: "Say whether they are already in the register.",
+};
+
+/** Never asked on an anonymous case — there is nobody to identify. */
+const IDENTITY_FIELDS = new Set([
+  "complainant_name",
+  "complainant_phone",
+  "complainant_email",
+  "preferred_contact_method",
+  "stakeholder_id",
+]);
+
+/** "Yes, they are in the register" needs the record number to link. */
+function withRegisterLink(base: Resolver<FormValues>): Resolver<FormValues> {
+  return async (values, context, options) => {
+    const result = await base(values, context, options);
+    if (values.confidentiality === "anonymous" || values.in_register !== "yes" || !isBlank(values.stakeholder_id)) {
+      return result;
+    }
+    return {
+      values: {},
+      errors: {
+        ...result.errors,
+        stakeholder_id: { type: "required", message: "Give their stakeholder record number." },
+      },
+    };
+  };
+}
 
 export default function NewGrievancePage() {
   const router = useRouter();
@@ -79,6 +110,18 @@ export default function NewGrievancePage() {
   const [files, setFiles] = useState<File[]>([]);
   const [filesError, setFilesError] = useState<string | undefined>();
 
+  const skip = useCallback(
+    (field: string, current: FormValues) =>
+      (current.confidentiality === "anonymous" && IDENTITY_FIELDS.has(field)) ||
+      (field === "complainant_email" && Boolean(current.complainant_has_no_email)),
+    [],
+  );
+  const { need, withRequired } = useRequiredFields<FormValues>("grievance", {
+    fieldNames: FIELD_NAMES,
+    messages: MESSAGES,
+    skip,
+  });
+
   const {
     register,
     handleSubmit,
@@ -88,13 +131,26 @@ export default function NewGrievancePage() {
     reset,
     formState: { errors, isSubmitting, isDirty },
   } = useForm<FormValues>({
-    resolver: zodResolver(schema),
+    resolver: withRequired(withRegisterLink(zodResolver(schema))),
     defaultValues: {
       channel: "in_person",
       confidentiality: "normal",
       received_at: new Date().toISOString().slice(0, 16),
       description: "",
       complainant_type: "community_member",
+      complainant_name: "",
+      complainant_phone: "",
+      complainant_email: "",
+      complainant_has_no_email: false,
+      complainant_language: "",
+      preferred_contact_method: "",
+      in_register: "",
+      stakeholder_id: "",
+      title: "",
+      desired_resolution: "",
+      location_id: "",
+      location_text: "",
+      demographics_gender: "",
     },
   });
 
@@ -134,7 +190,10 @@ export default function NewGrievancePage() {
   useEffect(() => {
     const stakeholderId = new URLSearchParams(window.location.search).get("stakeholder_id");
     if (!stakeholderId || !/^\d+$/.test(stakeholderId)) return;
-    const timer = setTimeout(() => setValue("stakeholder_id", stakeholderId, { shouldDirty: true }), 300);
+    const timer = setTimeout(() => {
+      setValue("in_register", "yes", { shouldDirty: true });
+      setValue("stakeholder_id", stakeholderId, { shouldDirty: true });
+    }, 300);
     return () => clearTimeout(timer);
   }, [project?.id, setValue]);
 
@@ -184,9 +243,11 @@ export default function NewGrievancePage() {
         : {
             complainant_name: formValues.complainant_name || null,
             complainant_phone: formValues.complainant_phone || null,
-            complainant_email: formValues.complainant_email || null,
+            complainant_email: formValues.complainant_has_no_email ? null : formValues.complainant_email || null,
+            complainant_has_no_email: Boolean(formValues.complainant_has_no_email),
             precise_location: formValues.precise_location || null,
-            stakeholder_id: formValues.stakeholder_id ? Number(formValues.stakeholder_id) : null,
+            stakeholder_id:
+              formValues.in_register === "yes" && formValues.stakeholder_id ? Number(formValues.stakeholder_id) : null,
           }),
     };
 
@@ -290,6 +351,8 @@ export default function NewGrievancePage() {
                     setValue("complainant_name", "");
                     setValue("complainant_phone", "");
                     setValue("complainant_email", "");
+                    setValue("complainant_has_no_email", false);
+                    setValue("in_register", "");
                     setValue("stakeholder_id", "");
                   }}
                   title="Anonymous"
@@ -341,20 +404,56 @@ export default function NewGrievancePage() {
             description="Enough to reach them again. On a confidential case this is released only to the handling group."
           >
             <FieldRow>
-              <Field label="Name" error={errors.complainant_name?.message} htmlFor="complainant_name">
+              <Field label="Name" {...need("complainant_name")} error={errors.complainant_name?.message} htmlFor="complainant_name">
                 <Input id="complainant_name" invalid={Boolean(errors.complainant_name)} {...register("complainant_name")} />
               </Field>
-              <Field label="Phone" optional htmlFor="complainant_phone" hint="Used to acknowledge and to close the loop.">
-                <Input id="complainant_phone" type="tel" inputMode="tel" placeholder="+255 754 000 000" {...register("complainant_phone")} />
+              <Field
+                label="Phone"
+                {...need("complainant_phone")}
+                error={errors.complainant_phone?.message}
+                htmlFor="complainant_phone"
+                hint="Used to acknowledge and to close the loop."
+              >
+                <Input
+                  id="complainant_phone"
+                  type="tel"
+                  inputMode="tel"
+                  placeholder="+255 754 000 000"
+                  invalid={Boolean(errors.complainant_phone)}
+                  {...register("complainant_phone")}
+                />
               </Field>
             </FieldRow>
 
             <FieldRow columns={3}>
-              <Field label="Email" optional htmlFor="complainant_email">
-                <Input id="complainant_email" type="email" autoCapitalize="none" {...register("complainant_email")} />
+              <Field label="Email" {...need("complainant_email")} error={errors.complainant_email?.message} htmlFor="complainant_email">
+                <Input
+                  id="complainant_email"
+                  type="email"
+                  autoCapitalize="none"
+                  disabled={Boolean(values.complainant_has_no_email)}
+                  invalid={Boolean(errors.complainant_email)}
+                  {...register("complainant_email")}
+                />
+                <div className="mt-2">
+                  <Controller
+                    control={control}
+                    name="complainant_has_no_email"
+                    render={({ field }) => (
+                      <Checkbox
+                        label="They have no e-mail"
+                        checked={Boolean(field.value)}
+                        onChange={(checked) => {
+                          field.onChange(checked);
+                          if (checked) setValue("complainant_email", "", { shouldValidate: false });
+                        }}
+                      />
+                    )}
+                  />
+                </div>
               </Field>
-              <Field label="They are a" optional htmlFor="complainant_type">
-                <Select id="complainant_type" placeholder="Not recorded" {...register("complainant_type")}>
+              <Field label="They are a" {...need("complainant_type")} error={errors.complainant_type?.message} htmlFor="complainant_type">
+                <Select id="complainant_type" placeholder="Choose" invalid={Boolean(errors.complainant_type)} {...register("complainant_type")}>
                   <option value="community_member">Community member</option>
                   <option value="worker">Project worker</option>
                   <option value="contractor">Contractor staff</option>
@@ -364,8 +463,18 @@ export default function NewGrievancePage() {
                   <option value="other">Other</option>
                 </Select>
               </Field>
-              <Field label="Language they used" optional htmlFor="complainant_language">
-                <Select id="complainant_language" placeholder="Not recorded" {...register("complainant_language")}>
+              <Field
+                label="Language they used"
+                {...need("complainant_language")}
+                error={errors.complainant_language?.message}
+                htmlFor="complainant_language"
+              >
+                <Select
+                  id="complainant_language"
+                  placeholder="Choose"
+                  invalid={Boolean(errors.complainant_language)}
+                  {...register("complainant_language")}
+                >
                   <option value="sw">Kiswahili</option>
                   <option value="en">English</option>
                 </Select>
@@ -373,8 +482,18 @@ export default function NewGrievancePage() {
             </FieldRow>
 
             <FieldRow>
-              <Field label="Best way to contact them" optional htmlFor="preferred_contact_method">
-                <Select id="preferred_contact_method" placeholder="Not recorded" {...register("preferred_contact_method")}>
+              <Field
+                label="Best way to contact them"
+                {...need("preferred_contact_method")}
+                error={errors.preferred_contact_method?.message}
+                htmlFor="preferred_contact_method"
+              >
+                <Select
+                  id="preferred_contact_method"
+                  placeholder="Choose"
+                  invalid={Boolean(errors.preferred_contact_method)}
+                  {...register("preferred_contact_method")}
+                >
                   <option value="phone">Phone call</option>
                   <option value="sms">SMS</option>
                   <option value="whatsapp">WhatsApp</option>
@@ -384,20 +503,36 @@ export default function NewGrievancePage() {
               </Field>
               <Field
                 label="Already in the register?"
-                optional
-                htmlFor="stakeholder_id"
+                {...need("stakeholder_id")}
+                error={errors.in_register?.message}
+                htmlFor="in_register"
                 hint="Linking the case puts it on that stakeholder's timeline."
               >
-                <Input id="stakeholder_id" type="number" placeholder="Stakeholder record number" {...register("stakeholder_id")} />
+                <Select id="in_register" placeholder="Choose" invalid={Boolean(errors.in_register)} {...register("in_register")}>
+                  <option value="yes">Yes — link their record</option>
+                  <option value="no">No, not in the register</option>
+                </Select>
               </Field>
             </FieldRow>
+
+            {values.in_register === "yes" ? (
+              <Field label="Stakeholder record number" required error={errors.stakeholder_id?.message} htmlFor="stakeholder_id">
+                <Input
+                  id="stakeholder_id"
+                  type="number"
+                  placeholder="Stakeholder record number"
+                  invalid={Boolean(errors.stakeholder_id)}
+                  {...register("stakeholder_id")}
+                />
+              </Field>
+            ) : null}
           </FormSection>
         ) : null}
 
         {/* --------------------- what happened --------------------- */}
         <FormSection title="What happened" description="In the complainant's own words wherever you can. This is the part an auditor reads.">
-          <Field label="Short summary" optional htmlFor="title" hint="Left blank, the first line of the account is used.">
-            <Input id="title" placeholder="Dust from haulage trucks is covering houses" {...register("title")} />
+          <Field label="Short summary" {...need("title")} error={errors.title?.message} htmlFor="title">
+            <Input id="title" placeholder="Dust from haulage trucks is covering houses" invalid={Boolean(errors.title)} {...register("title")} />
           </Field>
 
           <Field label="The account" required error={errors.description?.message} htmlFor="description">
@@ -410,13 +545,19 @@ export default function NewGrievancePage() {
             />
           </Field>
 
-          <Field label="What they want done" optional htmlFor="desired_resolution">
-            <Textarea id="desired_resolution" rows={3} placeholder="Water the road, or move the haulage route away from the houses." {...register("desired_resolution")} />
+          <Field label="What they want done" {...need("desired_resolution")} error={errors.desired_resolution?.message} htmlFor="desired_resolution">
+            <Textarea
+              id="desired_resolution"
+              rows={3}
+              placeholder="Water the road, or move the haulage route away from the houses."
+              invalid={Boolean(errors.desired_resolution)}
+              {...register("desired_resolution")}
+            />
           </Field>
 
           <FieldRow>
-            <Field label="Where" optional htmlFor="location_id">
-              <Select id="location_id" placeholder="Not recorded" {...register("location_id")}>
+            <Field label="Where" {...need("location_id")} error={errors.location_id?.message} htmlFor="location_id">
+              <Select id="location_id" placeholder="Choose a place" invalid={Boolean(errors.location_id)} {...register("location_id")}>
                 {locations.map((location) => (
                   <option key={location.id} value={location.id}>
                     {location.path ?? location.name}
@@ -424,8 +565,8 @@ export default function NewGrievancePage() {
                 ))}
               </Select>
             </Field>
-            <Field label="Or describe the place" optional htmlFor="location_text">
-              <Input id="location_text" placeholder="Near tower 142, by the school" {...register("location_text")} />
+            <Field label="Describe the place" {...need("location_text")} error={errors.location_text?.message} htmlFor="location_text">
+              <Input id="location_text" placeholder="Near tower 142, by the school" invalid={Boolean(errors.location_text)} {...register("location_text")} />
             </Field>
           </FieldRow>
 
@@ -502,11 +643,11 @@ export default function NewGrievancePage() {
 
         <FormSection
           title="About the complainant"
-          description="Optional, and only what they were happy to share. Used to show who the mechanism is reaching, and who it is missing."
+          description="Used to show who the mechanism is reaching, and who it is missing. “Prefer not to say” is always an acceptable answer."
         >
           <FieldRow>
-            <Field label="Gender" optional htmlFor="demographics_gender">
-              <Select id="demographics_gender" placeholder="Not recorded" {...register("demographics_gender")}>
+            <Field label="Gender" {...need("demographics.gender")} error={errors.demographics_gender?.message} htmlFor="demographics_gender">
+              <Select id="demographics_gender" placeholder="Choose" invalid={Boolean(errors.demographics_gender)} {...register("demographics_gender")}>
                 <option value="female">Female</option>
                 <option value="male">Male</option>
                 <option value="other">Other</option>

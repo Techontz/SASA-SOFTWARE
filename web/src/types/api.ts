@@ -740,6 +740,8 @@ export interface BootstrapPayload {
   locations: LocationRow[];
   members: Array<{ id: number; name: string; role: string | null }>;
   lists: ConfigurationBundle["lists"];
+  /** Per staff form, the fields that must be filled in before it saves. */
+  required_fields?: Record<string, string[]>;
   severity_levels: Array<{ level: number; label: string; description: string }>;
   stakeholder_types: string[];
   channels: string[];

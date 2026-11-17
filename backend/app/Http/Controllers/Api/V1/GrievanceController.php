@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Domain\Ai\AiClassificationService;
+use App\Domain\Configuration\RequiredFields;
 use App\Domain\Export\ExportService;
 use App\Domain\Grievance\GrievanceService;
 use App\Domain\Grievance\GrievanceVisibility;
@@ -25,6 +26,7 @@ class GrievanceController extends Controller
         private readonly GrievanceService $grievances,
         private readonly GrievanceVisibility $visibility,
         private readonly AiClassificationService $ai,
+        private readonly RequiredFields $required,
     ) {}
 
     public function index(Request $request)
@@ -48,7 +50,9 @@ class GrievanceController extends Controller
     {
         $this->authorize('create', Grievance::class);
 
-        $data = $request->validate([
+        $anonymous = $request->input('confidentiality') === 'anonymous';
+
+        $rules = $this->required->apply([
             'client_uuid' => ['nullable', 'uuid'],
             'idempotency_key' => ['nullable', 'string', 'max:100'],
             'channel' => ['required', Rule::in(Grievance::CHANNELS)],
@@ -62,6 +66,8 @@ class GrievanceController extends Controller
             'complainant_name' => ['nullable', 'exclude_if:confidentiality,anonymous', 'string', 'max:160'],
             'complainant_phone' => ['nullable', 'exclude_if:confidentiality,anonymous', 'string', 'max:40'],
             'complainant_email' => ['nullable', 'exclude_if:confidentiality,anonymous', 'email', 'max:160'],
+            // "They have no e-mail" answers a required e-mail question honestly.
+            'complainant_has_no_email' => ['nullable', 'boolean', 'exclude'],
             'complainant_address' => ['nullable', 'exclude_if:confidentiality,anonymous', 'string', 'max:1000'],
             'complainant_language' => ['nullable', 'string', 'max:10'],
             'preferred_contact_method' => ['nullable', 'string', 'max:30'],
@@ -84,10 +90,21 @@ class GrievanceController extends Controller
             'custom_fields' => ['nullable', 'array'],
             'captured_at' => ['nullable', 'date'],
             'request_ai_suggestion' => ['nullable', 'boolean'],
-        ], [
+        ], $this->project(), 'grievance', [
+            // Nobody is asked to identify someone who asked not to be.
+            'complainant_name' => Rule::requiredIf(! $anonymous),
+            'complainant_phone' => Rule::requiredIf(! $anonymous),
+            'complainant_email' => Rule::requiredIf(! $anonymous && ! $request->boolean('complainant_has_no_email')),
+            'preferred_contact_method' => Rule::requiredIf(! $anonymous),
+            // "Already in the register?" is answered in the form; "no" is an answer.
+            'stakeholder_id' => false,
+        ]);
+
+        $data = $request->validate($rules, array_merge($this->required->messages($this->project(), 'grievance'), [
             'description.required' => 'Write down what the complainant told you, in their own words where you can.',
             'confidentiality.required' => 'Choose whether this case is normal, confidential or anonymous.',
-        ]);
+            'complainant_email.required' => 'Add their e-mail, or tick that they have none.',
+        ]));
 
         $grievance = $this->intake->intake($this->project(), $data);
 

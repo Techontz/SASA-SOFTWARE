@@ -147,6 +147,46 @@ return [
         'high_risk_escalates_immediately' => true,
     ],
 
+    /*
+    | Fields a person must fill in before a form will save, per form. Set from
+    | the client's 17 November 2026 review; a project can override any list
+    | through the configuration registry (key `required_fields`).
+    |
+    | Enforced on the staff forms and their API endpoints. Records arriving by
+    | other routes — the voice agent, SMS, imports, the PAP register — and
+    | changes already queued on a device are not held to it, so nothing a
+    | phone captured offline under the old rules is rejected when it syncs.
+    | A grievance's identity fields are never required on an anonymous case.
+    */
+    'required_fields' => [
+        'grievance' => [
+            'complainant_name', 'complainant_phone', 'complainant_email', 'complainant_type',
+            'complainant_language', 'preferred_contact_method', 'stakeholder_id',
+            'title', 'desired_resolution', 'location_id', 'location_text', 'demographics.gender',
+        ],
+        'commitment' => [
+            'source_date', 'due_date', 'owner_id', 'owner_team', 'stakeholder_ids', 'location_id', 'notes',
+        ],
+        'engagement' => [
+            'engagement_plan_id', 'method', 'project_phase', 'facilitator_id', 'location_id', 'venue',
+            'organised_by', 'stakeholder_ids', 'attendance_total', 'attendance_female', 'attendance_male',
+            'attendance_youth', 'attendance_elderly', 'attendance_disability',
+            'aim', 'discussion_points', 'outcomes',
+        ],
+        'stakeholder' => [
+            'phone', 'preferred_language', 'preferred_contact_method', 'primary_location_id',
+            'physical_address', 'influence', 'interest', 'power', 'impact',
+            'concerns_expectations', 'notes',
+        ],
+        'eshs_anomaly' => [
+            'location_id', 'root_cause', 'contractor_action', 'action_owner_name',
+            'action_owner_email', 'action_owner_phone', 'target_date',
+        ],
+        'incident' => [
+            'company', 'location_id', 'site_detail', 'contractor_manager', 'resident_engineer',
+        ],
+    ],
+
     'grievances' => [
         'severity_levels' => [
             1 => ['label' => 'Level 1 — Minor', 'description' => 'Localised, easily resolved, no lasting effect.'],

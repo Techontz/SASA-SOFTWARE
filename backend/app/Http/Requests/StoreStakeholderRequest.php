@@ -2,6 +2,10 @@
 
 namespace App\Http\Requests;
 
+use App\Domain\Configuration\RequiredFields;
+use App\Domain\Stakeholder\PriorityCalculator;
+use App\Domain\Tenancy\TenantContext;
+use App\Models\Project;
 use App\Models\Stakeholder;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -14,6 +18,26 @@ class StoreStakeholderRequest extends FormRequest
     }
 
     public function rules(): array
+    {
+        return app(RequiredFields::class)->apply($this->baseRules(), $this->currentProject(), 'stakeholder', $this->disabledDimensions(), partial: $this->isMethod('PATCH') || $this->isMethod('PUT'));
+    }
+
+    /**
+     * A priority dimension weighted 0 is switched off for the project: the
+     * form disables it, so it cannot also be compulsory.
+     *
+     * @return array<string, false>
+     */
+    protected function disabledDimensions(): array
+    {
+        $project = $this->currentProject();
+        $weights = app(PriorityCalculator::class)->settings($project->organisation_id, $project->id)['weights'];
+
+        return array_map(fn () => false, array_filter($weights, fn ($weight) => (float) $weight === 0.0));
+    }
+
+    /** The register's own rules, before the project's mandatory fields are applied. */
+    protected function baseRules(): array
     {
         return [
             'client_uuid' => ['nullable', 'uuid'],
@@ -77,9 +101,14 @@ class StoreStakeholderRequest extends FormRequest
         ];
     }
 
+    protected function currentProject(): Project
+    {
+        return app(TenantContext::class)->requireProject();
+    }
+
     public function messages(): array
     {
-        return [
+        return app(RequiredFields::class)->messages($this->currentProject(), 'stakeholder') + [
             'name.required' => 'A stakeholder needs a name.',
             'type.required' => 'Choose what kind of stakeholder this is.',
             'type.in' => 'That stakeholder type is not on this project\'s list.',

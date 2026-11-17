@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Domain\Configuration\RequiredFields;
 use App\Domain\Engagement\EngagementService;
 use App\Domain\Export\ExportService;
 use App\Http\Controllers\Controller;
@@ -15,7 +16,10 @@ use Illuminate\Validation\Rule;
 
 class EngagementController extends Controller
 {
-    public function __construct(private readonly EngagementService $engagements) {}
+    public function __construct(
+        private readonly EngagementService $engagements,
+        private readonly RequiredFields $required,
+    ) {}
 
     public function index(Request $request)
     {
@@ -110,7 +114,7 @@ class EngagementController extends Controller
     {
         $required = $updating ? 'sometimes' : 'required';
 
-        return $request->validate([
+        $rules = $this->required->apply([
             'client_uuid' => ['nullable', 'uuid'],
             'engagement_plan_id' => ['nullable', 'integer', 'exists:engagement_plans,id'],
             'topic' => [$required, 'string', 'max:255'],
@@ -174,7 +178,13 @@ class EngagementController extends Controller
             'commitments.*.due_date' => ['nullable', 'date'],
             'commitments.*.risk_level' => ['nullable', Rule::in(['high', 'medium', 'low'])],
             'commitments.*.stakeholder_ids' => ['nullable', 'array'],
-        ], [
+        ], $this->project(), 'engagement', [
+            // "Was this planned?" is answered in the form; "not planned" is an answer.
+            'engagement_plan_id' => false,
+        ], partial: $updating);
+
+        return $request->validate($rules, $this->required->messages($this->project(), 'engagement') + [
+            'stakeholder_ids.required' => 'Choose at least one stakeholder who was there.',
             'topic.required' => 'What was this engagement about?',
             'held_at.required' => 'When did this engagement take place?',
             'concerns.*.description.required_with' => 'Write down what the concern was.',

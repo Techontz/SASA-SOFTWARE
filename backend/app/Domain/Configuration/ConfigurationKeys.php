@@ -36,6 +36,8 @@ final class ConfigurationKeys
 
     public const REPORTING = 'reports';
 
+    public const REQUIRED_FIELDS = 'required_fields';
+
     /** @return array<string,array{label:string,group:string,description:string}> */
     public static function catalogue(): array
     {
@@ -52,6 +54,7 @@ final class ConfigurationKeys
             self::DISAGGREGATION_DIMENSIONS => ['label' => 'Disaggregation dimensions', 'group' => 'Reporting', 'description' => 'Which optional demographic dimensions this project collects. Sensitive dimensions are never mandatory.'],
             self::CUSTOM_FIELDS => ['label' => 'Custom fields', 'group' => 'Register', 'description' => 'Extra project-specific fields on stakeholders, engagements, grievances and commitments.'],
             self::VOICE => ['label' => 'AI voice agent', 'group' => 'AI', 'description' => 'Call length cap, behaviour at the cap, consent wording and languages.'],
+            self::REQUIRED_FIELDS => ['label' => 'Mandatory fields', 'group' => 'Forms', 'description' => 'Which fields must be filled in before each form saves — grievance, commitment, engagement, stakeholder, ESHS anomaly and incident.'],
             self::REPORTING => ['label' => 'Reporting calendar', 'group' => 'Reporting', 'description' => 'Fiscal year start and default reporting periods.'],
         ];
     }

@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { ACCOUNTS, attachEvidence, queuedOperationCount, settle, signIn, uniqueName, serviceWorkerReady } from "./helpers";
+import { ACCOUNTS, attachEvidence, queuedOperationCount, settle, signIn, uniqueName, serviceWorkerReady, completeMandatoryFields } from "./helpers";
 
 /**
  * THE OFFLINE ACCEPTANCE TEST.
@@ -48,6 +48,7 @@ test.describe("working offline", () => {
     await page.fill("#name", stakeholderName);
     await page.selectOption("#type", "household");
     await page.fill("#phone", "+255 755 111 222");
+    await completeMandatoryFields(page);
     await page.getByRole("button", { name: /Add to the register/ }).click();
 
     // The user is told the truth: on this device, not on the server. The app
@@ -65,6 +66,7 @@ test.describe("working offline", () => {
       "Written down on a tablet with no connection and queued until the signal returned.",
     );
     await attachEvidence(page);
+    await completeMandatoryFields(page);
     await page.getByRole("button", { name: "Open the case" }).click();
     await expect(page.getByText(/Grievance saved on this device/i).first()).toBeVisible({ timeout: 20_000 });
 
@@ -120,6 +122,7 @@ test.describe("working offline", () => {
     await page.goto("/stakeholders/new");
     await page.fill("#name", uniqueName("Retry Household"));
     await page.selectOption("#type", "household");
+    await completeMandatoryFields(page);
     await page.getByRole("button", { name: /Add to the register/ }).click();
 
     await expect(page.getByText(/saved on this device/i).first()).toBeVisible({ timeout: 20_000 });

@@ -17,7 +17,8 @@ import { useEngagementPlans, useStakeholders } from "@/lib/api/hooks";
 import { useFieldReference } from "@/hooks/useFieldReference";
 import { localStore } from "@/lib/offline/dexieStore";
 import { syncEngine } from "@/lib/offline/syncEngine";
-import { humanise, uuid } from "@/lib/utils";
+import { useRequiredFields } from "@/lib/requiredFields";
+import { cn, humanise, uuid } from "@/lib/utils";
 import { useSession } from "@/providers/SessionProvider";
 import { useSync } from "@/providers/SyncProvider";
 import { useToast } from "@/providers/ToastProvider";
@@ -67,6 +68,14 @@ const schema = z.object({
 
 type FormValues = z.infer<typeof schema>;
 
+/** "Was this planned?" — an explicit "no" is an answer, so it has a value of its own. */
+const NOT_PLANNED = "none";
+
+const MESSAGES = {
+  engagement_plan_id: "Say whether this was planned.",
+  stakeholder_ids: "Choose at least one stakeholder who was there.",
+};
+
 export default function LogEngagementPage() {
   return (
     <Suspense fallback={<LoadingState />}>
@@ -90,6 +99,7 @@ function LogEngagementForm() {
   const [filesError, setFilesError] = useState<string | undefined>();
 
   const draftKey = "engagement:new";
+  const { need, withRequired } = useRequiredFields<FormValues>("engagement", { messages: MESSAGES });
 
   const {
     register,
@@ -97,14 +107,30 @@ function LogEngagementForm() {
     control,
     watch,
     reset,
+    getValues,
+    setValue,
     formState: { errors, isSubmitting, isDirty },
   } = useForm<FormValues>({
-    resolver: zodResolver(schema),
+    resolver: withRequired(zodResolver(schema)),
     defaultValues: {
       engagement_plan_id: searchParams.get("plan") ?? "",
       topic: "",
       held_at: new Date().toISOString().slice(0, 16),
       method: "community_meeting",
+      project_phase: "",
+      facilitator_id: "",
+      location_id: "",
+      venue: "",
+      organised_by: "",
+      aim: "",
+      discussion_points: "",
+      outcomes: "",
+      attendance_total: "",
+      attendance_female: "",
+      attendance_male: "",
+      attendance_youth: "",
+      attendance_elderly: "",
+      attendance_disability: "",
       vulnerable_groups_present: false,
       stakeholder_ids: [],
       concerns: [],
@@ -115,6 +141,16 @@ function LogEngagementForm() {
   const concerns = useFieldArray({ control, name: "concerns" });
   const commitments = useFieldArray({ control, name: "commitments" });
   const values = watch();
+
+  // Arriving from a plan's "Log what happened" link preselects that plan, but
+  // the list of plans loads afterwards, so the dropdown would show "Choose"
+  // while the form already holds the plan. Re-apply it once the options exist.
+  useEffect(() => {
+    const current = getValues("engagement_plan_id");
+    if (plans?.data && current && current !== NOT_PLANNED) {
+      setValue("engagement_plan_id", current);
+    }
+  }, [plans?.data, getValues, setValue]);
 
   useEffect(() => {
     if (!project || !isDirty) return;
@@ -151,7 +187,10 @@ function LogEngagementForm() {
     const number = (value?: string) => (value ? Number(value) : 0);
 
     const payload: Record<string, unknown> = {
-      engagement_plan_id: formValues.engagement_plan_id ? Number(formValues.engagement_plan_id) : null,
+      engagement_plan_id:
+        formValues.engagement_plan_id && formValues.engagement_plan_id !== NOT_PLANNED
+          ? Number(formValues.engagement_plan_id)
+          : null,
       topic: formValues.topic,
       project_phase: formValues.project_phase || null,
       held_at: formValues.held_at,
@@ -265,11 +304,18 @@ function LogEngagementForm() {
         <FormSection title="The meeting" description="What it was, when it happened, and where.">
           <Field
             label="Was this planned?"
-            optional
+            {...need("engagement_plan_id")}
+            error={errors.engagement_plan_id?.message}
             htmlFor="engagement_plan_id"
             hint="Linking it closes the plan and works out whether it was on time."
           >
-            <Select id="engagement_plan_id" placeholder="Not planned — this was unscheduled" {...register("engagement_plan_id")}>
+            <Select
+              id="engagement_plan_id"
+              placeholder="Choose"
+              invalid={Boolean(errors.engagement_plan_id)}
+              {...register("engagement_plan_id")}
+            >
+              <option value={NOT_PLANNED}>Not planned — this was unscheduled</option>
               {(plans?.data ?? []).map((plan) => (
                 <option key={plan.id} value={plan.id}>
                   {plan.reference} — {plan.title} ({plan.target_date})
@@ -295,8 +341,8 @@ function LogEngagementForm() {
           </FieldRow>
 
           <FieldRow columns={3}>
-            <Field label="How it was done" optional htmlFor="method">
-              <Select id="method" placeholder="Not recorded" {...register("method")}>
+            <Field label="How it was done" {...need("method")} error={errors.method?.message} htmlFor="method">
+              <Select id="method" placeholder="Choose" invalid={Boolean(errors.method)} {...register("method")}>
                 {methods.map((method) => (
                   <option key={method} value={method}>
                     {humanise(method)}
@@ -304,8 +350,8 @@ function LogEngagementForm() {
                 ))}
               </Select>
             </Field>
-            <Field label="Project phase" optional htmlFor="project_phase">
-              <Select id="project_phase" placeholder="Not recorded" {...register("project_phase")}>
+            <Field label="Project phase" {...need("project_phase")} error={errors.project_phase?.message} htmlFor="project_phase">
+              <Select id="project_phase" placeholder="Choose" invalid={Boolean(errors.project_phase)} {...register("project_phase")}>
                 {phases.map((phase) => (
                   <option key={phase} value={phase}>
                     {humanise(phase)}
@@ -313,8 +359,8 @@ function LogEngagementForm() {
                 ))}
               </Select>
             </Field>
-            <Field label="Facilitated by" optional htmlFor="facilitator_id">
-              <Select id="facilitator_id" placeholder="Not recorded" {...register("facilitator_id")}>
+            <Field label="Facilitated by" {...need("facilitator_id")} error={errors.facilitator_id?.message} htmlFor="facilitator_id">
+              <Select id="facilitator_id" placeholder="Choose" invalid={Boolean(errors.facilitator_id)} {...register("facilitator_id")}>
                 {members.map((member) => (
                   <option key={member.id} value={member.id}>
                     {member.name}
@@ -325,8 +371,8 @@ function LogEngagementForm() {
           </FieldRow>
 
           <FieldRow columns={3}>
-            <Field label="Location" optional htmlFor="location_id">
-              <Select id="location_id" placeholder="Not recorded" {...register("location_id")}>
+            <Field label="Location" {...need("location_id")} error={errors.location_id?.message} htmlFor="location_id">
+              <Select id="location_id" placeholder="Choose a place" invalid={Boolean(errors.location_id)} {...register("location_id")}>
                 {locations.map((location) => (
                   <option key={location.id} value={location.id}>
                     {location.path ?? location.name}
@@ -334,11 +380,16 @@ function LogEngagementForm() {
                 ))}
               </Select>
             </Field>
-            <Field label="Venue" optional htmlFor="venue">
-              <Input id="venue" placeholder="Village office" {...register("venue")} />
+            <Field label="Venue" {...need("venue")} error={errors.venue?.message} htmlFor="venue">
+              <Input id="venue" placeholder="Village office" invalid={Boolean(errors.venue)} {...register("venue")} />
             </Field>
-            <Field label="Organised by" optional htmlFor="organised_by">
-              <Input id="organised_by" placeholder="Community relations team" {...register("organised_by")} />
+            <Field label="Organised by" {...need("organised_by")} error={errors.organised_by?.message} htmlFor="organised_by">
+              <Input
+                id="organised_by"
+                placeholder="Community relations team"
+                invalid={Boolean(errors.organised_by)}
+                {...register("organised_by")}
+              />
             </Field>
           </FieldRow>
         </FormSection>
@@ -347,12 +398,23 @@ function LogEngagementForm() {
           title="Who was there"
           description="Attendance counts feed the reporting on who the project is reaching, and who it is missing."
         >
-          <Field label="Stakeholders present" optional hint="Links the meeting to their record and their timeline.">
+          <Field
+            label="Stakeholders present"
+            {...need("stakeholder_ids")}
+            error={errors.stakeholder_ids?.message}
+            hint="Links the meeting to their record and their timeline."
+          >
             <Controller
               control={control}
               name="stakeholder_ids"
               render={({ field }) => (
-                <div className="max-h-56 space-y-1 overflow-y-auto rounded-lg border border-ink-200 p-2">
+                <div
+                  className={cn(
+                    "max-h-56 space-y-1 overflow-y-auto rounded-lg border p-2",
+                    errors.stakeholder_ids ? "border-danger-500" : "border-ink-200",
+                  )}
+                  aria-invalid={errors.stakeholder_ids ? "true" : undefined}
+                >
                   {(stakeholders?.data ?? []).map((stakeholder) => {
                     const id = String(stakeholder.id);
                     const selected = field.value.includes(id);
@@ -381,26 +443,68 @@ function LogEngagementForm() {
           </Field>
 
           <FieldRow columns={3}>
-            <Field label="Total attending" optional htmlFor="attendance_total">
-              <Input id="attendance_total" type="number" inputMode="numeric" min={0} {...register("attendance_total")} />
+            <Field label="Total attending" {...need("attendance_total")} error={errors.attendance_total?.message} htmlFor="attendance_total">
+              <Input
+                id="attendance_total"
+                type="number"
+                inputMode="numeric"
+                min={0}
+                invalid={Boolean(errors.attendance_total)}
+                {...register("attendance_total")}
+              />
             </Field>
-            <Field label="Of which women" optional htmlFor="attendance_female">
-              <Input id="attendance_female" type="number" inputMode="numeric" min={0} {...register("attendance_female")} />
+            <Field label="Of which women" {...need("attendance_female")} error={errors.attendance_female?.message} htmlFor="attendance_female">
+              <Input
+                id="attendance_female"
+                type="number"
+                inputMode="numeric"
+                min={0}
+                invalid={Boolean(errors.attendance_female)}
+                {...register("attendance_female")}
+              />
             </Field>
-            <Field label="Of which men" optional htmlFor="attendance_male">
-              <Input id="attendance_male" type="number" inputMode="numeric" min={0} {...register("attendance_male")} />
+            <Field label="Of which men" {...need("attendance_male")} error={errors.attendance_male?.message} htmlFor="attendance_male">
+              <Input
+                id="attendance_male"
+                type="number"
+                inputMode="numeric"
+                min={0}
+                invalid={Boolean(errors.attendance_male)}
+                {...register("attendance_male")}
+              />
             </Field>
           </FieldRow>
 
           <FieldRow columns={3}>
-            <Field label="Young people" optional htmlFor="attendance_youth">
-              <Input id="attendance_youth" type="number" inputMode="numeric" min={0} {...register("attendance_youth")} />
+            <Field label="Young people" {...need("attendance_youth")} error={errors.attendance_youth?.message} htmlFor="attendance_youth">
+              <Input
+                id="attendance_youth"
+                type="number"
+                inputMode="numeric"
+                min={0}
+                invalid={Boolean(errors.attendance_youth)}
+                {...register("attendance_youth")}
+              />
             </Field>
-            <Field label="Elderly" optional htmlFor="attendance_elderly">
-              <Input id="attendance_elderly" type="number" inputMode="numeric" min={0} {...register("attendance_elderly")} />
+            <Field label="Elderly" {...need("attendance_elderly")} error={errors.attendance_elderly?.message} htmlFor="attendance_elderly">
+              <Input
+                id="attendance_elderly"
+                type="number"
+                inputMode="numeric"
+                min={0}
+                invalid={Boolean(errors.attendance_elderly)}
+                {...register("attendance_elderly")}
+              />
             </Field>
-            <Field label="People with a disability" optional htmlFor="attendance_disability">
-              <Input id="attendance_disability" type="number" inputMode="numeric" min={0} {...register("attendance_disability")} />
+            <Field label="People with a disability" {...need("attendance_disability")} error={errors.attendance_disability?.message} htmlFor="attendance_disability">
+              <Input
+                id="attendance_disability"
+                type="number"
+                inputMode="numeric"
+                min={0}
+                invalid={Boolean(errors.attendance_disability)}
+                {...register("attendance_disability")}
+              />
             </Field>
           </FieldRow>
 
@@ -425,19 +529,20 @@ function LogEngagementForm() {
         </FormSection>
 
         <FormSection title="What was said" description="The minutes. This is the record an auditor reads in two years' time.">
-          <Field label="Aim of the meeting" optional htmlFor="aim">
-            <Textarea id="aim" rows={2} {...register("aim")} />
+          <Field label="Aim of the meeting" {...need("aim")} error={errors.aim?.message} htmlFor="aim">
+            <Textarea id="aim" rows={2} invalid={Boolean(errors.aim)} {...register("aim")} />
           </Field>
-          <Field label="Discussion points" optional htmlFor="discussion_points">
+          <Field label="Discussion points" {...need("discussion_points")} error={errors.discussion_points?.message} htmlFor="discussion_points">
             <Textarea
               id="discussion_points"
               rows={6}
               placeholder="What was presented, what was asked, and what was answered."
+              invalid={Boolean(errors.discussion_points)}
               {...register("discussion_points")}
             />
           </Field>
-          <Field label="Outcomes" optional htmlFor="outcomes">
-            <Textarea id="outcomes" rows={3} {...register("outcomes")} />
+          <Field label="Outcomes" {...need("outcomes")} error={errors.outcomes?.message} htmlFor="outcomes">
+            <Textarea id="outcomes" rows={3} invalid={Boolean(errors.outcomes)} {...register("outcomes")} />
           </Field>
         </FormSection>
 

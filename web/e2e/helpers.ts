@@ -122,3 +122,68 @@ export async function attachEvidence(page: Page, name = "evidence.pdf") {
     buffer: Buffer.from("%PDF-1.4\n1 0 obj<<>>endobj\ntrailer<<>>\n%%EOF\n"),
   });
 }
+
+/**
+ * Fills every mandatory field the test has left empty, so a test about the
+ * engagement chain or offline sync is not also a test of which fields the
+ * project made compulsory (that is RequiredFieldsTest's job on the API, and
+ * the forms flag them on screen). Fields the test filled are left alone.
+ *
+ * A mandatory field is one whose label carries the red asterisk.
+ */
+export async function completeMandatoryFields(page: Page) {
+  const fields = await page.evaluate(() =>
+    [...document.querySelectorAll("label")]
+      .filter((label) => label.querySelector("span.text-danger-500"))
+      .map((label) => {
+        const id = label.htmlFor;
+        const control = id ? (document.getElementById(id) as HTMLInputElement | HTMLSelectElement | null) : null;
+        const container = label.parentElement;
+        return {
+          id: id || null,
+          tag: control?.tagName.toLowerCase() ?? null,
+          type: control instanceof HTMLInputElement ? control.type : null,
+          empty: control ? control.value.trim() === "" : false,
+          disabled: control ? control.disabled : false,
+          // A checklist ("Promised to", "Stakeholders present") has no single control.
+          checklist: !control && Boolean(container?.querySelector('input[type="checkbox"]'))
+            && !container?.querySelector('input[type="checkbox"]:checked'),
+          checklistIndex: [...document.querySelectorAll("label")].indexOf(label),
+        };
+      }),
+  );
+
+  const day = (offset: number) => new Date(Date.now() + offset * 864e5).toISOString().slice(0, 10);
+
+  for (const field of fields) {
+    if (field.checklist) {
+      await page
+        .locator("label")
+        .nth(field.checklistIndex)
+        .locator("xpath=..")
+        .locator('input[type="checkbox"]')
+        .first()
+        .check();
+      continue;
+    }
+    if (!field.id || !field.empty || field.disabled) continue;
+
+    const selector = `#${field.id}`;
+    if (field.tag === "select") {
+      const values = await page.$$eval(`${selector} option`, (options) =>
+        options.map((option) => (option as HTMLOptionElement).value).filter((value) => value && value !== "yes"),
+      );
+      if (values[0]) await page.selectOption(selector, values[0]);
+    } else if (field.type === "date") {
+      await page.fill(selector, /target|due/.test(field.id) ? day(7) : day(0));
+    } else if (field.type === "number") {
+      await page.fill(selector, "3");
+    } else if (field.type === "email") {
+      await page.fill(selector, "e2e@example.com");
+    } else if (field.type === "tel") {
+      await page.fill(selector, "+255754000333");
+    } else if (field.type !== "file" && field.type !== "checkbox" && field.type !== "radio") {
+      await page.fill(selector, "Recorded by the end-to-end suite.");
+    }
+  }
+}

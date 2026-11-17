@@ -36,7 +36,16 @@ abstract class TestCase extends BaseTestCase
         parent::setUp();
 
         app(TenantContext::class)->setUser(null);
+
+        // Most tests are about something other than which fields a form
+        // insists on, so they start with no mandatory fields.
+        // RequiredFieldsTest switches the real lists back on.
+        $this->realRequiredFields = config('sasa.required_fields');
+        config(['sasa.required_fields' => []]);
     }
+
+    /** The mandatory-field lists from config/sasa.php, as shipped. */
+    protected array $realRequiredFields = [];
 
     /**
      * A minimal but realistic tenant: one organisation, one project, the role

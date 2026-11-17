@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Domain\Configuration\RequiredFields;
 use App\Domain\Engagement\CommitmentService;
 use App\Domain\Export\ExportService;
 use App\Http\Controllers\Controller;
@@ -15,7 +16,10 @@ use Illuminate\Validation\Rule;
 
 class CommitmentController extends Controller
 {
-    public function __construct(private readonly CommitmentService $commitments) {}
+    public function __construct(
+        private readonly CommitmentService $commitments,
+        private readonly RequiredFields $required,
+    ) {}
 
     public function index(Request $request)
     {
@@ -126,7 +130,7 @@ class CommitmentController extends Controller
     {
         $required = $updating ? 'sometimes' : 'required';
 
-        return $request->validate([
+        $rules = $this->required->apply([
             'client_uuid' => ['nullable', 'uuid'],
             'commitment_text' => [$required, 'string', 'max:20000'],
             'engagement_id' => ['nullable', 'integer', 'exists:engagements,id'],
@@ -147,9 +151,12 @@ class CommitmentController extends Controller
             'stakeholder_ids' => ['nullable', 'array'],
             'stakeholder_ids.*' => ['integer', 'exists:stakeholders,id'],
             'captured_at' => ['nullable', 'date'],
-        ], [
+        ], $this->project(), 'commitment', partial: $updating);
+
+        return $request->validate($rules, array_merge($this->required->messages($this->project(), 'commitment'), [
             'commitment_text.required' => 'Write down what was promised, in the words it was promised.',
-        ]);
+            'stakeholder_ids.required' => 'Choose who it was promised to.',
+        ]));
     }
 
     private function buildQuery(Request $request)

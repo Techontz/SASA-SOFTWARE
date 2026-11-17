@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { ACCOUNTS, attachEvidence, signIn, uniqueName } from "./helpers";
+import { ACCOUNTS, attachEvidence, signIn, uniqueName, completeMandatoryFields } from "./helpers";
 
 /**
  * ACCEPTANCE: given a planned engagement exists, when the actual engagement is
@@ -40,6 +40,7 @@ test.describe("the engagement chain", () => {
     await page.selectOption("#commitment-0-risk", "high");
 
     await attachEvidence(page, "minutes.pdf");
+    await completeMandatoryFields(page);
     await page.getByRole("button", { name: "Save the engagement" }).click();
 
     await expect(page).toHaveURL(/\/engagements\/\d+$/, { timeout: 40_000 });
@@ -59,6 +60,7 @@ test.describe("the engagement chain", () => {
     await page.fill("#topic", uniqueName("Unscheduled visit after a complaint"));
     await page.fill("#attendance_total", "6");
     await attachEvidence(page, "minutes.pdf");
+    await completeMandatoryFields(page);
     await page.getByRole("button", { name: "Save the engagement" }).click();
 
     await expect(page).toHaveURL(/\/engagements\/\d+$/, { timeout: 40_000 });

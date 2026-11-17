@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { ACCOUNTS, attachEvidence, signIn, uniqueName } from "./helpers";
+import { ACCOUNTS, attachEvidence, signIn, uniqueName, completeMandatoryFields } from "./helpers";
 
 /**
  * ACCEPTANCE: given a grievance is submitted, the system assigns a case ID,
@@ -24,6 +24,7 @@ test.describe("the grievance lifecycle", () => {
     );
     await page.fill("#desired_resolution", "Water the road, or move the haulage route away from the houses.");
     await attachEvidence(page);
+    await completeMandatoryFields(page);
     await page.getByRole("button", { name: "Open the case" }).click();
 
     await expect(page).toHaveURL(/\/grievances\/\d+$/, { timeout: 40_000 });
@@ -107,6 +108,7 @@ test.describe("the grievance lifecycle", () => {
 
     await page.fill("#complainant_name", "Neema Charles Mwita");
     await page.fill("#description", "The haulage trucks pass every few minutes and the dust settles on the houses.");
+    await completeMandatoryFields(page);
     await page.getByRole("button", { name: "Open the case" }).click();
 
     await expect(page.getByText("Attach at least one file as evidence before opening the case.")).toBeVisible();

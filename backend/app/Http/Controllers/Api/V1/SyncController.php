@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Domain\Configuration\ConfigurationRegistry;
 use App\Domain\Configuration\ReferenceLists;
+use App\Domain\Configuration\RequiredFields;
 use App\Domain\Sync\SyncService;
 use App\Http\Controllers\Controller;
 use App\Models\Grievance;
@@ -117,6 +118,9 @@ class SyncController extends Controller
                 ])
                 ->sortBy('name')->values(),
             'lists' => app(ReferenceLists::class)->for($project),
+            // What each staff form must have filled in, so the form asks for
+            // exactly what the API will insist on.
+            'required_fields' => app(RequiredFields::class)->all($project),
             'severity_levels' => collect(config('sasa.grievances.severity_levels'))
                 ->map(fn ($level, $key) => ['level' => (int) $key, 'label' => $level['label'], 'description' => $level['description']])
                 ->values(),

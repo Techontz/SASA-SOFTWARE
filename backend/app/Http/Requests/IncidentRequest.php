@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Domain\Configuration\RequiredFields;
 use App\Domain\Incident\IncidentOptions;
 use App\Domain\Tenancy\TenantContext;
 use Illuminate\Foundation\Http\FormRequest;
@@ -26,7 +27,11 @@ class IncidentRequest extends FormRequest
         $required = $this->isMethod('patch') ? 'sometimes' : 'required';
         $levels = array_keys($options->levels());
 
-        return [
+        // A list the project has not filled in yet cannot be made compulsory:
+        // nobody could choose from it.
+        $unlessEmpty = fn (string $list) => $options->list($project, $list) === [] ? false : 'required';
+
+        return app(RequiredFields::class)->apply([
             'client_uuid' => ['nullable', 'uuid'],
             'occurred_at' => [$required, 'date', 'before_or_equal:'.now()->addDay()->toDateTimeString()],
             'company' => ['nullable', 'string', Rule::in($options->list($project, 'companies'))],
@@ -42,7 +47,11 @@ class IncidentRequest extends FormRequest
             'summary' => [$required, 'string', 'min:10', 'max:20000'],
             'contractor_manager' => ['nullable', 'string', Rule::in($options->list($project, 'contractor_managers'))],
             'resident_engineer' => ['nullable', 'string', Rule::in($options->list($project, 'resident_engineers'))],
-        ];
+        ], $project, 'incident', [
+            'company' => $unlessEmpty('companies'),
+            'contractor_manager' => $unlessEmpty('contractor_managers'),
+            'resident_engineer' => $unlessEmpty('resident_engineers'),
+        ], partial: $this->isMethod('patch'));
     }
 
     public function withValidator($validator): void
@@ -62,7 +71,7 @@ class IncidentRequest extends FormRequest
 
     public function messages(): array
     {
-        return [
+        return app(RequiredFields::class)->messages(app(TenantContext::class)->requireProject(), 'incident') + [
             'occurred_at.required' => 'Give the date and time of the incident.',
             'category.required' => 'Choose a category.',
             'category.in' => 'Choose a category from the list.',

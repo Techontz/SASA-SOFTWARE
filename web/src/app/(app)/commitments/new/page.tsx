@@ -13,7 +13,8 @@ import { PageHeader } from "@/components/ui/DetailLayout";
 import { PermissionDenied } from "@/components/ui/States";
 import { useLocations, useAssignableMembers, useStakeholders } from "@/lib/api/hooks";
 import { syncEngine } from "@/lib/offline/syncEngine";
-import { uuid } from "@/lib/utils";
+import { useRequiredFields } from "@/lib/requiredFields";
+import { cn, uuid } from "@/lib/utils";
 import { useSession } from "@/providers/SessionProvider";
 import { useSync } from "@/providers/SyncProvider";
 import { useToast } from "@/providers/ToastProvider";
@@ -34,6 +35,8 @@ const schema = z.object({
 
 type FormValues = z.infer<typeof schema>;
 
+const MESSAGES = { stakeholder_ids: "Choose who it was promised to." };
+
 export default function NewCommitmentPage() {
   const router = useRouter();
   const toast = useToast();
@@ -44,6 +47,7 @@ export default function NewCommitmentPage() {
   const { data: locationData } = useLocations();
 
   const [savedOffline, setSavedOffline] = useState(false);
+  const { need, withRequired } = useRequiredFields<FormValues>("commitment", { messages: MESSAGES });
 
   const {
     register,
@@ -52,13 +56,18 @@ export default function NewCommitmentPage() {
     reset,
     formState: { errors, isSubmitting },
   } = useForm<FormValues>({
-    resolver: zodResolver(schema),
+    resolver: withRequired(zodResolver(schema)),
     defaultValues: {
       commitment_text: "",
       risk_level: "medium",
       priority: "medium",
       stakeholder_ids: [],
       source_date: new Date().toISOString().slice(0, 10),
+      due_date: "",
+      owner_id: "",
+      owner_team: "",
+      location_id: "",
+      notes: "",
     },
   });
 
@@ -132,11 +141,17 @@ export default function NewCommitmentPage() {
           </Field>
 
           <FieldRow columns={3}>
-            <Field label="Made on" optional htmlFor="source_date">
-              <Input id="source_date" type="date" {...register("source_date")} />
+            <Field label="Made on" {...need("source_date")} error={errors.source_date?.message} htmlFor="source_date">
+              <Input id="source_date" type="date" invalid={Boolean(errors.source_date)} {...register("source_date")} />
             </Field>
-            <Field label="Due by" optional htmlFor="due_date" hint="Reminders fire before and after this date.">
-              <Input id="due_date" type="date" {...register("due_date")} />
+            <Field
+              label="Due by"
+              {...need("due_date")}
+              error={errors.due_date?.message}
+              htmlFor="due_date"
+              hint="Reminders fire before and after this date."
+            >
+              <Input id="due_date" type="date" invalid={Boolean(errors.due_date)} {...register("due_date")} />
             </Field>
             <Field label="Risk if it slips" htmlFor="risk_level">
               <Select id="risk_level" {...register("risk_level")}>
@@ -150,8 +165,8 @@ export default function NewCommitmentPage() {
 
         <FormSection title="Who owns it" description="A commitment with no owner is a commitment nobody delivers.">
           <FieldRow>
-            <Field label="Owner" optional htmlFor="owner_id">
-              <Select id="owner_id" placeholder="Unassigned" {...register("owner_id")}>
+            <Field label="Owner" {...need("owner_id")} error={errors.owner_id?.message} htmlFor="owner_id">
+              <Select id="owner_id" placeholder="Choose an owner" invalid={Boolean(errors.owner_id)} {...register("owner_id")}>
                 {(members ?? []).map((member) => (
                   <option key={member.id} value={member.id}>
                     {member.role ? `${member.name} — ${member.role}` : member.name}
@@ -159,17 +174,28 @@ export default function NewCommitmentPage() {
                 ))}
               </Select>
             </Field>
-            <Field label="Team" optional htmlFor="owner_team">
-              <Input id="owner_team" placeholder="Community relations" {...register("owner_team")} />
+            <Field label="Team" {...need("owner_team")} error={errors.owner_team?.message} htmlFor="owner_team">
+              <Input id="owner_team" placeholder="Community relations" invalid={Boolean(errors.owner_team)} {...register("owner_team")} />
             </Field>
           </FieldRow>
 
-          <Field label="Promised to" optional hint="Links the commitment to their record and their timeline.">
+          <Field
+            label="Promised to"
+            {...need("stakeholder_ids")}
+            error={errors.stakeholder_ids?.message}
+            hint="Links the commitment to their record and their timeline."
+          >
             <Controller
               control={control}
               name="stakeholder_ids"
               render={({ field }) => (
-                <div className="max-h-48 space-y-1 overflow-y-auto rounded-lg border border-ink-200 p-2">
+                <div
+                  className={cn(
+                    "max-h-48 space-y-1 overflow-y-auto rounded-lg border p-2",
+                    errors.stakeholder_ids ? "border-danger-500" : "border-ink-200",
+                  )}
+                  aria-invalid={errors.stakeholder_ids ? "true" : undefined}
+                >
                   {(stakeholders?.data ?? []).map((stakeholder) => {
                     const id = String(stakeholder.id);
                     const selected = field.value.includes(id);
@@ -192,8 +218,8 @@ export default function NewCommitmentPage() {
           </Field>
 
           <FieldRow>
-            <Field label="Location" optional htmlFor="location_id">
-              <Select id="location_id" placeholder="Not recorded" {...register("location_id")}>
+            <Field label="Location" {...need("location_id")} error={errors.location_id?.message} htmlFor="location_id">
+              <Select id="location_id" placeholder="Choose a place" invalid={Boolean(errors.location_id)} {...register("location_id")}>
                 {(locationData?.data ?? []).map((location) => (
                   <option key={location.id} value={location.id}>
                     {location.path ?? location.name}
@@ -210,8 +236,8 @@ export default function NewCommitmentPage() {
             </Field>
           </FieldRow>
 
-          <Field label="Notes" optional htmlFor="notes">
-            <Textarea id="notes" rows={3} {...register("notes")} />
+          <Field label="Notes" {...need("notes")} error={errors.notes?.message} htmlFor="notes">
+            <Textarea id="notes" rows={3} invalid={Boolean(errors.notes)} {...register("notes")} />
           </Field>
         </FormSection>
 

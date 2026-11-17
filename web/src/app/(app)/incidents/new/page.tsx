@@ -3,7 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Send, WifiOff } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { Controller, useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 import { AttachmentPicker, queueAttachments } from "@/components/app/AttachmentPicker";
@@ -17,6 +17,7 @@ import { ApiRequestError } from "@/lib/api/client";
 import { useLocations } from "@/lib/api/hooks";
 import { useIncidentOptions, useReportIncident } from "@/lib/api/incidents";
 import { groupTypesForCategory, isSeriousIncident, nowForDateTimeInput } from "@/lib/incidents";
+import { useRequiredFields } from "@/lib/requiredFields";
 import { uuid } from "@/lib/utils";
 import { useSession } from "@/providers/SessionProvider";
 import { useSync } from "@/providers/SyncProvider";
@@ -46,6 +47,13 @@ const schema = z
 
 type FormValues = z.infer<typeof schema>;
 
+/** The fields chosen from a project list, and the list each one comes from. */
+const LIST_FIELDS = {
+  company: "companies",
+  contractor_manager: "contractor_managers",
+  resident_engineer: "resident_engineers",
+} as const;
+
 export default function ReportIncidentPage() {
   const router = useRouter();
   const toast = useToast();
@@ -57,6 +65,16 @@ export default function ReportIncidentPage() {
   const [files, setFiles] = useState<File[]>([]);
   const [clientUuid] = useState(() => uuid());
 
+  /* A list the project has not filled in yet cannot be made compulsory —
+     nobody could choose from it. The API makes the same exception. */
+  const lists = options.data?.data;
+  const listIsEmpty = useCallback(
+    (field: string) => field in LIST_FIELDS && (lists?.[LIST_FIELDS[field as keyof typeof LIST_FIELDS]].length ?? 0) === 0,
+    [lists],
+  );
+  const { need, withRequired } = useRequiredFields<FormValues>("incident", { skip: listIsEmpty });
+  const needFromList = (field: keyof typeof LIST_FIELDS) => (listIsEmpty(field) ? { optional: true } : need(field));
+
   const {
     register,
     handleSubmit,
@@ -65,7 +83,7 @@ export default function ReportIncidentPage() {
     setValue,
     formState: { errors, isSubmitting },
   } = useForm<FormValues>({
-    resolver: zodResolver(schema),
+    resolver: withRequired(zodResolver(schema)),
     defaultValues: {
       occurred_at: nowForDateTimeInput(),
       category: "",
@@ -170,12 +188,12 @@ export default function ReportIncidentPage() {
             </Field>
             <Field
               label="Company"
-              optional
+              {...needFromList("company")}
               error={errors.company?.message}
               htmlFor="company"
               hint={vocabulary.companies.length === 0 ? "No companies are configured for this project yet." : undefined}
             >
-              <Select id="company" placeholder="Choose a company" disabled={vocabulary.companies.length === 0} {...register("company")}>
+              <Select id="company" placeholder="Choose a company" disabled={vocabulary.companies.length === 0} invalid={Boolean(errors.company)} {...register("company")}>
                 {vocabulary.companies.map((company) => (
                   <option key={company} value={company}>
                     {company}
@@ -185,8 +203,8 @@ export default function ReportIncidentPage() {
             </Field>
           </FieldRow>
           <FieldRow>
-            <Field label="Site / location" optional error={errors.location_id?.message} htmlFor="location_id">
-              <Select id="location_id" placeholder="Choose a location" {...register("location_id")}>
+            <Field label="Site / location" {...need("location_id")} error={errors.location_id?.message} htmlFor="location_id">
+              <Select id="location_id" placeholder="Choose a location" invalid={Boolean(errors.location_id)} {...register("location_id")}>
                 {(locationData?.data ?? []).map((location) => (
                   <option key={location.id} value={location.id}>
                     {location.path ?? location.name}
@@ -194,8 +212,8 @@ export default function ReportIncidentPage() {
                 ))}
               </Select>
             </Field>
-            <Field label="Site detail" optional error={errors.site_detail?.message} htmlFor="site_detail">
-              <Input id="site_detail" placeholder="Tower T-118, stringing yard, km 14…" {...register("site_detail")} />
+            <Field label="Site detail" {...need("site_detail")} error={errors.site_detail?.message} htmlFor="site_detail">
+              <Input id="site_detail" placeholder="Tower T-118, stringing yard, km 14…" invalid={Boolean(errors.site_detail)} {...register("site_detail")} />
             </Field>
           </FieldRow>
         </FormSection>
@@ -317,9 +335,10 @@ export default function ReportIncidentPage() {
             <p className="sasa-field flex items-center bg-surface-sunken text-ink-800">{user?.name ?? "You"}</p>
           </Field>
           <FieldRow>
-            <Field label="Contractor manager" optional error={errors.contractor_manager?.message} htmlFor="contractor_manager">
+            <Field label="Contractor manager" {...needFromList("contractor_manager")} error={errors.contractor_manager?.message} htmlFor="contractor_manager">
               <Select
                 id="contractor_manager"
+                invalid={Boolean(errors.contractor_manager)}
                 placeholder={vocabulary.contractor_managers.length ? "Choose" : "None configured"}
                 disabled={vocabulary.contractor_managers.length === 0}
                 {...register("contractor_manager")}
@@ -331,9 +350,10 @@ export default function ReportIncidentPage() {
                 ))}
               </Select>
             </Field>
-            <Field label="Consultant's resident engineer" optional error={errors.resident_engineer?.message} htmlFor="resident_engineer">
+            <Field label="Consultant's resident engineer" {...needFromList("resident_engineer")} error={errors.resident_engineer?.message} htmlFor="resident_engineer">
               <Select
                 id="resident_engineer"
+                invalid={Boolean(errors.resident_engineer)}
                 placeholder={vocabulary.resident_engineers.length ? "Choose" : "None configured"}
                 disabled={vocabulary.resident_engineers.length === 0}
                 {...register("resident_engineer")}
