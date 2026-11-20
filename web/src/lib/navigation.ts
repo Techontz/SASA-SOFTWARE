@@ -44,7 +44,7 @@ export const PRIMARY_NAVIGATION: NavGroup[] = [
   {
     label: null,
     items: [
-      { href: "/", label: "Dashboard", icon: LayoutDashboard, description: "What needs attention today" },
+      { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, description: "What needs attention today" },
       { href: "/stakeholders", label: "Stakeholders", icon: Users, permissions: ["stakeholder.view"], description: "The register" },
       { href: "/engagements", label: "Engagements", icon: CalendarClock, permissions: ["engagement.view"], description: "Planned and logged" },
       { href: "/concerns", label: "Concerns", icon: MessageSquareWarning, permissions: ["concern.view"], description: "Raised in engagement" },
@@ -76,7 +76,7 @@ export const PRIMARY_NAVIGATION: NavGroup[] = [
 
 /** The five destinations a field officer needs within thumb reach. */
 export const MOBILE_NAVIGATION: NavItem[] = [
-  { href: "/", label: "Today", icon: LayoutDashboard },
+  { href: "/dashboard", label: "Today", icon: LayoutDashboard },
   { href: "/stakeholders", label: "Register", icon: Users, permissions: ["stakeholder.view"] },
   { href: "/engagements", label: "Engage", icon: CalendarClock, permissions: ["engagement.view"] },
   { href: "/grievances", label: "Cases", icon: ClipboardCheck, permissions: ["grievance.view"] },

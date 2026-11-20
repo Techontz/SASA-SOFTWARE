@@ -28,7 +28,7 @@ test.describe("the mobile field experience", () => {
   test("no screen scrolls sideways on a phone", async ({ page }) => {
     await signIn(page, ACCOUNTS.fieldOfficer);
 
-    for (const path of ["/", "/stakeholders", "/grievances", "/engagements", "/sync"]) {
+    for (const path of ["/dashboard", "/stakeholders", "/grievances", "/engagements", "/sync"]) {
       await page.goto(path);
       await settle(page);
 

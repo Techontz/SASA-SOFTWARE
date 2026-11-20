@@ -25,6 +25,23 @@ test.describe("signing in", () => {
     await expect(page.getByText("What is happening on this project?")).toBeVisible();
   });
 
+  test("a visitor lands on the public page, and both calls to action lead to sign-in", async ({ page }) => {
+    await page.goto("/");
+    await expect(page.getByRole("heading", { level: 1 })).toContainText("Every stakeholder voice");
+
+    await page.getByRole("link", { name: /Get started/ }).first().click();
+    await expect(page).toHaveURL(/\/sign-in$/);
+
+    await page.goto("/");
+    await page.getByRole("link", { name: /Log in/ }).last().click();
+    await expect(page).toHaveURL(/\/sign-in$/);
+  });
+
+  test("signing in from the landing page opens the dashboard", async ({ page }) => {
+    await signIn(page, ACCOUNTS.grievanceOfficer);
+    await expect(page).toHaveURL(/\/dashboard$/);
+  });
+
   test("an unauthenticated visitor is sent to sign in", async ({ page }) => {
     await page.goto("/grievances");
     await expect(page).toHaveURL(/sign-in/);

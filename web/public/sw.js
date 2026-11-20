@@ -9,9 +9,10 @@
  * next person who picks it up, and an HTTP cache would do exactly that.
  */
 
-const VERSION = "sasa-shell-v1";
+const VERSION = "sasa-shell-v2";
 const SHELL = [
   "/",
+  "/dashboard",
   "/offline",
   "/manifest.webmanifest",
   "/icon.svg",

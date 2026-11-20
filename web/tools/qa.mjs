@@ -2,7 +2,8 @@ import { chromium } from '@playwright/test';
 import fs from 'node:fs';
 
 const pages = [
-  ['/', 'dashboard'],
+  ['/', 'landing'],
+  ['/dashboard', 'dashboard'],
   ['/stakeholders', 'stakeholders'],
   ['/stakeholders/1', 'stakeholder-detail'],
   ['/stakeholders/new', 'stakeholder-new'],

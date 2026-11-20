@@ -49,7 +49,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   // menu calls it that rather than promising a dashboard it will not see.
   const hasDashboard = canAny("dashboard.view");
   const shown = (items: NavItem[]) =>
-    items.filter(allowed).map((item) => (item.href === "/" && !hasDashboard ? { ...item, label: "Home" } : item));
+    items.filter(allowed).map((item) => (item.href === "/dashboard" && !hasDashboard ? { ...item, label: "Home" } : item));
   // Search covers the register, cases, engagements and commitments; a role
   // that can open none of them has nothing to search.
   const canSearch = canAny("stakeholder.view", "grievance.view", "engagement.view", "commitment.view");
@@ -312,7 +312,7 @@ export function AppShell({ children }: { children: ReactNode }) {
 function SidebarBrand({ compact }: { compact?: boolean }) {
   return (
     <Link
-      href="/"
+      href="/dashboard"
       className={cn("flex items-center gap-3", compact ? "" : "justify-center px-3 py-5 lg:justify-start lg:px-5")}
       aria-label="SASA home"
     >
@@ -468,7 +468,7 @@ function MobileNav({ quickActionHref }: { quickActionHref?: string }) {
   const items = MOBILE_NAVIGATION.filter(permitted);
   for (const item of PRIMARY_NAVIGATION.flatMap((group) => group.items)) {
     if (items.length >= 4) break;
-    if (item.href !== "/" && item.href !== "/sync" && permitted(item) && !items.some((existing) => existing.href === item.href)) {
+    if (item.href !== "/dashboard" && item.href !== "/sync" && permitted(item) && !items.some((existing) => existing.href === item.href)) {
       items.push({ ...item, label: item.label.split(" ")[0] });
     }
   }

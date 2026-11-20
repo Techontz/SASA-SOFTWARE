@@ -2,7 +2,7 @@
   "name": "SASA — Stakeholder Intelligence & Voice",
   "short_name": "SASA",
   "description": "Stakeholder register, engagement, grievances and reporting for infrastructure and extractive projects.",
-  "start_url": "/",
+  "start_url": "/dashboard",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait-primary",

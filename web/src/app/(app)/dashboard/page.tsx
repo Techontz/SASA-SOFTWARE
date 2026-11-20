@@ -203,7 +203,7 @@ function QuickActionGrid({ actions }: { actions: typeof QUICK_ACTIONS }) {
 function WorkHome({ greeting, quickActions }: { greeting: string; quickActions: typeof QUICK_ACTIONS }) {
   const { canAny } = useSession();
   const areas = PRIMARY_NAVIGATION.flatMap((group) => group.items).filter(
-    (item) => item.href !== "/" && item.description && (!item.permissions?.length || canAny(...item.permissions)),
+    (item) => item.href !== "/dashboard" && item.description && (!item.permissions?.length || canAny(...item.permissions)),
   );
 
   return (

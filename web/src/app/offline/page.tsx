@@ -17,7 +17,7 @@ export default function OfflinePage() {
           returns.
         </p>
         <Link
-          href="/"
+          href="/dashboard"
           className="mt-6 inline-flex h-11 items-center justify-center rounded-md bg-primary px-5 font-medium text-on-primary transition hover:bg-primary-hover"
         >
           Back to the dashboard
