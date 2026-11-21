@@ -1,5 +1,7 @@
 import {
   CreditCard,
+  Receipt,
+  Inbox,
   Activity,
   BarChart3,
   Bell,
@@ -71,7 +73,9 @@ export const PRIMARY_NAVIGATION: NavGroup[] = [
       { href: "/people", label: "People", icon: Building2, permissions: ["user.view"] },
       { href: "/audit", label: "Audit trail", icon: ScrollText, permissions: ["audit.view"] },
       { href: "/configuration", label: "Configuration", icon: Settings, permissions: ["configuration.view"] },
-      { href: "/billing", label: "Plans & billing", icon: CreditCard, permissions: ["billing.manage"] },
+      { href: "/billing", label: "Customers & billing", icon: CreditCard, permissions: ["billing.manage"] },
+      { href: "/subscription", label: "Your plan", icon: Receipt, permissions: ["organisation.billing"] },
+      { href: "/enquiries", label: "Enquiries", icon: Inbox, permissions: ["enquiry.manage"] },
     ],
   },
 ];

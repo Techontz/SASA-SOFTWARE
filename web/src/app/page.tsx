@@ -1,7 +1,12 @@
 import type { Metadata } from "next";
 import Image from "next/image";
+import Link from "next/link";
 import type { CSSProperties } from "react";
 import {
+  ArrowDown,
+  ArrowRight,
+  Check,
+  FileText,
   Bot,
   EyeOff,
   History,
@@ -15,24 +20,24 @@ import {
 } from "lucide-react";
 import { BackgroundVideo } from "@/components/marketing/BackgroundVideo";
 import { Faq } from "@/components/marketing/Faq";
-import { PricingPlans } from "@/components/marketing/PricingPlans";
 import { SiteFooter } from "@/components/marketing/SiteFooter";
 import { BrowserFrame, PhoneFrame } from "@/components/marketing/Frames";
 import { LandingNav } from "@/components/marketing/LandingNav";
 import { Eyebrow, Pill } from "@/components/marketing/Pill";
 import { ProductTour } from "@/components/marketing/ProductTour";
 import { Reveal } from "@/components/marketing/Reveal";
+import { PLATFORM_MODULES } from "@/lib/content/modules";
 import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {
-  title: { absolute: "SASA Compliance | Stakeholder intelligence for infrastructure projects" },
+  title: { absolute: "SASA Compliance | Environmental and Social performance. Connected." },
   description:
-    "Stakeholder engagement, grievances, commitments, project-affected persons, contractor ESHS and incidents in one auditable record, for infrastructure and extractive projects.",
+    "SASA Compliance brings stakeholder engagement, grievances, project-affected person records, incident notification and contractor assurance into one connected platform for infrastructure and extractive projects.",
 };
 
 /* ---------------------------------------------------------------- content */
 
-const SECTORS = ["Power transmission", "Roads and bridges", "Mining", "Dams and water", "Energy generation", "Pipelines"];
+const SECTORS = ["Infrastructure", "Mining", "Energy", "Oil and Gas"];
 
 const CHAIN = [
   { title: "Stakeholder", body: "Everyone the project affects, registered once and ranked transparently." },
@@ -43,12 +48,6 @@ const CHAIN = [
   { title: "Commitment", body: "Every promise made, owned and due, until verified as kept." },
   { title: "Resolution", body: "Closed on evidence, with the complainant's response on record." },
   { title: "Reporting", body: "Lender and management reports generated from the live record." },
-];
-
-const OUTCOMES = [
-  { title: "Know who matters", body: "A transparent priority score for every stakeholder, with consent and review dates." },
-  { title: "Close every case on time", body: "Service levels and escalation that run themselves, so no complaint is forgotten." },
-  { title: "Prove it to lenders", body: "Every number defined and traceable to the records behind it." },
 ];
 
 const FIELD_POINTS: Array<{ icon: LucideIcon; title: string; text: string }> = [
@@ -86,7 +85,7 @@ const FAQ = [
   },
   {
     q: "How do we get started?",
-    a: "Choose a plan, pay by mobile money or card, and our team sets up your organisation and sends your administrator their sign-in. Your administrator then creates an account for each colleague, with the role that matches their work.",
+    a: "Register your interest or book a demonstration, and tell us about your project and the workflows your team needs. We will contact you about SASA Compliance and relevant pilot opportunities as they become available.",
   },
 ];
 
@@ -108,12 +107,12 @@ export default function LandingPage() {
       <main id="main">
         <Hero />
         <Sectors />
+        <Challenge />
         <Platform />
         <Chain />
         <Tour />
         <Field />
         <Safeguards />
-        <Pricing />
         <FaqSection />
         <Closing />
       </main>
@@ -174,15 +173,15 @@ function Hero() {
 
       <div className={cn(WRAP, "pb-20 pt-36 md:pb-24")}>
         <p className="lp-rise text-[0.9375rem] font-medium text-chrome-fg" style={{ "--d": "0ms" } as CSSProperties}>
-          Stakeholder intelligence for infrastructure and extractive projects
+          SASA Compliance, for infrastructure and extractive projects
         </p>
         <h1
-          className="lp-rise mt-5 max-w-[15ch] text-[3rem] font-semibold leading-[0.98] tracking-[-0.05em] text-white sm:text-[4.5rem] lg:text-[6rem]"
+          className="lp-rise mt-5 max-w-[18ch] text-[2.75rem] font-semibold leading-[1] tracking-[-0.05em] text-white sm:text-[4.25rem] lg:text-[5.5rem]"
           style={{ "--d": "120ms" } as CSSProperties}
         >
-          Every stakeholder voice, <span className="text-accent-300">one </span>
+          Environmental and Social performance.{" "}
           <span className="relative inline-block whitespace-nowrap text-accent-300">
-            trusted record.
+            Connected.
             <svg
               viewBox="0 0 400 24"
               preserveAspectRatio="none"
@@ -211,13 +210,14 @@ function Hero() {
           className="lp-rise mt-7 max-w-[38rem] text-[1.125rem] leading-[1.5] tracking-[-0.01em] text-chrome-fg md:text-[1.375rem]"
           style={{ "--d": "240ms" } as CSSProperties}
         >
-          SASA brings engagement, grievances, commitments, land and resettlement, contractor ESHS and incidents into
-          one auditable system, in the office and in the field.
+          We are building SASA Compliance to bring stakeholder engagement, grievances, project-affected person
+          records, incident notification and contractor assurance into one connected platform for infrastructure and
+          extractive projects.
         </p>
         <div className="lp-rise mt-10 flex flex-col gap-3 sm:flex-row" style={{ "--d": "360ms" } as CSSProperties}>
-          <Pill href="/pricing">Get started</Pill>
-          <Pill href="/sign-in" tone="glass" arrow={false}>
-            Log in
+          <Pill href="/book-demo">Book a demo</Pill>
+          <Pill href="/register-interest" tone="glass" arrow={false}>
+            Register interest
           </Pill>
         </div>
 
@@ -226,9 +226,9 @@ function Hero() {
           style={{ "--d": "480ms" } as CSSProperties}
         >
           {[
-            ["Offline in the field", "Works with no signal and syncs itself"],
-            ["Confidential by design", "Identity protected by the server"],
-            ["Audited end to end", "Every change kept, nothing deleted"],
+            ["Stakeholders and engagement", "Registers, consultations, concerns and commitments"],
+            ["Grievances and PAP records", "Cases to closure, households, land and compensation"],
+            ["Incidents and contractors", "Incident notification and ESHS contractor assurance"],
           ].map(([term, detail]) => (
             <div key={term}>
               <dt className="text-[0.9375rem] font-semibold text-white">{term}</dt>
@@ -248,13 +248,71 @@ function Sectors() {
     <section className="border-b border-hairline bg-surface" aria-labelledby="sectors-heading">
       <div className={cn(WRAP, "flex flex-col gap-5 py-8 lg:flex-row lg:items-center lg:gap-10")}>
         <p id="sectors-heading" className="shrink-0 text-sm font-medium text-ink-500">
-          Built for projects that answer to the communities around them
+          Being developed for
         </p>
-        <ul className="flex flex-1 flex-wrap gap-x-7 gap-y-2 text-[0.9375rem] font-semibold text-ink-800 lg:flex-nowrap lg:justify-between">
+        <ul className="flex flex-1 flex-wrap gap-x-10 gap-y-2 text-[0.9375rem] font-semibold text-ink-800">
           {SECTORS.map((sector) => (
             <li key={sector} className="whitespace-nowrap">{sector}</li>
           ))}
         </ul>
+      </div>
+    </section>
+  );
+}
+
+/* ---------------------------------------------------------------- the challenge */
+
+const SCATTERED = ["Consultation minutes.docx", "Complaints log.xlsx", "Compensation schedule.pdf", "ESHS inspection.xlsx"];
+const QUESTIONS = ["Who is responsible?", "What was agreed?", "What evidence is available?", "What still needs attention?"];
+
+function Challenge() {
+  return (
+    <section id="challenge" className="scroll-mt-20 bg-canvas py-20 md:py-28">
+      <div className={cn(WRAP, "grid items-center gap-14 lg:grid-cols-2 lg:gap-20")}>
+        <Reveal>
+          <Eyebrow>The challenge we are addressing</Eyebrow>
+          <h2 className="mt-4 text-[2.375rem] font-semibold leading-[1.03] tracking-[-0.042em] text-ink-900 md:text-[3.5rem]">
+            Keep important actions from getting lost between records.
+          </h2>
+          <p className="mt-6 text-[1.125rem] leading-[1.55] text-ink-600 md:text-[1.25rem]">
+            Consultations, complaints, compensation records and ESHS inspection findings often sit in separate Excel,
+            PDF and Word files. Project teams need to know who is responsible, what was agreed, what evidence is
+            available and what still needs attention. SASA is being developed around these practical project needs.
+          </p>
+        </Reveal>
+
+        <Reveal delay={120} className="relative">
+          <div className="sasa-card p-6 md:p-8">
+            <p className="text-sm font-medium text-ink-500">Today, spread across files</p>
+            <ul className="mt-4 grid gap-2.5 sm:grid-cols-2">
+              {SCATTERED.map((file) => (
+                <li
+                  key={file}
+                  className="flex items-center gap-2.5 truncate rounded-xl bg-surface-sunken px-3.5 py-3 text-sm text-ink-600 ring-1 ring-hairline"
+                >
+                  <FileText className="h-4 w-4 shrink-0 text-ink-400" aria-hidden />
+                  <span className="truncate">{file}</span>
+                </li>
+              ))}
+            </ul>
+            <div className="my-6 flex items-center gap-3 text-sm font-medium text-brand-700">
+              <span className="h-px flex-1 bg-hairline" aria-hidden />
+              <ArrowDown className="h-4 w-4" aria-hidden />
+              Connected in SASA
+              <span className="h-px flex-1 bg-hairline" aria-hidden />
+            </div>
+            <ul className="divide-y divide-hairline overflow-hidden rounded-2xl ring-1 ring-hairline">
+              {QUESTIONS.map((question) => (
+                <li key={question} className="flex items-center gap-3 bg-surface px-4 py-3.5 text-[0.9375rem] font-medium text-ink-900">
+                  <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-brand-50 text-brand-600">
+                    <Check className="h-3.5 w-3.5" aria-hidden />
+                  </span>
+                  {question}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </Reveal>
       </div>
     </section>
   );
@@ -268,8 +326,8 @@ function Platform() {
       <div className={WRAP}>
         <SectionHead
           eyebrow="The platform"
-          title="One record for everything a project promises its neighbours."
-          body="Community relations, grievance, safeguards and HSE teams work in one shared system, so every voice is heard, every commitment is kept, and the evidence is there when lenders and auditors ask."
+          title="One platform for connected project workflows."
+          body="Stakeholder register, engagement, grievances, the PAP master register, incident notification, ESHS contractor assurance and reporting, in one place."
         />
 
         <Reveal className="mt-14">
@@ -285,13 +343,24 @@ function Platform() {
           <p className="mt-4 text-center text-xs text-ink-500">Real screens from SASA, shown with demonstration data.</p>
         </Reveal>
 
-        <div className="mt-16 grid gap-10 md:grid-cols-3 md:gap-8">
-          {OUTCOMES.map((item, index) => (
-            <Reveal key={item.title} delay={index * 80} className="border-t-2 border-ink-900 pt-6">
-              <h3 className="text-[1.375rem] font-semibold tracking-[-0.025em] text-ink-900">{item.title}</h3>
-              <p className="mt-2.5 text-[0.96875rem] leading-relaxed text-ink-600">{item.body}</p>
+        <ul className="mt-16 grid gap-x-8 gap-y-0 md:grid-cols-2 lg:grid-cols-3">
+          {PLATFORM_MODULES.map((module, index) => (
+            <Reveal as="li" key={module.key} delay={(index % 3) * 70} className="border-t border-hairline">
+              <Link href={`/platform#${module.key}`} className="group flex items-start gap-4 py-6">
+                <span className="font-mono text-sm text-ink-500">{String(index + 1).padStart(2, "0")}</span>
+                <span className="min-w-0 flex-1">
+                  <span className="block text-[1.125rem] font-semibold tracking-[-0.02em] text-ink-900">{module.name}</span>
+                  <span className="mt-1.5 line-clamp-2 block text-[0.9375rem] leading-relaxed text-ink-600">{module.summary}</span>
+                </span>
+                <ArrowRight className="mt-1 h-4 w-4 shrink-0 text-ink-400 transition group-hover:translate-x-0.5 group-hover:text-ink-900" aria-hidden />
+              </Link>
             </Reveal>
           ))}
+        </ul>
+        <div className="mt-10">
+          <Pill href="/platform" tone="light">
+            Explore the modules
+          </Pill>
         </div>
       </div>
     </section>
@@ -426,30 +495,6 @@ function Safeguards() {
   );
 }
 
-/* ---------------------------------------------------------------- pricing */
-
-function Pricing() {
-  return (
-    <section id="pricing" className="scroll-mt-20 bg-surface py-20 md:py-28">
-      <div className={WRAP}>
-        <Reveal className="mx-auto max-w-[44rem] text-center">
-          <Eyebrow>Pricing</Eyebrow>
-          <h2 className="mt-4 text-[2.375rem] font-semibold leading-[1.03] tracking-[-0.042em] text-ink-900 md:text-[3.5rem]">
-            A plan for every stage of the project.
-          </h2>
-          <p className="mt-5 text-[1.0625rem] leading-relaxed text-ink-600">
-            See prices in US dollars or Tanzanian shillings, and pay in shillings by mobile money or card. Once the
-            payment is confirmed, our team sets up your organisation and sends your administrator their sign-in.
-          </p>
-        </Reveal>
-        <Reveal className="mt-12" delay={100}>
-          <PricingPlans />
-        </Reveal>
-      </div>
-    </section>
-  );
-}
-
 /* ---------------------------------------------------------------- FAQ */
 
 function FaqSection() {
@@ -481,15 +526,16 @@ function Closing() {
       <div className={cn(WRAP, "py-28 md:py-40")}>
         <Reveal className="max-w-[40rem]">
           <h2 className="text-[2.75rem] font-semibold leading-[1] tracking-[-0.05em] text-white md:text-[4.5rem]">
-            Bring every voice into one record.
+            Bring your project requirement into the conversation.
           </h2>
           <p className="mt-6 max-w-[32rem] text-[1.0625rem] leading-relaxed text-chrome-fg">
-            Sign in with the account your project administrator gave you, and pick up where your team left off.
+            Tell us about your project and the workflows your team needs. We will contact you about SASA Compliance and
+            relevant pilot opportunities as they become available.
           </p>
           <div className="mt-10 flex flex-col gap-3 sm:flex-row">
-            <Pill href="/pricing">Get started</Pill>
-            <Pill href="/sign-in" tone="glass" arrow={false}>
-              Log in
+            <Pill href="/register-interest">Register interest</Pill>
+            <Pill href="/book-demo" tone="glass" arrow={false}>
+              Book a demo
             </Pill>
           </div>
         </Reveal>

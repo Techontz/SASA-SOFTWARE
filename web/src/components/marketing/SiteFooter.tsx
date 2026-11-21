@@ -8,29 +8,35 @@ const WRAP = "mx-auto w-full max-w-[1240px] px-4 sm:px-6 md:px-10";
 export function SiteFooter() {
   return (
     <footer className="border-t border-chrome-line bg-chrome-deep text-chrome-muted">
-      <div className={cn(WRAP, "grid gap-10 py-14 md:grid-cols-[1.5fr_1fr_1fr]")}>
+      <div className={cn(WRAP, "grid gap-10 py-14 sm:grid-cols-2 lg:grid-cols-[1.6fr_1fr_1fr_1fr]")}>
         <div>
           <Logo onDark />
           <p className="mt-5 max-w-[22rem] text-sm leading-relaxed">
-            Stakeholder intelligence, engagement, grievance and reporting for infrastructure and extractive projects.
+            Environmental and social performance, connected, for infrastructure and extractive projects.
           </p>
         </div>
         <nav aria-label="Footer">
           <p className="text-sm font-semibold text-white">Explore</p>
           <ul className="mt-4 space-y-2.5 text-sm">
-            <li><Link href="/#platform" className="hover:text-white">Platform</Link></li>
-            <li><Link href="/#how" className="hover:text-white">How it works</Link></li>
-            <li><Link href="/#product" className="hover:text-white">Product</Link></li>
-            <li><Link href="/#field" className="hover:text-white">In the field</Link></li>
-            <li><Link href="/#safeguards" className="hover:text-white">Safeguards</Link></li>
-            <li><Link href="/pricing" className="hover:text-white">Pricing</Link></li>
+            <li><Link href="/platform" className="hover:text-white">Platform</Link></li>
+            <li><Link href="/industries" className="hover:text-white">Industries</Link></li>
+            <li><Link href="/about" className="hover:text-white">About</Link></li>
+            <li><Link href="/request-quote" className="hover:text-white">Request a quote</Link></li>
           </ul>
         </nav>
         <div>
-          <p className="text-sm font-semibold text-white">Your account</p>
+          <p className="text-sm font-semibold text-white">Get in touch</p>
           <ul className="mt-4 space-y-2.5 text-sm">
+            <li><Link href="/book-demo" className="hover:text-white">Book a demo</Link></li>
+            <li><Link href="/register-interest" className="hover:text-white">Register interest</Link></li>
             <li><Link href="/sign-in" className="hover:text-white">Log in</Link></li>
-            <li><Link href="/pricing" className="hover:text-white">Subscribe</Link></li>
+          </ul>
+        </div>
+        <div>
+          <p className="text-sm font-semibold text-white">Legal</p>
+          <ul className="mt-4 space-y-2.5 text-sm">
+            <li><Link href="/data-protection" className="hover:text-white">Data protection</Link></li>
+            <li><Link href="/privacy" className="hover:text-white">Privacy and website terms</Link></li>
           </ul>
         </div>
       </div>

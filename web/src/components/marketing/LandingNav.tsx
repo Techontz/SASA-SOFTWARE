@@ -10,11 +10,10 @@ import { Logo } from "./Brand";
 import { Pill } from "./Pill";
 
 const LINKS = [
-  { href: "/#platform", label: "Platform" },
-  { href: "/#how", label: "How it works" },
-  { href: "/#product", label: "Product" },
-  { href: "/#field", label: "In the field" },
-  { href: "/pricing", label: "Pricing" },
+  { href: "/platform", label: "Platform" },
+  { href: "/industries", label: "Industries" },
+  { href: "/about", label: "About" },
+  { href: "/request-quote", label: "Request a quote" },
 ];
 
 /**
@@ -48,10 +47,10 @@ export function LandingNav({ solid: alwaysSolid = false }: { solid?: boolean } =
           <Logo onDark={!solid} />
         </Link>
 
-        <ul className="ml-8 hidden items-center gap-1 xl:flex">
+        <ul className="ml-8 hidden items-center gap-1 lg:flex">
           {LINKS.map((link) => (
             <li key={link.href}>
-              <a
+              <Link
                 href={link.href}
                 className={cn(
                   "rounded-lg px-3 py-2 text-[0.9375rem] font-medium transition-colors",
@@ -59,7 +58,7 @@ export function LandingNav({ solid: alwaysSolid = false }: { solid?: boolean } =
                 )}
               >
                 {link.label}
-              </a>
+              </Link>
             </li>
           ))}
         </ul>
@@ -83,8 +82,8 @@ export function LandingNav({ solid: alwaysSolid = false }: { solid?: boolean } =
               >
                 Log in
               </Link>
-              <Pill href="/pricing" className="hidden h-10 px-4 sm:inline-flex" arrow={false}>
-                Get started
+              <Pill href="/book-demo" className="hidden h-10 px-4 sm:inline-flex" arrow={false}>
+                Book a demo
               </Pill>
             </>
           )}
@@ -92,7 +91,7 @@ export function LandingNav({ solid: alwaysSolid = false }: { solid?: boolean } =
             type="button"
             onClick={() => setOpen((value) => !value)}
             className={cn(
-              "grid h-11 w-11 place-items-center rounded-lg ring-1 ring-inset xl:hidden",
+              "grid h-11 w-11 place-items-center rounded-lg ring-1 ring-inset lg:hidden",
               solid ? "text-ink-900 ring-hairline-strong" : "text-white ring-chrome-fg/40",
             )}
             aria-expanded={open}
@@ -105,17 +104,17 @@ export function LandingNav({ solid: alwaysSolid = false }: { solid?: boolean } =
       </nav>
 
       {open ? (
-        <div id="landing-menu" className="max-h-[calc(100dvh-4.5rem)] overflow-y-auto border-t border-hairline px-4 pb-6 pt-2 sm:px-6 xl:hidden">
+        <div id="landing-menu" className="max-h-[calc(100dvh-4.5rem)] overflow-y-auto border-t border-hairline px-4 pb-6 pt-2 sm:px-6 lg:hidden">
           <ul>
             {LINKS.map((link) => (
               <li key={link.href} className="border-b border-hairline">
-                <a
+                <Link
                   href={link.href}
                   onClick={() => setOpen(false)}
                   className="block py-3.5 text-base font-medium text-ink-900"
                 >
                   {link.label}
-                </a>
+                </Link>
               </li>
             ))}
           </ul>
@@ -124,7 +123,7 @@ export function LandingNav({ solid: alwaysSolid = false }: { solid?: boolean } =
               <Pill href="/dashboard">Open SASA</Pill>
             ) : (
               <>
-                <Pill href="/pricing">Get started</Pill>
+                <Pill href="/book-demo">Book a demo</Pill>
                 <Pill href="/sign-in" tone="light" arrow={false}>
                   Log in
                 </Pill>

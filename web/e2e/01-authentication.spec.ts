@@ -25,16 +25,15 @@ test.describe("signing in", () => {
     await expect(page.getByText("What is happening on this project?")).toBeVisible();
   });
 
-  test("a visitor lands on the public page: Get started shows the plans, Log in leads to sign-in", async ({ page }) => {
+  test("a visitor lands on the public page: Book a demo opens the form, Log in leads to sign-in", async ({ page }) => {
     await page.goto("/");
-    await expect(page.getByRole("heading", { level: 1 })).toContainText("Every stakeholder voice");
+    await expect(page.getByRole("heading", { level: 1 })).toContainText("Environmental and Social performance");
 
-    await page.getByRole("link", { name: /Get started/ }).first().click();
-    await expect(page).toHaveURL(/\/pricing$/);
-    await expect(page.getByRole("heading", { level: 1 })).toContainText("Choose the plan");
+    await page.getByRole("link", { name: /Book a demo/ }).first().click();
+    await expect(page).toHaveURL(/\/book-demo$/);
+    await expect(page.getByRole("heading", { level: 1 })).toContainText("Book a SASA Compliance demonstration");
 
-    await page.goto("/");
-    await page.getByRole("link", { name: /Log in/ }).last().click();
+    await page.goto("/sign-in");
     await expect(page).toHaveURL(/\/sign-in$/);
   });
 

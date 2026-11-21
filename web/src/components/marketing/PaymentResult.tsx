@@ -140,7 +140,10 @@ export function SandboxCard() {
     setBusy(outcome);
     try {
       await completeSandboxPayment(id, outcome);
-      router.push(`/subscribe/return?payment=${id}`);
+      // Invoice payments come back to the customer's plan page; a return path
+      // is only ever an internal one.
+      const back = params.get("return");
+      router.push(back && back.startsWith("/") && !back.startsWith("//") ? `${back}?payment=${id}` : `/subscribe/return?payment=${id}`);
     } catch {
       setError("Test mode is switched off on this server.");
       setBusy(null);

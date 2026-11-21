@@ -118,9 +118,9 @@ export default function SignInPage() {
 
       <div className="mx-auto grid w-full max-w-[1240px] min-h-0 flex-1 items-center gap-10 px-4 pb-6 sm:px-6 md:px-10 lg:grid-cols-[1fr_26rem] lg:gap-16">
         <div className="hidden max-w-[34rem] lg:block">
-          <p className="text-[0.9375rem] font-medium text-chrome-fg">Stakeholder intelligence for infrastructure projects</p>
+          <p className="text-[0.9375rem] font-medium text-chrome-fg">SASA Compliance, for infrastructure and extractive projects</p>
           <h2 className="mt-4 text-[3.5rem] font-semibold leading-[1] tracking-[-0.05em] text-white">
-            Every stakeholder voice, <span className="text-accent-300">one trusted record.</span>
+            Environmental and Social performance. <span className="text-accent-300">Connected.</span>
           </h2>
           <ul className="mt-10 space-y-3">
             {HIGHLIGHTS.map(({ icon: Icon, label }) => (
@@ -218,8 +218,8 @@ export default function SignInPage() {
             <p>Forgotten your password? Your project administrator can reset it.</p>
             <p>
               New to SASA?{" "}
-              <Link href="/pricing" className="font-semibold text-brand-700 hover:underline">
-                See the plans
+              <Link href="/request-quote" className="font-semibold text-brand-700 hover:underline">
+                Request a quote
               </Link>
             </p>
           </div>
