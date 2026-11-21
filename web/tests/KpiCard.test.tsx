@@ -10,7 +10,7 @@ vi.mock("next/link", () => ({
 const kpi: Kpi = {
   key: "grievances_open",
   label: "Open grievances",
-  definition: "Cases not currently closed, rejected or withdrawn — measured now, not within the period.",
+  definition: "Cases not currently closed, rejected or withdrawn, measured now, not within the period.",
   unit: "count",
   value: 14,
   delta_percent: null,
@@ -38,10 +38,10 @@ describe("KPI card", () => {
     expect(screen.getByRole("link")).toHaveAttribute("href", "/grievances?status=open");
   });
 
-  it("shows an em dash rather than a zero when there is no data", () => {
+  it("shows a word rather than a zero when there is no data", () => {
     render(<KpiCard kpi={{ ...kpi, value: null, drill: null }} />);
 
-    expect(screen.getByText("—")).toBeInTheDocument();
+    expect(screen.getByText("Not recorded")).toBeInTheDocument();
   });
 
   it("formats a percentage with its sign", () => {

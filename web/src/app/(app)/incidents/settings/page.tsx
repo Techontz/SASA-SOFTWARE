@@ -19,7 +19,7 @@ const LISTS: Array<{ key: ListKey; title: string; description: string; icon: Rea
   {
     key: "companies",
     title: "Companies",
-    description: "The companies a reporter can choose on the form — the contractor, its subcontractors, the client.",
+    description: "The companies a reporter can choose on the form: the contractor, its subcontractors, the client.",
     icon: <Building2 className="h-4 w-4" aria-hidden />,
   },
   {
@@ -88,7 +88,7 @@ function ListsForm({ options }: { options: IncidentOptions }) {
         {LISTS.map((list) => (
           <FormSection key={list.key} title={list.title} description={list.description} aside={list.icon}>
             <Field
-              label={`${list.title} — one per line`}
+              label={`${list.title} (one per line)`}
               htmlFor={`list-${list.key}`}
               hint={`${parseNamesList(text[list.key]).length} on the list`}
             >
@@ -102,7 +102,7 @@ function ListsForm({ options }: { options: IncidentOptions }) {
           </FormSection>
         ))}
 
-        <FormActions note={!sync.online ? "Offline — a connection is needed to save. Nothing has been saved." : undefined}>
+        <FormActions note={!sync.online ? "Offline. A connection is needed to save. Nothing has been saved." : undefined}>
           <Button variant="primary" loading={update.isPending} disabled={!sync.online} icon={<Save className="h-4 w-4" />} onClick={() => void save()}>
             Save lists
           </Button>

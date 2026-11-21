@@ -79,7 +79,7 @@ function AnomalyDetail({ anomaly, refetch }: { anomaly: EshsAnomaly; refetch: ()
     }
   };
 
-  const offlineNote = !sync.online ? "You are offline. This needs a connection — nothing will be saved until you are back online." : undefined;
+  const offlineNote = !sync.online ? "You are offline. This needs a connection. Nothing will be saved until you are back online." : undefined;
 
   const timeline: TimelineItem[] = (anomaly.history ?? []).map((entry: EshsHistoryEntry) => ({
     id: entry.id,
@@ -175,7 +175,7 @@ function AnomalyDetail({ anomaly, refetch }: { anomaly: EshsAnomaly; refetch: ()
                 <DetailField label="Anomaly type">{anomaly.anomaly_type}</DetailField>
                 <DetailField label="Risk rating">{anomaly.risk_label}</DetailField>
                 <DetailField label="Root cause" wide>
-                  {anomaly.root_cause ? `${anomaly.root_cause_group} — ${anomaly.root_cause}` : "Not yet identified"}
+                  {anomaly.root_cause ? `${anomaly.root_cause_group}: ${anomaly.root_cause}` : "Not yet identified"}
                 </DetailField>
               </DetailGrid>
             </CardBody>
@@ -186,7 +186,7 @@ function AnomalyDetail({ anomaly, refetch }: { anomaly: EshsAnomaly; refetch: ()
             <CardBody className="space-y-5">
               <p className="whitespace-pre-line leading-relaxed text-ink-800">{anomaly.contractor_action ?? "No action recorded yet."}</p>
               <DetailGrid columns={2}>
-                <DetailField label="Action owner">{anomaly.action_owner_name ?? "—"}</DetailField>
+                <DetailField label="Action owner">{anomaly.action_owner_name ?? "Not recorded"}</DetailField>
                 {"action_owner_email" in anomaly ? (
                   <DetailField label="Owner e-mail">
                     {anomaly.action_owner_email ? (
@@ -194,7 +194,7 @@ function AnomalyDetail({ anomaly, refetch }: { anomaly: EshsAnomaly; refetch: ()
                         {anomaly.action_owner_email}
                       </a>
                     ) : (
-                      "—"
+                      "Not recorded"
                     )}
                   </DetailField>
                 ) : null}
@@ -205,7 +205,7 @@ function AnomalyDetail({ anomaly, refetch }: { anomaly: EshsAnomaly; refetch: ()
                         {anomaly.action_owner_phone}
                       </a>
                     ) : (
-                      "—"
+                      "Not recorded"
                     )}
                   </DetailField>
                 ) : null}
@@ -277,14 +277,14 @@ function AnomalyDetail({ anomaly, refetch }: { anomaly: EshsAnomaly; refetch: ()
                 <DetailField label="ID">{anomaly.reference}</DetailField>
                 <DetailField label="Date raised">{formatDate(anomaly.raised_on)}</DetailField>
                 <DetailField label="Contractor">{anomaly.contractor}</DetailField>
-                <DetailField label="Subcontractor">{anomaly.subcontractor ?? "—"}</DetailField>
+                <DetailField label="Subcontractor">{anomaly.subcontractor ?? "Not recorded"}</DetailField>
                 <DetailField label="Area / location" wide>
-                  {anomaly.location.path ?? "—"}
+                  {anomaly.location.path ?? "Not recorded"}
                 </DetailField>
-                <DetailField label="Raised by">{anomaly.raised_by?.name ?? "—"}</DetailField>
+                <DetailField label="Raised by">{anomaly.raised_by?.name ?? "Not recorded"}</DetailField>
                 <DetailField label="Status">{anomaly.status_label}</DetailField>
                 <DetailField label="Date closed">{formatDate(anomaly.closed_on)}</DetailField>
-                <DetailField label="Verified & closed by">{anomaly.closed_by?.name ?? "—"}</DetailField>
+                <DetailField label="Verified & closed by">{anomaly.closed_by?.name ?? "Not yet closed"}</DetailField>
               </DetailGrid>
             </CardBody>
           </Card>

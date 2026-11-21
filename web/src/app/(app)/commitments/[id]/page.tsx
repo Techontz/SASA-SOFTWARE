@@ -140,11 +140,11 @@ export default function CommitmentDetailPage() {
             <CardBody>
               <DetailGrid columns={2}>
                 <DetailField label="Owner">{commitment.owner?.name ?? "Unassigned"}</DetailField>
-                <DetailField label="Team">{commitment.owner_team ?? "—"}</DetailField>
+                <DetailField label="Team">{commitment.owner_team ?? "Not recorded"}</DetailField>
                 <DetailField label="Due">{formatDate(commitment.due_date)}</DetailField>
                 <DetailField label="Completed">{formatDate(commitment.completed_on)}</DetailField>
                 <DetailField label="Verification">{humanise(commitment.verification_status)}</DetailField>
-                <DetailField label="Verified by">{commitment.verified_by ?? "—"}</DetailField>
+                <DetailField label="Verified by">{commitment.verified_by ?? "Not yet verified"}</DetailField>
               </DetailGrid>
             </CardBody>
           </Card>
@@ -158,7 +158,7 @@ export default function CommitmentDetailPage() {
                 {commitment.engagement ? (
                   <DetailField label="Engagement" wide>
                     <Link href={`/engagements/${commitment.engagement.id}`} className="text-brand-700 hover:underline">
-                      {commitment.engagement.reference} — {commitment.engagement.topic}
+                      {commitment.engagement.reference} · {commitment.engagement.topic}
                     </Link>
                   </DetailField>
                 ) : null}
@@ -169,7 +169,7 @@ export default function CommitmentDetailPage() {
                     </Link>
                   </DetailField>
                 ) : null}
-                <DetailField label="Location">{commitment.location.path ?? "—"}</DetailField>
+                <DetailField label="Location">{commitment.location.path ?? "Not recorded"}</DetailField>
               </DetailGrid>
             </CardBody>
           </Card>
@@ -234,7 +234,7 @@ export default function CommitmentDetailPage() {
               value={form.status ?? commitment.status}
               onChange={(event) => setForm((current) => ({ ...current, status: event.target.value }))}
             >
-              <option value="open">Open — not started</option>
+              <option value="open">Open: not started</option>
               <option value="in_progress">In progress</option>
               <option value="fulfilled">Delivered</option>
               <option value="cancelled">Cancelled</option>
@@ -267,7 +267,7 @@ export default function CommitmentDetailPage() {
         open={drawer === "verify"}
         onClose={() => setDrawer(null)}
         title="Verify delivery"
-        description="Confirm the commitment was actually delivered — ideally with the stakeholder present."
+        description="Confirm the commitment was actually delivered, ideally with the stakeholder present."
         width="sm"
         footer={
           <>
@@ -295,8 +295,8 @@ export default function CommitmentDetailPage() {
               value={form.verification_status ?? "verified"}
               onChange={(event) => setForm((current) => ({ ...current, verification_status: event.target.value }))}
             >
-              <option value="verified">Verified — it was delivered</option>
-              <option value="disputed">Disputed — the stakeholder disagrees</option>
+              <option value="verified">Verified: it was delivered</option>
+              <option value="disputed">Disputed: the stakeholder disagrees</option>
               <option value="unverified">Not yet verified</option>
             </Select>
           </Field>

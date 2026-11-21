@@ -145,7 +145,7 @@ export function AttachmentPanel({
                   {item.status === "uploading"
                     ? "Uploading…"
                     : item.status === "failed"
-                      ? `Upload failed — kept on this device and will retry. ${item.lastError ?? ""}`
+                      ? `Upload failed. It is kept on this device and will retry. ${item.lastError ?? ""}`
                       : "On this device, waiting for a connection"}
                 </p>
               </div>

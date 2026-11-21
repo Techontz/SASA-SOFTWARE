@@ -355,7 +355,7 @@ function Dashboard({ summary, loading }: { summary: EshsSummary | undefined; loa
                         </td>
                         <td className="tabular px-4 py-3 text-ink-700">{row.closed}</td>
                         <td className="tabular px-4 py-3 text-ink-700">{formatRate(row.closure_rate)}</td>
-                        <td className="tabular px-4 py-3 text-ink-700">{row.avg_days_to_close ?? "—"}</td>
+                        <td className="tabular px-4 py-3 text-ink-700">{row.avg_days_to_close ?? "No data"}</td>
                       </tr>
                     ))}
                   </tbody>

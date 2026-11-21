@@ -124,7 +124,7 @@ function PlanList() {
         ].map(([label, value]) => (
           <div key={String(label)} className="sasa-card px-4 py-3">
             <dt className="sasa-eyebrow">{label}</dt>
-            <dd className="tabular mt-1 text-2xl font-semibold text-ink-900">{(value as number) ?? "—"}</dd>
+            <dd className="tabular mt-1 text-2xl font-semibold text-ink-900">{(value as number) ?? "No data"}</dd>
           </div>
         ))}
       </dl>

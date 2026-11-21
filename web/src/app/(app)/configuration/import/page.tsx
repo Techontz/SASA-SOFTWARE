@@ -133,7 +133,7 @@ export default function ImportWizardPage() {
         backHref="/configuration"
         eyebrow="Administration"
         title="Import data"
-        description="Download a template, upload your file, map the columns, check what will happen — and only then commit. Production data is never partly written."
+        description="Download a template, upload your file, map the columns, check what will happen, and only then commit. Production data is never partly written."
       />
 
       {/* --------------------------- stepper --------------------------- */}
@@ -273,7 +273,7 @@ export default function ImportWizardPage() {
           <Card>
             <CardHeader
               title="3. Map the columns"
-              description="We have guessed from your headings. Check each one — anything left blank is simply not imported."
+              description="We have guessed from your headings. Check each one: anything left blank is simply not imported."
             />
             <CardBody className="space-y-3">
               {template.map((column) => (
@@ -339,7 +339,7 @@ export default function ImportWizardPage() {
                   </p>
                   <p className="mt-1 text-sm text-danger-700">
                     Fix these in your spreadsheet and upload again, or import the valid rows now and add these
-                    afterwards — they are skipped, never guessed at.
+                    afterwards. They are skipped, never guessed at.
                   </p>
                   <ul className="mt-3 max-h-56 space-y-1.5 overflow-y-auto text-sm">
                     {(job.errors ?? []).slice(0, 40).map((error) => (
@@ -368,7 +368,7 @@ export default function ImportWizardPage() {
                         <tr key={index}>
                           {Object.values(row).map((value, cellIndex) => (
                             <td key={cellIndex} className="whitespace-nowrap px-3 py-2 text-ink-700">
-                              {String(value ?? "—")}
+                              {String(value ?? "Blank")}
                             </td>
                           ))}
                         </tr>

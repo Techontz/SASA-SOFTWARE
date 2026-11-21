@@ -33,7 +33,7 @@ const schema = z
     incident_type: z.string().min(1, "Choose the incident type."),
     actual_consequence: z.string().min(1, "Choose the actual consequence."),
     potential_consequence: z.string().min(1, "Choose the potential consequence."),
-    summary: z.string().trim().min(10, "Describe what happened — at least a sentence."),
+    summary: z.string().trim().min(10, "Describe what happened, in at least a sentence."),
     contractor_manager: z.string().optional(),
     resident_engineer: z.string().optional(),
   })
@@ -368,7 +368,7 @@ export default function ReportIncidentPage() {
           </FieldRow>
         </FormSection>
 
-        <FormSection title="Photos, videos or documents" description="Optional — but a photo taken now is worth a page of description later.">
+        <FormSection title="Photos, videos or documents" description="Optional, but a photo taken now is worth a page of description later.">
           <AttachmentPicker
             files={files}
             onChange={setFiles}
@@ -379,7 +379,7 @@ export default function ReportIncidentPage() {
         <FormActions
           note={
             !sync.online
-              ? "Offline — a connection is needed to submit. Nothing has been saved."
+              ? "Offline. A connection is needed to submit. Nothing has been saved."
               : files.length > 0
                 ? `${files.length} file${files.length === 1 ? "" : "s"} will upload after you submit.`
                 : undefined

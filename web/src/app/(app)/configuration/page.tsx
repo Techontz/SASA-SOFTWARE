@@ -187,7 +187,7 @@ function PrioritySettings() {
           <p className="flex items-start gap-2.5 rounded-lg bg-warning-50 p-3.5 text-warning-800">
             <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
             <span>
-              The stakeholder matrix in the source specification was internally inconsistent — identical inputs
+              The stakeholder matrix in the source specification was internally inconsistent: identical inputs
               mapped to different strategies, and &ldquo;impact&rdquo; appeared in the register but not in the
               matrix. SASA does not silently correct it.
             </span>
@@ -373,7 +373,7 @@ function SlaSettings() {
                     </div>
                   </td>
                   <td className="px-5 py-3 text-ink-600">
-                    {(policy.reminder_thresholds ?? []).map((threshold) => `${threshold}%`).join(", ") || "—"}
+                    {(policy.reminder_thresholds ?? []).map((threshold) => `${threshold}%`).join(", ") || "None"}
                   </td>
                   <td className="px-5 py-3">
                     <StatusBadge status={policy.is_active ? "active" : "inactive"} size="sm" />
@@ -562,7 +562,7 @@ function NotificationSettings() {
     <Card>
       <CardHeader
         title="When SASA tells someone"
-        description="Every rule — the trigger, who is told, on which channel and in what words — is configurable per project. SMS and WhatsApp are additive: the rule already carries the channel list."
+        description="Every rule (the trigger, who is told, on which channel and in what words) is configurable per project. SMS and WhatsApp are additive: the rule already carries the channel list."
       />
       <CardBody className="p-0 sm:p-0">
         <ul className="divide-y divide-hairline">
@@ -632,7 +632,7 @@ function ListSettings() {
       <Card className="lg:col-span-2">
         <CardHeader
           title="Disaggregation dimensions"
-          description="A dashboard cannot disaggregate on data that is not collected. Sensitive dimensions are never mandatory and are switched off by default — collecting them lawfully, voluntarily and safely is a decision for the project."
+          description="A dashboard cannot disaggregate on data that is not collected. Sensitive dimensions are never mandatory and are switched off by default. Collecting them lawfully, voluntarily and safely is a decision for the project."
         />
         <CardBody>
           <ul className="divide-y divide-hairline">
@@ -675,7 +675,7 @@ function ImportPanel() {
         </Link>
         <p className="mt-4 max-w-2xl text-sm leading-relaxed text-ink-600">
           The wizard downloads a template with the exact expected columns, checks every row before anything is
-          written, shows you what will be created, and only then commits — in resumable batches, so a failure
+          written, shows you what will be created, and only then commits. It works in resumable batches, so a failure
           halfway through never leaves the data half-written.
         </p>
       </CardBody>

@@ -39,7 +39,7 @@ describe("target and rate labels", () => {
   });
 
   it("shows a dash rather than 0% when nothing was raised", () => {
-    expect(formatRate(null)).toBe("—");
+    expect(formatRate(null)).toBe("No data");
     expect(formatRate(33.3)).toBe("33.3%");
   });
 });

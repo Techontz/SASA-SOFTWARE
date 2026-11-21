@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 import {
   AlertTriangle,
   FileQuestion,
@@ -61,6 +63,23 @@ export function ErrorState({
 }) {
   const failure = error instanceof ApiRequestError ? error : null;
 
+  // A demo that has run its course is not a permission problem.
+  if (failure?.code === "demo_ended") {
+    return (
+      <EmptyState
+        icon={Lock}
+        title="This demo has ended"
+        description="Thank you for trying SASA. Contact the SASA team, or request a quote, to continue with your own workspace."
+        action={
+          <Link href="/request-quote" className="inline-flex h-10 items-center rounded-full bg-accent-solid px-5 text-sm font-semibold text-on-primary">
+            Request a quote
+          </Link>
+        }
+        className={className}
+      />
+    );
+  }
+
   // "Not part of your role" and "not found" are answers, not faults: they get
   // a calm explanation, no retry button and no support code.
   if (failure?.status === 403) {
@@ -108,7 +127,7 @@ export function ErrorState({
       <p className="mt-1.5 max-w-md text-sm text-ink-600">
         {description ??
           readable ??
-          "Something went wrong on our side. Nothing you entered has been lost — please try again in a moment."}
+          "Something went wrong on our side. Nothing you entered has been lost. Please try again in a moment."}
       </p>
       {onRetry ? (
         <Button className="mt-5" variant="secondary" icon={<RefreshCw className="h-4 w-4" />} onClick={onRetry}>

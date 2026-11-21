@@ -105,7 +105,7 @@ function EngagementList() {
               {row.counts.commitments} {row.counts.commitments === 1 ? "commitment" : "commitments"}
             </span>
           ) : null}
-          {!row.counts?.concerns && !row.counts?.commitments ? <span className="text-ink-400">—</span> : null}
+          {!row.counts?.concerns && !row.counts?.commitments ? <span className="text-ink-400">None</span> : null}
         </span>
       ),
     },
@@ -121,7 +121,7 @@ function EngagementList() {
       <PageHeader
         eyebrow="Stakeholder management"
         title="Engagements"
-        description="Every consultation, meeting and disclosure, lodged as it happens — with a planned-versus-actual flag on each one."
+        description="Every consultation, meeting and disclosure, lodged as it happens, with a planned-versus-actual flag on each one."
         actions={
           <>
             <Button
@@ -217,7 +217,7 @@ function EngagementList() {
             <EmptyState
               icon={CalendarClock}
               title="Nothing logged yet"
-              description="When a meeting, focus group or household visit happens, record it here — with who attended, what was said, and what was promised."
+              description="When a meeting, focus group or household visit happens, record it here, with who attended, what was said, and what was promised."
               action={
                 can("engagement.log") ? (
                   <Link href="/engagements/log">

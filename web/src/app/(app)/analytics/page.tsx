@@ -182,11 +182,11 @@ function TimelinessDashboard({ query }: { query: Query }) {
             <div className="grid grid-cols-2 gap-3 border-t border-hairline pt-4">
               <div>
                 <p className="sasa-eyebrow">Clocks running</p>
-                <p className="tabular mt-1 text-2xl font-semibold text-ink-900">{dashboard?.open_clocks ?? "—"}</p>
+                <p className="tabular mt-1 text-2xl font-semibold text-ink-900">{dashboard?.open_clocks ?? "No data"}</p>
               </div>
               <div>
                 <p className="sasa-eyebrow">Paused</p>
-                <p className="tabular mt-1 text-2xl font-semibold text-ink-900">{dashboard?.paused_clocks ?? "—"}</p>
+                <p className="tabular mt-1 text-2xl font-semibold text-ink-900">{dashboard?.paused_clocks ?? "No data"}</p>
               </div>
             </div>
           </CardBody>
@@ -257,7 +257,7 @@ function SlaBreakdownTable({
                     <td className="tabular px-3 py-2.5 text-right text-ink-700">{row.on_time}</td>
                     <td className="tabular px-3 py-2.5 text-right text-danger-700">{row.breached}</td>
                     <td className="tabular px-5 py-2.5 text-right font-medium text-ink-900">
-                      {row.compliance_percent === null ? "—" : `${row.compliance_percent}%`}
+                      {row.compliance_percent === null ? "No data" : `${row.compliance_percent}%`}
                     </td>
                   </tr>
                 ))}
@@ -302,7 +302,7 @@ function SeverityDashboard({ query }: { query: Query }) {
                   <div className="flex items-center justify-between gap-3">
                     <div className="flex items-center gap-2.5">
                       <SeverityBadge severity={level.level} size="sm" />
-                      <span className="text-sm font-medium text-ink-800">{level.label.split("—")[1]?.trim()}</span>
+                      <span className="text-sm font-medium text-ink-800">{level.label.split(/\s*[\u2014\u2013:]\s*/)[1]?.trim()}</span>
                     </div>
                     <span className="tabular text-lg font-semibold text-ink-900">{level.total}</span>
                   </div>
@@ -336,7 +336,7 @@ function SeverityDashboard({ query }: { query: Query }) {
             <CardHeader title="Time to escalation" description="Average days from a case being received to it being escalated." />
             <CardBody>
               <p className="tabular text-3xl font-semibold text-ink-900">
-                {dashboard?.time_to_escalation_days ?? "—"}
+                {dashboard?.time_to_escalation_days ?? "No data"}
                 <span className="ml-2 text-base font-normal text-ink-500">days</span>
               </p>
             </CardBody>
@@ -438,7 +438,7 @@ function EngagementDashboard({ query }: { query: Query }) {
 
       <div className="grid gap-4 lg:grid-cols-2">
         <Card>
-          <CardHeader title="Overdue commitments" description="Oldest first — these are what a community remembers." />
+          <CardHeader title="Overdue commitments" description="Oldest first. These are what a community remembers." />
           <CardBody className="p-0 sm:p-0">
             {(dashboard?.overdue_commitments ?? []).length === 0 ? (
               <EmptyState title="Nothing overdue" description="Every commitment on this project is inside its due date." />

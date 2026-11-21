@@ -96,7 +96,7 @@ function AiBoundary() {
               <div className="flex items-center justify-between gap-3">
                 <dt className="text-ink-600">Minimum confidence to suggest</dt>
                 <dd className="tabular font-medium text-ink-900">
-                  {status ? `${Math.round((status as unknown as { min_confidence?: number }).min_confidence ?? 0.35 * 100)}%` : "—"}
+                  {status ? `${Math.round((status as unknown as { min_confidence?: number }).min_confidence ?? 0.35 * 100)}%` : "Not set"}
                 </dd>
               </div>
             </dl>
@@ -173,12 +173,12 @@ function VoiceCallList() {
                       <StatusBadge status={call.status === "completed" ? "synced" : call.status} size="sm" />
                       {!call.consent_granted ? (
                         <span className="rounded-full bg-warning-50 px-2 py-0.5 text-xs font-medium text-warning-700">
-                          Consent not granted — no case created
+                          Consent not granted, no case created
                         </span>
                       ) : null}
                       {call.was_truncated ? (
                         <span className="rounded-full bg-danger-50 px-2 py-0.5 text-xs font-medium text-danger-700">
-                          Cut short — needs a person
+                          Cut short, needs a person
                         </span>
                       ) : null}
                       {call.grievance ? (
@@ -255,7 +255,7 @@ function AiAccuracy() {
         <CardHeader title="What to do with this" />
         <CardBody className="space-y-3 text-sm leading-relaxed text-ink-700">
           <p>
-            A low acceptance rate is not a reason to stop using the AI — it is information. If officers keep
+            A low acceptance rate is not a reason to stop using the AI. It is information. If officers keep
             changing the severity in the same direction, that usually means the severity descriptions on this
             project need editing, not that the model is broken.
           </p>
@@ -265,7 +265,7 @@ function AiAccuracy() {
           </p>
           <div className="flex items-center gap-2 rounded-lg bg-brand-50 p-3 text-brand-800">
             <CheckCircle2 className="h-4 w-4 shrink-0" aria-hidden />
-            <span>A case is never classified by the AI alone. It reads &ldquo;AI suggested — confirm&rdquo; until somebody does.</span>
+            <span>A case is never classified by the AI alone. It reads &ldquo;AI suggested: confirm&rdquo; until somebody does.</span>
           </div>
         </CardBody>
       </Card>

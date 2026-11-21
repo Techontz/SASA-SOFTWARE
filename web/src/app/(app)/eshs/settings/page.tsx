@@ -67,7 +67,7 @@ function SettingsForm({ initial }: { initial: EshsSettings }) {
           </Field>
         </FormSection>
 
-        <FormActions note={!sync.online ? "Offline — saving needs a connection. Nothing has been saved." : undefined}>
+        <FormActions note={!sync.online ? "Offline. Saving needs a connection. Nothing has been saved." : undefined}>
           <Button
             variant="primary"
             icon={<Save className="h-4 w-4" />}

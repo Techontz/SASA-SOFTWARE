@@ -148,7 +148,7 @@ export default function StakeholderDetailPage() {
             <Link href={`/paps/${managedByPap.id}`} className="font-semibold underline underline-offset-2">
               {managedByPap.reference}
             </Link>
-            . Name, contact, location and vulnerability are kept in step from there — edit them on the PAP record, or
+            . Name, contact, location and vulnerability are kept in step from there. Edit them on the PAP record, or
             your change here will be replaced on the next PAP update.
           </p>
         </div>
@@ -177,9 +177,9 @@ export default function StakeholderDetailPage() {
                           <span className="font-mono">{stakeholder.reference}</span>
                         </DetailField>
                         <DetailField label="Type">{stakeholder.type_label}</DetailField>
-                        <DetailField label="Also known as">{stakeholder.alias ?? "—"}</DetailField>
-                        <DetailField label="Organisation">{stakeholder.organisation_name ?? "—"}</DetailField>
-                        <DetailField label="Position">{stakeholder.position ?? "—"}</DetailField>
+                        <DetailField label="Also known as">{stakeholder.alias ?? "Not recorded"}</DetailField>
+                        <DetailField label="Organisation">{stakeholder.organisation_name ?? "Not recorded"}</DetailField>
+                        <DetailField label="Position">{stakeholder.position ?? "Not recorded"}</DetailField>
                         <DetailField label="Preferred language">
                           {languageName(stakeholder.preferred_language)}
                         </DetailField>
@@ -438,7 +438,7 @@ export default function StakeholderDetailPage() {
             <p className="sasa-eyebrow mb-2">Calculated now</p>
             <div className="flex items-center gap-3">
               <PriorityBadge priority={assessment.calculated_priority} />
-              <span className="tabular text-sm text-ink-600">score {assessment.score ?? "—"}</span>
+              <span className="tabular text-sm text-ink-600">{assessment.score === null || assessment.score === undefined ? "Not scored" : `score ${assessment.score}`}</span>
             </div>
             {assessment.explanation ? (
               <p className="mt-2 text-sm leading-relaxed text-ink-600">{assessment.explanation}</p>
@@ -547,7 +547,7 @@ function PriorityCard({
             <p className="sasa-eyebrow">Calculated</p>
             <div className="mt-1.5 flex items-center justify-end gap-2">
               <PriorityBadge priority={assessment.calculated_priority} size="sm" />
-              <span className="tabular text-lg font-semibold text-brand-900">{assessment.score ?? "—"}</span>
+              <span className="tabular text-lg font-semibold text-brand-900">{assessment.score ?? "Not scored"}</span>
             </div>
           </div>
         </div>
@@ -573,8 +573,8 @@ function PriorityCard({
         ) : null}
 
         <DetailGrid columns={2}>
-          <DetailField label="Recommended strategy">{strategy ?? "—"}</DetailField>
-          <DetailField label="Contact frequency">{frequency ?? "—"}</DetailField>
+          <DetailField label="Recommended strategy">{strategy ?? "Not recorded"}</DetailField>
+          <DetailField label="Contact frequency">{frequency ?? "Not recorded"}</DetailField>
         </DetailGrid>
       </CardBody>
     </Card>

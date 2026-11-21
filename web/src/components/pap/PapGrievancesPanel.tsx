@@ -62,7 +62,7 @@ export function PapGrievancesPanel({ pap }: { pap: Pap }) {
                   </div>
                   <dl className="mt-3 grid gap-x-6 gap-y-2 text-sm sm:grid-cols-2 lg:grid-cols-3">
                     <Item label="Date logged" value={formatDate(grievance.date_logged)} />
-                    <Item label="Issue category" value={grievance.category ?? "—"} />
+                    <Item label="Issue category" value={grievance.category ?? "Not recorded"} />
                     <Item label="Assigned officer" value={grievance.assigned_officer ?? "Unassigned"} />
                     <Item label="Resolution date" value={formatDate(grievance.resolution_date)} />
                     <Item label="Closure date" value={formatDate(grievance.closure_date)} />

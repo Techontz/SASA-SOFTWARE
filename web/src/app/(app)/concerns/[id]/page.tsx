@@ -53,7 +53,7 @@ export default function ConcernDetailPage() {
       await queryClient.invalidateQueries({ queryKey: ["concern", id] });
       toast.success(
         `Escalated as ${response.data.reference}`,
-        "The concern's own words carried across — nothing was retyped.",
+        "The concern's own words carried across. Nothing was retyped.",
       );
       router.push(`/grievances/${response.data.id}`);
     } catch (error) {
@@ -126,7 +126,7 @@ export default function ConcernDetailPage() {
               <DetailField label="Engagement" wide>
                 {concern.engagement ? (
                   <Link href={`/engagements/${concern.engagement.id}`} className="text-brand-700 hover:underline">
-                    {concern.engagement.reference} — {concern.engagement.topic}
+                    {concern.engagement.reference} · {concern.engagement.topic}
                   </Link>
                 ) : (
                   "Recorded outside an engagement"
@@ -138,7 +138,7 @@ export default function ConcernDetailPage() {
               {concern.stakeholder ? (
                 <DetailField label="In the register" wide>
                   <Link href={`/stakeholders/${concern.stakeholder.id}`} className="text-brand-700 hover:underline">
-                    {concern.stakeholder.reference} — {concern.stakeholder.name}
+                    {concern.stakeholder.reference} · {concern.stakeholder.name}
                   </Link>
                 </DetailField>
               ) : null}

@@ -37,7 +37,7 @@ export function SavedOnDeviceNotice({
               {what} saved on this device{reference ? ` as ${reference}` : ""}
             </p>
             <p className="mt-1 text-sm leading-relaxed text-warning-800">
-              It has <strong>not</strong> reached the server yet — there is no connection. SASA will send it by
+              It has <strong>not</strong> reached the server yet, because there is no connection. SASA will send it by
               itself as soon as there is a signal, and nothing you entered can be lost in the meantime.
             </p>
           </div>

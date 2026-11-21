@@ -63,7 +63,7 @@ export default function ReportsPage() {
       <PageHeader
         eyebrow="Dashboards, analytics and reporting"
         title="Reports"
-        description="Generated from live records — there is no second reporting database to reconcile. The same definition run twice a week apart legitimately produces different numbers, and both are traceable."
+        description="Generated from live records. There is no second reporting database to reconcile. The same definition run twice a week apart legitimately produces different numbers, and both are traceable."
       />
 
       <div className="grid gap-4 lg:grid-cols-[1fr_1.3fr]">
@@ -116,7 +116,7 @@ export default function ReportsPage() {
             </Button>
 
             <p className="rounded-lg bg-surface-sunken p-3 text-sm text-ink-600">
-              Every report carries the project, the period, the filters, who generated it and when — plus the
+              Every report carries the project, the period, the filters, who generated it and when, plus the
               definition of each number in its footer.
             </p>
           </CardBody>

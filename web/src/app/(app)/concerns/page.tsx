@@ -82,7 +82,7 @@ function ConcernList() {
             {row.grievance.reference}
           </Link>
         ) : (
-          <span className="text-ink-400">—</span>
+          <span className="text-ink-400">None</span>
         ),
     },
   ];
@@ -100,11 +100,11 @@ function ConcernList() {
           ["Total", summary.total],
           ["Still open", summary.open],
           ["Escalated to a case", summary.escalated],
-          ["Conversion rate", summary.conversion_rate !== null && summary.conversion_rate !== undefined ? `${summary.conversion_rate}%` : "—"],
+          ["Conversion rate", summary.conversion_rate !== null && summary.conversion_rate !== undefined ? `${summary.conversion_rate}%` : "No data"],
         ].map(([label, value]) => (
           <div key={String(label)} className="sasa-card px-4 py-3">
             <dt className="sasa-eyebrow">{label}</dt>
-            <dd className="tabular mt-1 text-2xl font-semibold text-ink-900">{(value as string | number) ?? "—"}</dd>
+            <dd className="tabular mt-1 text-2xl font-semibold text-ink-900">{(value as string | number) ?? "No data"}</dd>
           </div>
         ))}
       </dl>

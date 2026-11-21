@@ -88,7 +88,7 @@ export default function NewPapConsultationPage() {
         backHref="/paps/consultations"
         eyebrow="PAP master register · Part L"
         title="Record a consultation"
-        description="A resettlement meeting with a village or group — not with one PAP."
+        description="A resettlement meeting with a village or group, not with one PAP."
       />
 
       <form onSubmit={(event) => void submit(event)} className="space-y-5 pb-6" noValidate>
@@ -148,7 +148,7 @@ export default function NewPapConsultationPage() {
           </Field>
         </FormSection>
 
-        <FormActions note={!sync.online ? "Offline — nothing can be saved until you reconnect." : undefined}>
+        <FormActions note={!sync.online ? "Offline. Nothing can be saved until you reconnect." : undefined}>
           <Button variant="secondary" type="button" onClick={() => router.back()}>
             Cancel
           </Button>

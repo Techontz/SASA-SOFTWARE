@@ -115,7 +115,7 @@ export default function NewEngagementPlanPage() {
         <FormSection title="What and when">
           <FieldRow>
             <Field label="Title" required error={errors.title?.message} htmlFor="title">
-              <Input id="title" placeholder="Quarterly disclosure meeting — Buswelu" invalid={Boolean(errors.title)} {...register("title")} />
+              <Input id="title" placeholder="Quarterly disclosure meeting, Buswelu" invalid={Boolean(errors.title)} {...register("title")} />
             </Field>
             <Field label="Target date" required error={errors.target_date?.message} htmlFor="target_date">
               <Input id="target_date" type="date" invalid={Boolean(errors.target_date)} {...register("target_date")} />

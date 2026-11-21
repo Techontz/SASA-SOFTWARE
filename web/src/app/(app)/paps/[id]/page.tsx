@@ -87,7 +87,7 @@ export default function PapDetailPage() {
         meta={
           <>
             {pap.archived_at ? <StatusBadge status="archived" /> : <StatusBadge status="active" />}
-            <span className="font-mono text-sm text-ink-600">Household {pap.household_id ?? "—"}</span>
+            <span className="font-mono text-sm text-ink-600">{pap.household_id ? `Household ${pap.household_id}` : "No household ID"}</span>
             {pap.is_vulnerable ? <StatusBadge status="at_risk" label={pap.vulnerability_label ?? "Vulnerable"} showIcon={false} /> : null}
             {pap.stakeholder ? (
               <Link href={`/stakeholders/${pap.stakeholder.id}`} className="inline-flex items-center gap-1 text-sm font-medium text-brand-700 hover:underline">
@@ -174,23 +174,23 @@ function ProfileTab({
           <CardBody>
             <DetailGrid>
               <DetailField label="PAP ID">{pap.reference}</DetailField>
-              <DetailField label="Household ID">{pap.household_id ?? "—"}</DetailField>
-              <DetailField label="Project">{pap.project_name ?? "—"}</DetailField>
+              <DetailField label="Household ID">{pap.household_id ?? "Not recorded"}</DetailField>
+              <DetailField label="Project">{pap.project_name ?? "Not recorded"}</DetailField>
               <DetailField label="Full name">{pap.full_name}</DetailField>
               <DetailField label="National ID (NIDA)">
-                {pap.sensitive_withheld ? <span className="text-ink-500">Withheld — needs sensitive access</span> : (pap.national_id ?? "—")}
+                {pap.sensitive_withheld ? <span className="text-ink-500">Withheld (needs sensitive access)</span> : (pap.national_id ?? "Not recorded")}
               </DetailField>
-              <DetailField label="Gender">{pap.gender_label ?? "—"}</DetailField>
+              <DetailField label="Gender">{pap.gender_label ?? "Not recorded"}</DetailField>
               <DetailField label="Date of birth">{formatDate(pap.date_of_birth)}</DetailField>
               <DetailField label="Age">
-                {pap.age === null ? "—" : `${pap.age}${pap.age_is_derived ? "" : " (stated)"}`}
+                {pap.age === null ? "Not recorded" : `${pap.age}${pap.age_is_derived ? "" : " (stated)"}`}
               </DetailField>
-              <DetailField label="Marital status">{pap.marital_status_label ?? "—"}</DetailField>
-              <DetailField label="Phone number">{pap.phone ?? "—"}</DetailField>
-              <DetailField label="Alternative contact">{pap.alternative_contact ?? "—"}</DetailField>
+              <DetailField label="Marital status">{pap.marital_status_label ?? "Not recorded"}</DetailField>
+              <DetailField label="Phone number">{pap.phone ?? "Not recorded"}</DetailField>
+              <DetailField label="Alternative contact">{pap.alternative_contact ?? "Not recorded"}</DetailField>
               <DetailField label="Vulnerability category">{pap.vulnerability_label ?? "None"}</DetailField>
-              <DetailField label="Next of kin">{pap.next_of_kin ?? "—"}</DetailField>
-              <DetailField label="Next of kin contact">{pap.next_of_kin_contact ?? "—"}</DetailField>
+              <DetailField label="Next of kin">{pap.next_of_kin ?? "Not recorded"}</DetailField>
+              <DetailField label="Next of kin contact">{pap.next_of_kin_contact ?? "Not recorded"}</DetailField>
               {pap.remarks ? (
                 <DetailField label="Remarks" wide>
                   <span className="whitespace-pre-line">{pap.remarks}</span>
@@ -204,15 +204,15 @@ function ProfileTab({
           <CardHeader title="Location" />
           <CardBody>
             <DetailGrid>
-              <DetailField label="Region">{pap.location.region ?? "—"}</DetailField>
-              <DetailField label="District">{pap.location.district ?? "—"}</DetailField>
-              <DetailField label="Ward">{pap.location.ward ?? "—"}</DetailField>
-              <DetailField label="Village">{pap.location.village ?? "—"}</DetailField>
-              <DetailField label="Kitongoji">{pap.location.kitongoji ?? "—"}</DetailField>
+              <DetailField label="Region">{pap.location.region ?? "Not recorded"}</DetailField>
+              <DetailField label="District">{pap.location.district ?? "Not recorded"}</DetailField>
+              <DetailField label="Ward">{pap.location.ward ?? "Not recorded"}</DetailField>
+              <DetailField label="Village">{pap.location.village ?? "Not recorded"}</DetailField>
+              <DetailField label="Kitongoji">{pap.location.kitongoji ?? "Not recorded"}</DetailField>
               <DetailField label="GPS coordinates">
-                {pap.gps.latitude !== null && pap.gps.longitude !== null ? `${pap.gps.latitude}, ${pap.gps.longitude}` : "—"}
+                {pap.gps.latitude !== null && pap.gps.longitude !== null ? `${pap.gps.latitude}, ${pap.gps.longitude}` : "Not recorded"}
               </DetailField>
-              <DetailField label="Physical address" wide>{pap.physical_address ?? "—"}</DetailField>
+              <DetailField label="Physical address" wide>{pap.physical_address ?? "Not recorded"}</DetailField>
             </DetailGrid>
           </CardBody>
         </Card>

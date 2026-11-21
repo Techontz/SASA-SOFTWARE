@@ -55,7 +55,7 @@ const schema = z.object({
     subcategory_id: z.string().optional(),
     severity: z.string().optional(),
     title: z.string().optional(),
-    description: z.string().min(20, "Write down what the complainant told you — at least a sentence or two."),
+    description: z.string().min(20, "Write down what the complainant told you, at least a sentence or two."),
     desired_resolution: z.string().optional(),
     demographics_gender: z.string().optional(),
     demographics_age_band: z.string().optional(),
@@ -306,7 +306,7 @@ export default function NewGrievancePage() {
         backHref="/grievances"
         eyebrow="Grievances"
         title="Log a grievance"
-        description="Record it the way it was told to you. Classification and severity can be confirmed afterwards — what matters now is that nothing is lost."
+        description="Record it the way it was told to you. Classification and severity can be confirmed afterwards. What matters now is that nothing is lost."
       />
 
       <form onSubmit={submit} className="space-y-5 pb-6" noValidate>
@@ -356,7 +356,7 @@ export default function NewGrievancePage() {
                     setValue("stakeholder_id", "");
                   }}
                   title="Anonymous"
-                  description="No identity is recorded at all — not even for administrators. You will not be able to contact them back."
+                  description="No identity is recorded at all, not even for administrators. You will not be able to contact them back."
                   icon={<EyeOff className="h-4 w-4" aria-hidden />}
                   tone="danger"
                 />
@@ -370,7 +370,7 @@ export default function NewGrievancePage() {
               <p>
                 Nothing identifying will be stored, so SASA will record that acknowledging the complainant was
                 not possible rather than leaving it blank. If they can be contacted, ask whether they would
-                prefer <strong>confidential</strong> instead — it protects them and still lets you close the loop.
+                prefer <strong>confidential</strong> instead. It protects them and still lets you close the loop.
               </p>
             </div>
           ) : null}
@@ -509,7 +509,7 @@ export default function NewGrievancePage() {
                 hint="Linking the case puts it on that stakeholder's timeline."
               >
                 <Select id="in_register" placeholder="Choose" invalid={Boolean(errors.in_register)} {...register("in_register")}>
-                  <option value="yes">Yes — link their record</option>
+                  <option value="yes">Yes: link their record</option>
                   <option value="no">No, not in the register</option>
                 </Select>
               </Field>
@@ -628,8 +628,8 @@ export default function NewGrievancePage() {
             <div className="flex items-start gap-3 rounded-lg bg-danger-50 p-4 text-sm text-danger-800">
               <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
               <p>
-                This is a restricted category. The case will be visible only to the named handling group —
-                not to other project members — and will be reported in aggregate only.
+                This is a restricted category. The case will be visible only to the named handling group
+                (not to other project members) and will be reported in aggregate only.
               </p>
             </div>
           ) : null}
@@ -683,7 +683,7 @@ export default function NewGrievancePage() {
         <FormActions
           note={
             !sync.online
-              ? "Offline — the case will be saved on this device and opened on the server when the signal returns."
+              ? "Offline. The case will be saved on this device and opened on the server when the signal returns."
               : "Draft saved on this device as you type."
           }
         >

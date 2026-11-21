@@ -24,7 +24,7 @@ describe("status badges", () => {
 
   it("renders an em dash rather than nothing for a missing status", () => {
     render(<StatusBadge status={null} />);
-    expect(screen.getByText("—")).toBeInTheDocument();
+    expect(screen.getByText("Not set")).toBeInTheDocument();
   });
 
   it("reads severity as a level, never as a bare number", () => {

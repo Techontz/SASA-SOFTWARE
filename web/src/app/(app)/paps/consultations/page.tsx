@@ -59,7 +59,7 @@ function ConsultationList() {
         </div>
       ),
     },
-    { key: "village", header: "Village", sortable: true, cell: (row) => <span className="text-ink-700">{row.village ?? "—"}</span> },
+    { key: "village", header: "Village", sortable: true, cell: (row) => <span className="text-ink-700">{row.village ?? "Not recorded"}</span> },
     {
       key: "attendance",
       header: "Male / female / vulnerable",
@@ -145,7 +145,7 @@ function ConsultationList() {
               </p>
               <p className="mt-0.5 text-ink-900">{truncate(row.topic_discussed, 110)}</p>
               <p className="mt-1 text-sm text-ink-600">
-                {row.village ?? "—"} · {row.number_male} men, {row.number_female} women, {row.number_vulnerable} vulnerable
+                {row.village ?? "Village not recorded"} · {row.number_male} men, {row.number_female} women, {row.number_vulnerable} vulnerable
               </p>
             </div>
           )}
@@ -171,7 +171,7 @@ function ConsultationList() {
             row.key_concerns_raised || row.actions_agreed ? (
               <div key={row.id} className="sasa-card p-4">
                 <p className="font-mono text-xs text-ink-500">
-                  {row.reference} · {row.village ?? "—"} · {row.facilitator ?? "Facilitator not recorded"}
+                  {row.reference} · {row.village ?? "Village not recorded"} · {row.facilitator ?? "Facilitator not recorded"}
                 </p>
                 {row.key_concerns_raised ? (
                   <p className="mt-2 text-sm text-ink-800">

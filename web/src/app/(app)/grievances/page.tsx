@@ -149,7 +149,7 @@ function GrievanceList() {
           const tile = (
             <div className="sasa-card h-full px-4 py-3 transition hover:border-brand-300">
               <dt className="sasa-eyebrow">{label}</dt>
-              <dd className="tabular mt-1 text-2xl font-semibold text-ink-900">{(value as number) ?? "—"}</dd>
+              <dd className="tabular mt-1 text-2xl font-semibold text-ink-900">{(value as number) ?? "No data"}</dd>
             </div>
           );
 
@@ -316,7 +316,7 @@ export function SlaCell({
   dueAt: string | null;
   compact?: boolean;
 }) {
-  if (!state) return <span className="text-ink-400">—</span>;
+  if (!state) return <span className="text-ink-400">Not set</span>;
 
   const days = daysBetween(dueAt);
 

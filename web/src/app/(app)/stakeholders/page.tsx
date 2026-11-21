@@ -81,7 +81,7 @@ function StakeholderRegister() {
       sortable: true,
       align: "right",
       hideBelow: "xl",
-      cell: (row) => <span className="tabular text-ink-700">{row.assessment.score ?? "—"}</span>,
+      cell: (row) => <span className="tabular text-ink-700">{row.assessment.score ?? "Not scored"}</span>,
     },
     {
       key: "flags",
@@ -126,7 +126,7 @@ function StakeholderRegister() {
       <PageHeader
         eyebrow="Register"
         title="Stakeholders"
-        description="Every individual, household, group, organisation and authority tied to this project — with a transparent priority score and a review date on each."
+        description="Every individual, household, group, organisation and authority tied to this project, with a transparent priority score and a review date on each."
         actions={
           <>
             {can("stakeholder.export") ? (
@@ -156,7 +156,7 @@ function StakeholderRegister() {
         ].map(([label, value]) => (
           <div key={String(label)} className="sasa-card px-4 py-3">
             <dt className="sasa-eyebrow">{label}</dt>
-            <dd className="tabular mt-1 text-2xl font-semibold text-ink-900">{value ?? "—"}</dd>
+            <dd className="tabular mt-1 text-2xl font-semibold text-ink-900">{value ?? "No data"}</dd>
           </div>
         ))}
       </dl>

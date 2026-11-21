@@ -155,7 +155,7 @@ export default function SyncPage() {
         <Card className="mb-6 border-danger-500/25">
           <CardHeader
             title="Changes that clash"
-            description="Somebody edited this record on the server while the device was offline. SASA did not overwrite either version — choose which one is right."
+            description="Somebody edited this record on the server while the device was offline. SASA did not overwrite either version. Choose which one is right."
           />
           <CardBody className="space-y-4">
             {openConflicts.map((conflict) => (
@@ -195,12 +195,12 @@ export default function SyncPage() {
                   {Object.entries(conflict.conflicting_fields).map(([field, values]) => (
                     <div key={field} className="grid gap-3 sm:grid-cols-2">
                       <div className="rounded-lg bg-brand-50 p-3">
-                        <p className="sasa-eyebrow mb-1">On this device — {humanise(field)}</p>
-                        <p className="text-sm font-medium text-ink-900">{String(values.local ?? "—")}</p>
+                        <p className="sasa-eyebrow mb-1">On this device · {humanise(field)}</p>
+                        <p className="text-sm font-medium text-ink-900">{String(values.local ?? "Empty")}</p>
                       </div>
                       <div className="rounded-lg bg-ink-50 p-3">
-                        <p className="sasa-eyebrow mb-1">On the server — {humanise(field)}</p>
-                        <p className="text-sm font-medium text-ink-900">{String(values.server ?? "—")}</p>
+                        <p className="sasa-eyebrow mb-1">On the server · {humanise(field)}</p>
+                        <p className="text-sm font-medium text-ink-900">{String(values.server ?? "Empty")}</p>
                         <p className="mt-1 text-xs text-ink-500">
                           Changed by {values.server_changed_by ?? "someone"}{" "}
                           {values.server_changed_at ? formatRelative(String(values.server_changed_at)) : ""}
@@ -226,7 +226,7 @@ export default function SyncPage() {
               <EmptyState
                 icon={CheckCircle2}
                 title="Everything is on the server"
-                description="No changes are waiting. You can go offline and keep working — anything you enter will be queued here."
+                description="No changes are waiting. You can go offline and keep working. Anything you enter will be queued here."
               />
             ) : (
               <ul className="divide-y divide-hairline">
@@ -288,7 +288,7 @@ export default function SyncPage() {
                 <div className="flex items-start justify-between gap-3">
                   <dt className="text-ink-600">Space used</dt>
                   <dd className="tabular font-medium text-ink-800">
-                    {storage.usageBytes !== null ? `${(storage.usageBytes / 1_048_576).toFixed(1)} MB` : "—"}
+                    {storage.usageBytes !== null ? `${(storage.usageBytes / 1_048_576).toFixed(1)} MB` : "Unknown"}
                     {storage.quotaBytes ? (
                       <span className="ml-1 font-normal text-ink-500">
                         of {(storage.quotaBytes / 1_073_741_824).toFixed(1)} GB
@@ -323,7 +323,7 @@ export default function SyncPage() {
               </Button>
               {queued.length > 0 || attachments.length > 0 ? (
                 <p className="text-xs text-ink-500">
-                  You cannot clear the local copy while work is still waiting to sync — that is the point of it.
+                  You cannot clear the local copy while work is still waiting to sync. That is the point of it.
                 </p>
               ) : null}
             </CardBody>

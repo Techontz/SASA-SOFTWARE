@@ -242,9 +242,9 @@ export default function EngagementDetailPage() {
                     <CardBody>
                       <DetailGrid columns={2}>
                         <DetailField label="Method">{humanise(engagement.method)}</DetailField>
-                        <DetailField label="Venue">{engagement.venue ?? "—"}</DetailField>
-                        <DetailField label="Organised by">{engagement.organised_by ?? "—"}</DetailField>
-                        <DetailField label="Facilitator">{engagement.facilitator?.name ?? "—"}</DetailField>
+                        <DetailField label="Venue">{engagement.venue ?? "Not recorded"}</DetailField>
+                        <DetailField label="Organised by">{engagement.organised_by ?? "Not recorded"}</DetailField>
+                        <DetailField label="Facilitator">{engagement.facilitator?.name ?? "Not recorded"}</DetailField>
                         <DetailField label="Project phase">{humanise(engagement.project_phase)}</DetailField>
                         <DetailField label="Recorded">{formatDate(engagement.created_at)}</DetailField>
                       </DetailGrid>
@@ -297,7 +297,7 @@ export default function EngagementDetailPage() {
                           <span className="min-w-0 flex-1">
                             <span className="block font-medium text-ink-900">{participant.name ?? "Unnamed"}</span>
                             <span className="block text-sm text-ink-500">
-                              {[participant.position, participant.organisation_name].filter(Boolean).join(" · ") || "—"}
+                              {[participant.position, participant.organisation_name].filter(Boolean).join(" · ") || "Not recorded"}
                             </span>
                           </span>
                           {participant.category ? (

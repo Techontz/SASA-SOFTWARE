@@ -5,7 +5,7 @@ describe("PAP money and figures", () => {
   it("writes shillings the same way everywhere", () => {
     expect(formatMoney(12110000)).toBe("TZS 12,110,000");
     expect(formatMoney("540000.00")).toBe("TZS 540,000");
-    expect(formatMoney(null)).toBe("—");
+    expect(formatMoney(null)).toBe("Not recorded");
   });
 
   it("keeps a KPI tile short enough for a phone", () => {
@@ -13,12 +13,12 @@ describe("PAP money and figures", () => {
     expect(formatMoneyCompact(1_250_000_000)).toBe("TZS 1.3bn");
     expect(formatMoneyCompact(450_000)).toBe("TZS 450k");
     expect(formatMoneyCompact(9_500)).toBe("TZS 9,500");
-    expect(formatMoneyCompact(null)).toBe("—");
+    expect(formatMoneyCompact(null)).toBe("Not recorded");
   });
 
   it("shows quantities with their unit", () => {
     expect(formatQuantity(0.75, "ha")).toBe("0.75 ha");
-    expect(formatQuantity(null)).toBe("—");
+    expect(formatQuantity(null)).toBe("Not recorded");
   });
 
   it("turns form input into API values", () => {

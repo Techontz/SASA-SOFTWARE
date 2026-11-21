@@ -310,14 +310,14 @@ export function StakeholderForm({ stakeholder }: { stakeholder?: Stakeholder }) 
           <div className="min-w-0">
             <p className="font-medium text-warning-800">These records look similar</p>
             <p className="mt-0.5 text-sm text-warning-700">
-              A village can genuinely have two people with the same name, so this is only a check — you can
+              A village can genuinely have two people with the same name, so this is only a check. You can
               still save.
             </p>
             <ul className="mt-2 space-y-1 text-sm">
               {duplicates.map((duplicate) => (
                 <li key={duplicate.id}>
                   <a href={`/stakeholders/${duplicate.id}`} className="font-medium text-warning-800 underline underline-offset-2">
-                    {duplicate.reference} — {duplicate.name}
+                    {duplicate.reference} · {duplicate.name}
                   </a>
                   {duplicate.village ? <span className="text-warning-700"> · {duplicate.village}</span> : null}
                 </li>
@@ -602,7 +602,7 @@ export function StakeholderForm({ stakeholder }: { stakeholder?: Stakeholder }) 
           !sync.online ? (
             <span className="flex items-center gap-1.5 text-warning-700">
               <Users className="h-4 w-4" aria-hidden />
-              Offline — this will be saved on the device and synced later.
+              Offline. This will be saved on the device and synced later.
             </span>
           ) : (
             "Draft saved on this device as you type."

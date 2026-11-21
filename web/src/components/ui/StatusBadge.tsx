@@ -111,7 +111,7 @@ interface StatusBadgeProps {
 }
 
 export function StatusBadge({ status, label, size = "md", className, showIcon = true }: StatusBadgeProps) {
-  if (!status) return <span className="text-ink-400">—</span>;
+  if (!status) return <span className="text-ink-400">Not set</span>;
 
   const entry = STATUS_MAP[status] ?? { tone: "neutral" as Tone, icon: CircleDot };
   const Icon = entry.icon;
@@ -143,7 +143,7 @@ export function PriorityBadge({
   prefix?: string;
   className?: string;
 }) {
-  if (!priority) return <span className="text-ink-400">—</span>;
+  if (!priority) return <span className="text-ink-400">Not set</span>;
 
   const tone: Tone = priority === "high" ? "danger" : priority === "medium" ? "warning" : "neutral";
   const bars = priority === "high" ? 3 : priority === "medium" ? 2 : 1;

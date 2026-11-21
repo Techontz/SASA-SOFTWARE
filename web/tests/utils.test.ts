@@ -5,14 +5,14 @@ describe("presentation helpers", () => {
   it("turns machine values into words a person reads", () => {
     expect(humanise("under_investigation")).toBe("Under investigation");
     expect(humanise("on_plan")).toBe("On plan");
-    expect(humanise(null)).toBe("—");
+    expect(humanise(null)).toBe("Not recorded");
   });
 
   it("formats a metric with its unit", () => {
     expect(formatMetric(88.9, "percent")).toBe("88.9%");
     expect(formatMetric(50, "percent")).toBe("50%");
     expect(formatMetric(1234, "count")).toBe("1,234");
-    expect(formatMetric(null, "count")).toBe("—");
+    expect(formatMetric(null, "count")).toBe("Not recorded");
   });
 
   it("counts days to a date, signed", () => {
@@ -59,7 +59,7 @@ describe("language names", () => {
   });
 
   it("says nothing is recorded when nothing is", () => {
-    expect(languageName(null)).toBe("—");
-    expect(languageName("")).toBe("—");
+    expect(languageName(null)).toBe("Not recorded");
+    expect(languageName("")).toBe("Not recorded");
   });
 });

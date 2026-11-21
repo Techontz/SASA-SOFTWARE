@@ -70,6 +70,8 @@ export interface Enquiry {
   handled_at: string | null;
   created_at: string;
   details?: QuoteDetails | null;
+  /** The latest demo workspace given for this enquiry. */
+  demo?: { public_id: string; status: "active" | "expired" | "ended" | "converted"; ends_at: string } | null;
 }
 
 export function submitEnquiry(body: EnquiryInput) {

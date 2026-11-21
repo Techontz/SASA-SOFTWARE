@@ -12,6 +12,7 @@ import { ApiRequestError } from "@/lib/api/client";
 import { useEnquiries, useUpdateEnquiry, type Enquiry, type EnquiryStatus, type EnquiryType } from "@/lib/api/enquiries";
 import { PLATFORM_MODULES, SECTORS } from "@/lib/content/modules";
 import { cn, formatRelative } from "@/lib/utils";
+import { DemoList, DemoPanel } from "@/components/app/DemoPanel";
 import { useSession } from "@/providers/SessionProvider";
 import { useToast } from "@/providers/ToastProvider";
 
@@ -41,11 +42,7 @@ const STATUS_FILTERS = [
 
 export default function EnquiriesPage() {
   const { can } = useSession();
-  const [type, setType] = useState("");
-  const [status, setStatus] = useState("");
-  const [open, setOpen] = useState<Enquiry | null>(null);
-  const { data, isLoading } = useEnquiries({ type, status });
-  const rows = data?.data ?? [];
+  const [tab, setTab] = useState<"enquiries" | "demos">("enquiries");
 
   if (!can("enquiry.manage")) return <PermissionDenied what="website enquiries" />;
 
@@ -54,9 +51,44 @@ export default function EnquiriesPage() {
       <PageHeader
         eyebrow="Administration"
         title="Enquiries"
-        description="Demo requests, quote requests and interest registrations from the website, for your team to follow up."
+        description="Demo requests, quote requests and interest registrations from the website, and the demos you have given."
       />
+      <div role="tablist" aria-label="Enquiries" className="mb-8 inline-flex rounded-full bg-ink-100 p-1 text-sm font-semibold">
+        {(
+          [
+            { key: "enquiries", label: "Requests" },
+            { key: "demos", label: "Demos" },
+          ] as const
+        ).map((item) => (
+          <button
+            key={item.key}
+            type="button"
+            role="tab"
+            aria-selected={tab === item.key}
+            onClick={() => setTab(item.key)}
+            className={cn(
+              "rounded-full px-5 py-2 transition-all duration-[var(--duration-base)] ease-[var(--ease-spring)]",
+              tab === item.key ? "bg-surface text-ink-900 shadow-[var(--shadow-raised)]" : "text-ink-600 hover:text-ink-900",
+            )}
+          >
+            {item.label}
+          </button>
+        ))}
+      </div>
+      {tab === "enquiries" ? <Requests /> : <DemoList />}
+    </div>
+  );
+}
 
+function Requests() {
+  const [type, setType] = useState("");
+  const [status, setStatus] = useState("");
+  const [open, setOpen] = useState<Enquiry | null>(null);
+  const { data, isLoading } = useEnquiries({ type, status });
+  const rows = data?.data ?? [];
+
+  return (
+    <div>
       <div className="mb-5 flex flex-wrap items-center gap-2">
         {TYPE_FILTERS.map((filter) => (
           <button
@@ -126,6 +158,7 @@ export default function EnquiriesPage() {
                   {row.modules?.length ? row.modules.map((key) => MODULE_LABEL[key] ?? key).join(", ") : "No modules chosen"}
                 </span>
                 <span className="flex items-center gap-3">
+                  {row.demo?.status === "active" ? <StatusBadge status="active" label="Demo running" size="sm" /> : null}
                   <StatusBadge status={row.status === "new" ? "open" : row.status === "contacted" ? "in_progress" : "closed"} label={STATUS_LABEL[row.status]} />
                   <span className="whitespace-nowrap text-xs text-ink-500">{formatRelative(row.created_at)}</span>
                 </span>
@@ -244,6 +277,8 @@ function EnquiryDrawer({ enquiry, onClose }: { enquiry: Enquiry; onClose: () => 
             </div>
           ) : null}
         </dl>
+
+        <DemoPanel enquiry={enquiry} />
 
         <Field label="Status" htmlFor="enquiry-status">
           <Select id="enquiry-status" value={status} onChange={(event) => setStatus(event.target.value as EnquiryStatus)}>

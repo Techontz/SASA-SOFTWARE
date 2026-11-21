@@ -198,7 +198,7 @@ export default function GrievanceDetailPage() {
                     <CardBody>
                       <DetailGrid columns={2}>
                         <DetailField label="Category">{grievance.category?.name ?? "Not classified"}</DetailField>
-                        <DetailField label="Subcategory">{grievance.subcategory?.name ?? "—"}</DetailField>
+                        <DetailField label="Subcategory">{grievance.subcategory?.name ?? "None"}</DetailField>
                         <DetailField label="Severity">
                           <SeverityBadge severity={grievance.severity} label={grievance.severity_label} size="sm" />
                         </DetailField>
@@ -304,7 +304,7 @@ export default function GrievanceDetailPage() {
                           <p className="mt-2 whitespace-pre-line text-sm leading-relaxed text-ink-700">{message.body}</p>
                           {message.status === "not_possible" ? (
                             <p className="mt-2 text-xs text-warning-700">
-                              Recorded, but not sent — this case has no reachable contact.
+                              Recorded, but not sent: this case has no reachable contact.
                             </p>
                           ) : null}
                         </li>
@@ -418,7 +418,7 @@ function SlaTile({
         {completedAt
           ? "Done"
           : days === null
-            ? "—"
+            ? "No deadline"
             : days >= 0
               ? `${days} ${days === 1 ? "day" : "days"} left`
               : `${Math.abs(days)} ${Math.abs(days) === 1 ? "day" : "days"} over`}
@@ -456,7 +456,7 @@ function ComplainantCard({ grievance }: { grievance: Grievance }) {
         title="Complainant"
         description={
           grievance.confidentiality === "confidential"
-            ? "Confidential — your view of these details has been recorded in the audit trail."
+            ? "Confidential. Your view of these details has been recorded in the audit trail."
             : undefined
         }
       />
@@ -485,7 +485,7 @@ function ComplainantCard({ grievance }: { grievance: Grievance }) {
           {grievance.stakeholder ? (
             <DetailField label="In the register" wide>
               <Link href={`/stakeholders/${grievance.stakeholder.id}`} className="text-brand-700 hover:underline">
-                {grievance.stakeholder.reference} — {grievance.stakeholder.name}
+                {grievance.stakeholder.reference} · {grievance.stakeholder.name}
               </Link>
             </DetailField>
           ) : null}
@@ -548,7 +548,7 @@ function AiSuggestionCard({
             <Sparkles className="h-5 w-5" aria-hidden />
           </span>
           <div className="min-w-0">
-            <p className="font-semibold text-brand-900">AI suggested — please confirm</p>
+            <p className="font-semibold text-brand-900">AI suggested: please confirm</p>
             <p className="mt-1 text-sm leading-relaxed text-brand-800">
               {suggestion.suggestion.rationale ?? "A classification has been proposed for this case."}
               {confidence !== null ? ` Confidence ${confidence}%.` : ""}
@@ -677,7 +677,7 @@ function buildTimeline(grievance: Grievance): TimelineItem[] {
       id: "reopened",
       tone: "warning",
       icon: <RotateCcw className="h-3.5 w-3.5" aria-hidden />,
-      title: `Reopened — cycle ${grievance.resolution_cycle}`,
+      title: `Reopened (cycle ${grievance.resolution_cycle})`,
       body: grievance.cycles?.find((cycle) => cycle.cycle_number === grievance.resolution_cycle)?.reopen_reason,
       at: formatDateTime(grievance.last_reopened_at),
     });

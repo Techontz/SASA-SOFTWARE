@@ -1,7 +1,7 @@
 "use client";
 
 import { useQueryClient } from "@tanstack/react-query";
-import { CalendarClock, CheckCircle2, Plus } from "lucide-react";
+import { CalendarClock, CheckCircle2, Minus, Plus } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useState } from "react";
@@ -115,12 +115,12 @@ export default function EngagementPlanDetailPage() {
                       {plan.stakeholder.name}
                     </Link>
                   ) : (
-                    plan.stakeholder_group ?? "—"
+                    plan.stakeholder_group ?? "Not recorded"
                   )}
                 </DetailField>
-                <DetailField label="Location">{plan.location.path ?? plan.location.text ?? "—"}</DetailField>
+                <DetailField label="Location">{plan.location.path ?? plan.location.text ?? "Not recorded"}</DetailField>
                 <DetailField label="Owner">{plan.owner?.name ?? "Unassigned"}</DetailField>
-                <DetailField label="Responsible team">{plan.responsible_team ?? "—"}</DetailField>
+                <DetailField label="Responsible team">{plan.responsible_team ?? "Not recorded"}</DetailField>
                 <DetailField label="Repeats">{humanise(plan.recurrence)}</DetailField>
                 {plan.status_reason ? (
                   <DetailField label="Status reason" wide>
@@ -196,7 +196,7 @@ export default function EngagementPlanDetailPage() {
                         : "mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-ink-100 text-ink-500"
                     }
                   >
-                    {enabled ? <CheckCircle2 className="h-3.5 w-3.5" aria-hidden /> : "—"}
+                    {enabled ? <CheckCircle2 className="h-3.5 w-3.5" aria-hidden /> : <Minus className="h-3.5 w-3.5" aria-hidden />}
                   </span>
                   <span className="min-w-0">
                     <span className="block text-sm font-medium text-ink-800">{label as string}</span>
@@ -213,9 +213,9 @@ export default function EngagementPlanDetailPage() {
               <CardBody>
                 <DetailGrid columns={2}>
                   <DetailField label="Budget">
-                    {plan.budget_amount ? `${plan.budget_currency ?? ""} ${plan.budget_amount}` : "—"}
+                    {plan.budget_amount ? `${plan.budget_currency ?? ""} ${plan.budget_amount}` : "Not set"}
                   </DetailField>
-                  <DetailField label="Needed">{plan.resources_required ?? "—"}</DetailField>
+                  <DetailField label="Needed">{plan.resources_required ?? "Not recorded"}</DetailField>
                 </DetailGrid>
               </CardBody>
             </Card>

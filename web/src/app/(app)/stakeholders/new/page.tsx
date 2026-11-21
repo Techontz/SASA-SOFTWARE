@@ -18,7 +18,7 @@ export default function NewStakeholderPage() {
         backHref="/stakeholders"
         eyebrow="Register"
         title="Add a stakeholder"
-        description="Only the name and the type are required. Everything else can be filled in later — a partial record in the register is worth more than a complete one in a notebook."
+        description="Only the name and the type are required. Everything else can be filled in later. A partial record in the register is worth more than a complete one in a notebook."
       />
       <StakeholderForm />
     </div>

@@ -12,7 +12,7 @@ export function displayField(
   const value: PapRecordValue = record[field.key];
 
   if (value === undefined) return "Withheld";
-  if (value === null || value === "") return "—";
+  if (value === null || value === "") return "Not recorded";
 
   if ("options" in field && field.options) {
     const label = record[`${field.key}_label`];

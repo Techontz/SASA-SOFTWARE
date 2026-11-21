@@ -47,6 +47,8 @@ export interface ProjectMembershipSummary {
   role: RoleSummary;
   permissions: string[];
   handling_groups: string[];
+  /** Set when this project is a time-limited demo workspace. */
+  demo?: { ends_at: string; status: "active" | "expired" | "ended" | "converted" } | null;
 }
 
 export interface CurrentUser {

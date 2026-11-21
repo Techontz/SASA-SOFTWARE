@@ -129,9 +129,9 @@ export default function IncidentDetailPage() {
               <CardHeader title="Review" />
               <CardBody className="space-y-5">
                 <DetailGrid columns={2}>
-                  <DetailField label="Reviewed by">{incident.reviewed_by ?? "—"}</DetailField>
+                  <DetailField label="Reviewed by">{incident.reviewed_by ?? "Not yet reviewed"}</DetailField>
                   <DetailField label="Review started">{formatDateTime(incident.reviewed_at)}</DetailField>
-                  <DetailField label="Closed by">{incident.closed_by ?? "—"}</DetailField>
+                  <DetailField label="Closed by">{incident.closed_by ?? "Not yet closed"}</DetailField>
                   <DetailField label="Closed">{formatDateTime(incident.closed_at)}</DetailField>
                 </DetailGrid>
                 {incident.review_note ? (
@@ -163,12 +163,12 @@ export default function IncidentDetailPage() {
             <CardBody>
               <DetailGrid columns={2}>
                 <DetailField label="Date and time" wide>{formatDateTime(incident.occurred_at)}</DetailField>
-                <DetailField label="Company" wide>{incident.company ?? "—"}</DetailField>
-                <DetailField label="Location" wide>{incident.location.path ?? "—"}</DetailField>
-                <DetailField label="Site detail" wide>{incident.site_detail ?? "—"}</DetailField>
-                <DetailField label="Reported by">{incident.reported_by?.name ?? "—"}</DetailField>
-                <DetailField label="Contractor manager">{incident.contractor_manager ?? "—"}</DetailField>
-                <DetailField label="Consultant's resident engineer" wide>{incident.resident_engineer ?? "—"}</DetailField>
+                <DetailField label="Company" wide>{incident.company ?? "Not recorded"}</DetailField>
+                <DetailField label="Location" wide>{incident.location.path ?? "Not recorded"}</DetailField>
+                <DetailField label="Site detail" wide>{incident.site_detail ?? "Not recorded"}</DetailField>
+                <DetailField label="Reported by">{incident.reported_by?.name ?? "Not recorded"}</DetailField>
+                <DetailField label="Contractor manager">{incident.contractor_manager ?? "Not recorded"}</DetailField>
+                <DetailField label="Consultant's resident engineer" wide>{incident.resident_engineer ?? "Not recorded"}</DetailField>
               </DetailGrid>
             </CardBody>
           </Card>

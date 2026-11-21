@@ -35,7 +35,7 @@ export function PapKpis({ summary, loading }: { summary?: PapSummary; loading?: 
 function PapKpiTile({ kpi, currency }: { kpi: PapKpi; currency: string }) {
   const value =
     kpi.value === null
-      ? "—"
+      ? "No data"
       : kpi.unit === "currency"
         ? formatMoneyCompact(kpi.value, currency)
         : kpi.unit === "percent"

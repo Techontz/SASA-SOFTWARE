@@ -209,9 +209,14 @@ export function AppShell({ children }: { children: ReactNode }) {
           </header>
 
           <main className="min-w-0 flex-1 px-4 pb-28 pt-6 sm:px-6 sm:pt-8 md:pb-12 lg:px-10 lg:pt-10">
+            <DemoNotice />
             {/* Keyed on the path so each screen gets its entrance. */}
             <div key={pathname} className="sasa-page mx-auto w-full max-w-[86rem]">
-              {children}
+              {project?.demo && project.demo.status !== "active" && project.demo.status !== "converted" && !user?.is_system_admin ? (
+                <DemoEnded />
+              ) : (
+                children
+              )}
             </div>
           </main>
         </div>
@@ -301,6 +306,47 @@ export function AppShell({ children }: { children: ReactNode }) {
         {user ? `Signed in as ${user.name}` : ""}
         {project ? ` on project ${project.name}` : ""}
       </span>
+    </div>
+  );
+}
+
+/** A demo workspace says so, and says when it ends. */
+function DemoNotice() {
+  const { project } = useSession();
+  // Read the clock once, when the notice first appears.
+  const [now] = useState(() => Date.now());
+  const demo = project?.demo;
+  if (!demo || demo.status !== "active") return null;
+  const ends = new Date(demo.ends_at);
+  const days = Math.max(0, Math.ceil((ends.getTime() - now) / 864e5));
+  return (
+    <div className="mx-auto mb-6 flex w-full max-w-[86rem] flex-wrap items-center gap-x-4 gap-y-2 rounded-2xl bg-brand-50 px-5 py-3.5 text-sm text-brand-900 ring-1 ring-brand-100">
+      <span className="font-semibold">Demo workspace</span>
+      <span className="text-brand-800">
+        {days === 0 ? "Your demo ends today" : `Your demo ends in ${days} day${days === 1 ? "" : "s"}`}, on{" "}
+        {ends.toLocaleDateString("en-GB", { day: "numeric", month: "long" })}. The records here are sample data you can
+        change freely.
+      </span>
+      <Link href="/request-quote" className="ml-auto font-semibold text-brand-700 hover:underline">
+        Request a quote
+      </Link>
+    </div>
+  );
+}
+
+function DemoEnded() {
+  return (
+    <div className="mx-auto max-w-lg py-20 text-center">
+      <h1 className="text-[2rem] font-bold tracking-[-0.03em] text-ink-900">This demo has ended</h1>
+      <p className="mt-3 text-ink-600">
+        Thank you for trying SASA. Your demo records are kept. Contact the SASA team, or request a quote, to continue
+        with your own workspace.
+      </p>
+      <Link href="/request-quote"
+        className="mt-8 inline-flex h-11 items-center rounded-full bg-accent-solid px-6 text-[0.9375rem] font-semibold text-on-primary"
+      >
+        Request a quote
+      </Link>
     </div>
   );
 }

@@ -29,7 +29,7 @@ const schema = z.object({
   subcontractor: z.string().optional(),
   category: z.string().min(1, "Choose the ESHS category."),
   subcategory: z.string().min(1, "Choose a subcategory."),
-  description: z.string().min(10, "Describe what was found — what, where and why it matters."),
+  description: z.string().min(10, "Describe what was found: what, where and why it matters."),
   anomaly_type: z.string().min(1, "Choose the anomaly type."),
   risk_rating: z.string().min(1, "Choose a risk rating."),
   root_cause: z.string().optional(),
@@ -148,7 +148,7 @@ export default function NewEshsAnomalyPage() {
           <div className="flex items-start gap-3 rounded-xl border border-warning-500/25 bg-warning-50 p-4" role="status">
             <WifiOff className="mt-0.5 h-5 w-5 shrink-0 text-warning-600" aria-hidden />
             <p className="text-sm text-warning-800">
-              You are offline. Raising an anomaly needs a connection — nothing on this form has been saved. Keep the page open
+              You are offline. Raising an anomaly needs a connection. Nothing on this form has been saved. Keep the page open
               and submit when the signal returns.
             </p>
           </div>
@@ -196,7 +196,7 @@ export default function NewEshsAnomalyPage() {
             >
               <Select
                 id="subcategory"
-                placeholder={category ? "Choose a subcategory" : "—"}
+                placeholder={category ? "Choose a subcategory" : "Choose a category first"}
                 disabled={!category}
                 invalid={Boolean(errors.subcategory)}
                 {...register("subcategory")}
@@ -263,7 +263,7 @@ export default function NewEshsAnomalyPage() {
               required
               error={errors.contractor?.message}
               htmlFor="contractor"
-              hint={lists.contractors.length === 0 ? "No contractor list is configured for this project yet — type the company name." : undefined}
+              hint={lists.contractors.length === 0 ? "No contractor list is configured for this project yet. Type the company name." : undefined}
             >
               {lists.contractors.length > 0 ? (
                 <Select id="contractor" placeholder="Choose a contractor" invalid={Boolean(errors.contractor)} {...register("contractor")}>
@@ -323,7 +323,7 @@ export default function NewEshsAnomalyPage() {
           <AttachmentPicker files={files} onChange={setFiles} hint="Files upload to the server as soon as the anomaly is saved." />
         </FormSection>
 
-        <FormActions note={!sync.online ? "Offline — connect to raise this anomaly. Nothing has been saved." : undefined}>
+        <FormActions note={!sync.online ? "Offline. Connect to raise this anomaly. Nothing has been saved." : undefined}>
           <Button variant="secondary" type="button" onClick={() => router.back()}>
             Cancel
           </Button>

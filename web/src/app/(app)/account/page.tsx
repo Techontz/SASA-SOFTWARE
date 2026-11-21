@@ -89,7 +89,7 @@ export default function AccountPage() {
               checked={muted}
               onChange={setMuted}
               label="Pause all notifications"
-              description="You will still see everything in SASA — you just will not be emailed or alerted."
+              description="You will still see everything in SASA. You just will not be emailed or alerted."
             />
             <Button variant="primary" loading={busy} icon={<Save className="h-4 w-4" />} onClick={() => void saveProfile()}>
               Save

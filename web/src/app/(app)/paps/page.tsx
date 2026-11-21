@@ -54,19 +54,19 @@ function PapList() {
           <span className="font-mono text-xs text-ink-500">{row.reference}</span>
           <p className="mt-0.5 font-medium text-ink-900">{row.full_name}</p>
           <p className="text-xs text-ink-500">
-            {[row.gender_label, row.age !== null ? `${row.age} yrs` : null].filter(Boolean).join(" · ") || "—"}
+            {[row.gender_label, row.age !== null ? `${row.age} yrs` : null].filter(Boolean).join(" · ") || "Not recorded"}
           </p>
         </div>
       ),
     },
-    { key: "household_id", header: "Household", sortable: true, hideBelow: "lg", cell: (row) => <span className="font-mono text-sm text-ink-700">{row.household_id ?? "—"}</span> },
+    { key: "household_id", header: "Household", sortable: true, hideBelow: "lg", cell: (row) => <span className="font-mono text-sm text-ink-700">{row.household_id ?? "Not recorded"}</span> },
     {
       key: "village",
       header: "Village",
       sortable: true,
       cell: (row) => (
         <div>
-          <p className="text-ink-800">{row.location.village ?? "—"}</p>
+          <p className="text-ink-800">{row.location.village ?? "Not recorded"}</p>
           {row.location.kitongoji ? <p className="text-xs text-ink-500">{row.location.kitongoji}</p> : null}
         </div>
       ),
@@ -193,7 +193,8 @@ function PapList() {
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
                   <p className="font-mono text-xs text-ink-500">
-                    {row.reference} · {row.household_id ?? "—"}
+                    {row.reference}
+                    {row.household_id ? ` · ${row.household_id}` : ""}
                   </p>
                   <p className="mt-0.5 font-medium text-ink-900">{row.full_name}</p>
                 </div>

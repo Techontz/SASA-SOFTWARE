@@ -22,7 +22,7 @@ export default function AuditPage() {
       <PageHeader
         eyebrow="Administration"
         title="Audit trail"
-        description="Append-only. Nothing in SASA is hard-deleted — archiving is itself an audit event — and every entry survives the record it describes."
+        description="Append-only. Nothing in SASA is hard-deleted (archiving is itself an audit event), and every entry survives the record it describes."
       />
 
       <Suspense fallback={<TableSkeleton />}>
@@ -177,11 +177,11 @@ function AuditRow({ entry }: { entry: AuditEntry }) {
                     <dd className="text-ink-600">
                       {entry.before?.[field] !== undefined ? (
                         <>
-                          <span className="line-through opacity-60">{String(entry.before[field] ?? "—")}</span>{" "}
+                          <span className="line-through opacity-60">{String(entry.before[field] ?? "Empty")}</span>{" "}
                           <span aria-hidden>→</span>{" "}
                         </>
                       ) : null}
-                      <span className="font-medium text-ink-900">{String(entry.after?.[field] ?? "—")}</span>
+                      <span className="font-medium text-ink-900">{String(entry.after?.[field] ?? "Empty")}</span>
                     </dd>
                   </div>
                 ))}

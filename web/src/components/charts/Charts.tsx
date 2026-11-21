@@ -250,7 +250,7 @@ export function ComplianceLineChart({
         <YAxis domain={[0, 100]} width={44} unit="%" {...theme.axisProps} />
         <Tooltip
           {...theme.tooltip}
-          formatter={(value) => [`${value ?? "—"}%`, "On time"] as [string, string]}
+          formatter={(value) => [value === null || value === undefined ? "No data" : `${value}%`, "On time"] as [string, string]}
         />
         <Line
           type="monotone"
@@ -293,7 +293,7 @@ export function ProgressMeter({
       <div className="flex items-baseline justify-between gap-3">
         <span className="text-sm font-medium text-ink-800">{label}</span>
         <span className="tabular text-sm font-semibold text-ink-900">
-          {value === null ? "—" : `${value}%`}
+          {value === null ? "No data" : `${value}%`}
         </span>
       </div>
       <div className="mt-2 h-2 overflow-hidden rounded-full bg-ink-100" role="progressbar" aria-valuenow={safe} aria-valuemin={0} aria-valuemax={100}>

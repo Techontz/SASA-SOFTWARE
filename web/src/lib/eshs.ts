@@ -49,7 +49,7 @@ export function targetLabel(daysUntil: number | null | undefined, closed: boolea
 
 /** Closure rate as shown: one decimal, or a dash when nothing has been raised. */
 export function formatRate(rate: number | null | undefined): string {
-  return rate === null || rate === undefined ? "—" : `${rate}%`;
+  return rate === null || rate === undefined ? "No data" : `${rate}%`;
 }
 
 /** Cleans a one-per-line textarea into a list: trimmed, no blanks, no repeats. */

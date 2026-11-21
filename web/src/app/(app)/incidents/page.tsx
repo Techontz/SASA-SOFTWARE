@@ -35,7 +35,7 @@ function kpi(key: string, label: string, value: number | null, definition: strin
 function SummaryPanel({ summary }: { summary: IncidentSummary }) {
   const cards: Array<{ kpi: Kpi; href: string | null }> = [
     { kpi: kpi("total", "Incidents reported", summary.total, "Every incident notification on this project, archived records excluded."), href: null },
-    { kpi: kpi("open", "Awaiting closure", summary.open, "Submitted or under review — not yet closed."), href: "/incidents?status=submitted" },
+    { kpi: kpi("open", "Awaiting closure", summary.open, "Submitted or under review, not yet closed."), href: "/incidents?status=submitted" },
     { kpi: kpi("serious", "Serious", summary.serious, summary.definitions.serious), href: "/incidents?serious=1" },
     { kpi: kpi("last_30_days", "Last 30 days", summary.last_30_days, summary.definitions.last_30_days), href: null },
     {
@@ -153,7 +153,7 @@ function IncidentRegister() {
       key: "company",
       header: "Company",
       hideBelow: "xl",
-      cell: (row) => <span className="text-ink-700">{row.company ?? "—"}</span>,
+      cell: (row) => <span className="text-ink-700">{row.company ?? "Not recorded"}</span>,
     },
   ];
 
@@ -162,7 +162,7 @@ function IncidentRegister() {
       <PageHeader
         eyebrow="Safeguards"
         title="Incidents"
-        description="Incident notification reports from the field — what happened, how bad it was, how bad it could have been — and their review to closure."
+        description="Incident notification reports from the field (what happened, how bad it was, how bad it could have been) and their review to closure."
         actions={
           <>
             {can("configuration.manage") ? (

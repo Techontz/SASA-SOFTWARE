@@ -116,7 +116,7 @@ export default function NewCommitmentPage() {
         backHref="/commitments"
         eyebrow="Stakeholder management"
         title="Add a commitment"
-        description="Most commitments are captured while logging an engagement. Use this for one made outside a meeting — in a letter, a call or a site visit."
+        description="Most commitments are captured while logging an engagement. Use this for one made outside a meeting: in a letter, a call or a site visit."
       />
 
       <form onSubmit={onSubmit} className="space-y-5 pb-6" noValidate>
@@ -157,7 +157,7 @@ export default function NewCommitmentPage() {
               <Select id="risk_level" {...register("risk_level")}>
                 <option value="low">Low</option>
                 <option value="medium">Medium</option>
-                <option value="high">High — escalates immediately when overdue</option>
+                <option value="high">High: escalates immediately when overdue</option>
               </Select>
             </Field>
           </FieldRow>
@@ -169,7 +169,7 @@ export default function NewCommitmentPage() {
               <Select id="owner_id" placeholder="Choose an owner" invalid={Boolean(errors.owner_id)} {...register("owner_id")}>
                 {(members ?? []).map((member) => (
                   <option key={member.id} value={member.id}>
-                    {member.role ? `${member.name} — ${member.role}` : member.name}
+                    {member.role ? `${member.name} (${member.role})` : member.name}
                   </option>
                 ))}
               </Select>
@@ -241,7 +241,7 @@ export default function NewCommitmentPage() {
           </Field>
         </FormSection>
 
-        <FormActions note={!sync.online ? "Offline — this will be saved on the device and synced later." : undefined}>
+        <FormActions note={!sync.online ? "Offline. This will be saved on the device and synced later." : undefined}>
           <Button variant="secondary" type="button" onClick={() => router.back()}>
             Cancel
           </Button>

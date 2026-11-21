@@ -129,7 +129,7 @@ export function SavedViewBar({
               id="view-name"
               value={name}
               onChange={(event) => setName(event.target.value)}
-              placeholder="Overdue commitments — Northern district"
+              placeholder="Overdue commitments, Northern district"
               autoFocus
             />
           </Field>

@@ -245,11 +245,11 @@ export function PapProfileForm({ pap }: { pap: Pap | null }) {
           <Textarea id="pap-remarks" rows={3} value={values.remarks} onChange={(event) => set("remarks")(event.target.value)} />
         </Field>
         {!pap ? (
-          <p className="text-sm text-ink-600">The photograph is added on the PAP&apos;s record after saving — use “Take a photo” under Files.</p>
+          <p className="text-sm text-ink-600">The photograph is added on the PAP&apos;s record after saving. Use “Take a photo” under Files.</p>
         ) : null}
       </FormSection>
 
-      <FormActions note={!sync.online ? "Offline — nothing can be saved until you reconnect." : "Saves to the server and updates the stakeholder register."}>
+      <FormActions note={!sync.online ? "Offline. Nothing can be saved until you reconnect." : "Saves to the server and updates the stakeholder register."}>
         <Button variant="secondary" type="button" onClick={() => router.back()}>
           Cancel
         </Button>

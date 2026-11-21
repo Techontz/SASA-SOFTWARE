@@ -184,7 +184,7 @@ export function GrievanceActions({ grievance }: { grievance: Grievance }) {
               <option value="">Unassigned</option>
               {(members ?? []).map((member) => (
                 <option key={member.id} value={member.id}>
-                  {member.role ? `${member.name} — ${member.role}` : member.name}
+                  {member.role ? `${member.name} (${member.role})` : member.name}
                 </option>
               ))}
             </Select>
@@ -260,7 +260,7 @@ export function GrievanceActions({ grievance }: { grievance: Grievance }) {
         open={action === "investigate"}
         onClose={() => setAction(null)}
         title="Investigation"
-        description="What you found, and what is being done about it. This is human work — the AI never writes findings."
+        description="What you found, and what is being done about it. This is human work: the AI never writes findings."
         width="lg"
         footer={
           <>
@@ -327,7 +327,7 @@ export function GrievanceActions({ grievance }: { grievance: Grievance }) {
           <Field label="Is the investigation finished?" htmlFor="inv-complete">
             <Select id="inv-complete" value={form.completed ?? "no"} onChange={(event) => set("completed", event.target.value)}>
               <option value="no">Still in progress</option>
-              <option value="yes">Yes — findings are complete</option>
+              <option value="yes">Yes: findings are complete</option>
             </Select>
           </Field>
         </div>
@@ -392,7 +392,7 @@ export function GrievanceActions({ grievance }: { grievance: Grievance }) {
         open={action === "response"}
         onClose={() => setAction(null)}
         title="What did the complainant say?"
-        description="Their answer is recorded as its own act. If they did not accept it, reopen the case rather than closing it — that is what keeps the statistics honest."
+        description="Their answer is recorded as its own act. If they did not accept it, reopen the case rather than closing it. That is what keeps the statistics honest."
         width="sm"
         footer={
           <>
@@ -416,8 +416,8 @@ export function GrievanceActions({ grievance }: { grievance: Grievance }) {
         <div className="space-y-5">
           <Field label="Their answer" required htmlFor="response">
             <Select id="response" value={form.response ?? "accepted"} onChange={(event) => set("response", event.target.value)}>
-              <option value="accepted">Accepted — they are satisfied</option>
-              <option value="rejected">Not accepted — they are not satisfied</option>
+              <option value="accepted">Accepted: they are satisfied</option>
+              <option value="rejected">Not accepted: they are not satisfied</option>
               <option value="no_response">No response after several attempts</option>
               <option value="not_contactable">Could not be contacted</option>
             </Select>
@@ -523,7 +523,7 @@ export function GrievanceActions({ grievance }: { grievance: Grievance }) {
               <option value="">Whoever the escalation rules name</option>
               {(members ?? []).map((member) => (
                 <option key={member.id} value={member.id}>
-                  {member.role ? `${member.name} — ${member.role}` : member.name}
+                  {member.role ? `${member.name} (${member.role})` : member.name}
                 </option>
               ))}
             </Select>
@@ -536,7 +536,7 @@ export function GrievanceActions({ grievance }: { grievance: Grievance }) {
         open={action === "note"}
         onClose={() => setAction(null)}
         title="Add to the case history"
-        description="Site visits, calls, decisions — anything the next person needs to understand what happened."
+        description="Site visits, calls, decisions: anything the next person needs to understand what happened."
         width="md"
         footer={
           <>

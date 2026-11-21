@@ -6,15 +6,15 @@
 const whole = new Intl.NumberFormat("en-GB", { maximumFractionDigits: 0 });
 
 export function formatMoney(value: number | string | null | undefined, currency = "TZS"): string {
-  if (value === null || value === undefined || value === "") return "—";
+  if (value === null || value === undefined || value === "") return "Not recorded";
   const numeric = typeof value === "string" ? Number(value) : value;
-  if (Number.isNaN(numeric)) return "—";
+  if (Number.isNaN(numeric)) return "Not recorded";
   return `${currency} ${whole.format(numeric)}`;
 }
 
 /** "TZS 12.1M" — for KPI tiles on a phone, where the full figure would overflow. */
 export function formatMoneyCompact(value: number | null | undefined, currency = "TZS"): string {
-  if (value === null || value === undefined || Number.isNaN(value)) return "—";
+  if (value === null || value === undefined || Number.isNaN(value)) return "Not recorded";
   const abs = Math.abs(value);
   const sign = value < 0 ? "-" : "";
   const scaled = (divisor: number, suffix: string) => {
@@ -30,9 +30,9 @@ export function formatMoneyCompact(value: number | null | undefined, currency = 
 }
 
 export function formatQuantity(value: number | string | null | undefined, unit?: string): string {
-  if (value === null || value === undefined || value === "") return "—";
+  if (value === null || value === undefined || value === "") return "Not recorded";
   const numeric = typeof value === "string" ? Number(value) : value;
-  if (Number.isNaN(numeric)) return "—";
+  if (Number.isNaN(numeric)) return "Not recorded";
   const formatted = new Intl.NumberFormat("en-GB", { maximumFractionDigits: 4 }).format(numeric);
   return unit ? `${formatted} ${unit}` : formatted;
 }

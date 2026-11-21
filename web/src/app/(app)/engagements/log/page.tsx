@@ -278,7 +278,7 @@ function LogEngagementForm() {
 
   /* Evidence is checked alongside the schema, so every missing thing shows at once. */
   const submit = (event: FormEvent<HTMLFormElement>) => {
-    if (files.length === 0) setFilesError("Attach at least one file — the minutes, the attendance list or a photo.");
+    if (files.length === 0) setFilesError("Attach at least one file: the minutes, the attendance list or a photo.");
     return onSubmit(event);
   };
 
@@ -288,7 +288,7 @@ function LogEngagementForm() {
         backHref="/engagements"
         eyebrow="Stakeholder management"
         title="Log an engagement"
-        description="Record what happened, who was there and what was said. Concerns and commitments captured here become records of their own — nobody types them twice."
+        description="Record what happened, who was there and what was said. Concerns and commitments captured here become records of their own. Nobody types them twice."
       />
 
       <form onSubmit={submit} className="space-y-5 pb-6" noValidate>
@@ -315,10 +315,10 @@ function LogEngagementForm() {
               invalid={Boolean(errors.engagement_plan_id)}
               {...register("engagement_plan_id")}
             >
-              <option value={NOT_PLANNED}>Not planned — this was unscheduled</option>
+              <option value={NOT_PLANNED}>Not planned: this was unscheduled</option>
               {(plans?.data ?? []).map((plan) => (
                 <option key={plan.id} value={plan.id}>
-                  {plan.reference} — {plan.title} ({plan.target_date})
+                  {plan.reference} · {plan.title} ({plan.target_date})
                 </option>
               ))}
             </Select>
@@ -327,13 +327,13 @@ function LogEngagementForm() {
           {selectedPlan ? (
             <p className="rounded-lg bg-brand-50 p-3 text-sm text-brand-800">
               Planned for {selectedPlan.target_date}. If you held it on a very different day, SASA will flag it
-              as late or early — that gap is the point, not a problem to hide.
+              as late or early. That gap is the point, not a problem to hide.
             </p>
           ) : null}
 
           <FieldRow>
             <Field label="Topic" required error={errors.topic?.message} htmlFor="topic">
-              <Input id="topic" placeholder="Corridor disclosure meeting — Buswelu" invalid={Boolean(errors.topic)} {...register("topic")} />
+              <Input id="topic" placeholder="Corridor disclosure meeting, Buswelu" invalid={Boolean(errors.topic)} {...register("topic")} />
             </Field>
             <Field label="Date and time" required error={errors.held_at?.message} htmlFor="held_at">
               <Input id="held_at" type="datetime-local" invalid={Boolean(errors.held_at)} {...register("held_at")} />
@@ -563,7 +563,7 @@ function LogEngagementForm() {
         >
           {concerns.fields.length === 0 ? (
             <p className="rounded-lg bg-surface-sunken px-4 py-5 text-center text-sm text-ink-500">
-              No concerns recorded. If somebody raised something, add it — a concern in the register is what
+              No concerns recorded. If somebody raised something, add it. A concern in the register is what
               stops it becoming a grievance nobody saw coming.
             </p>
           ) : (
@@ -640,7 +640,7 @@ function LogEngagementForm() {
         >
           {commitments.fields.length === 0 ? (
             <p className="rounded-lg bg-surface-sunken px-4 py-5 text-center text-sm text-ink-500">
-              Nothing promised. If the project said it would do something, record it here — a promise made in
+              Nothing promised. If the project said it would do something, record it here. A promise made in
               March has to be traceable in October.
             </p>
           ) : (
@@ -720,7 +720,7 @@ function LogEngagementForm() {
             !sync.online ? (
               <span className="flex items-center gap-1.5 text-warning-700">
                 <Users className="h-4 w-4" aria-hidden />
-                Offline — this will be saved on the device and synced later.
+                Offline. This will be saved on the device and synced later.
               </span>
             ) : (
               "Draft saved on this device as you type."

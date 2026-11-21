@@ -32,7 +32,7 @@ export default function AuthenticatedLayout({ children }: { children: ReactNode 
           <h1 className="text-xl font-semibold text-ink-900">You are not on a project yet</h1>
           <p className="mt-2 text-[0.9375rem] leading-relaxed text-ink-600">
             Your account exists, but nobody has added you to a project. Ask your project administrator to
-            give you a role — SASA scopes everything to a project, so there is nothing to show until then.
+            give you a role. SASA scopes everything to a project, so there is nothing to show until then.
           </p>
         </div>
       </div>

@@ -16,7 +16,7 @@ const SPELLED_OUT: Record<string, string> = {
 
 /** "under_investigation" -> "Under investigation" */
 export function humanise(value: string | null | undefined): string {
-  if (!value) return "—";
+  if (!value) return "Not recorded";
   const known = SPELLED_OUT[value];
   if (known) return known;
   const spaced = value.replace(/_/g, " ").trim();
@@ -32,7 +32,7 @@ export function humanise(value: string | null | undefined): string {
  * configures a language SASA has never seen still gets a real name.
  */
 export function languageName(code: string | null | undefined): string {
-  if (!code) return "—";
+  if (!code) return "Not recorded";
 
   try {
     /* The endonym first: the name in the language's own locale. */
@@ -61,7 +61,7 @@ export function initials(name: string | null | undefined): string {
 const numberFormatter = new Intl.NumberFormat("en-GB");
 
 export function formatNumber(value: number | null | undefined): string {
-  if (value === null || value === undefined || Number.isNaN(value)) return "—";
+  if (value === null || value === undefined || Number.isNaN(value)) return "Not recorded";
   return numberFormatter.format(value);
 }
 
@@ -69,7 +69,7 @@ export function formatMetric(
   value: number | string | null | undefined,
   unit?: string,
 ): string {
-  if (value === null || value === undefined || value === "") return "—";
+  if (value === null || value === undefined || value === "") return "Not recorded";
   const numeric = typeof value === "string" ? Number(value) : value;
   if (Number.isNaN(numeric)) return String(value);
 
@@ -98,9 +98,9 @@ export function metricSuffix(unit?: string): string | null {
 
 /** Dates the way a person writes them, not the way a database stores them. */
 export function formatDate(value: string | Date | null | undefined): string {
-  if (!value) return "—";
+  if (!value) return "Not recorded";
   const date = typeof value === "string" ? new Date(value) : value;
-  if (Number.isNaN(date.getTime())) return "—";
+  if (Number.isNaN(date.getTime())) return "Not recorded";
   return date.toLocaleDateString("en-GB", {
     day: "numeric",
     month: "short",
@@ -109,9 +109,9 @@ export function formatDate(value: string | Date | null | undefined): string {
 }
 
 export function formatDateTime(value: string | Date | null | undefined): string {
-  if (!value) return "—";
+  if (!value) return "Not recorded";
   const date = typeof value === "string" ? new Date(value) : value;
-  if (Number.isNaN(date.getTime())) return "—";
+  if (Number.isNaN(date.getTime())) return "Not recorded";
   return date.toLocaleString("en-GB", {
     day: "numeric",
     month: "short",
@@ -122,9 +122,9 @@ export function formatDateTime(value: string | Date | null | undefined): string 
 }
 
 export function formatRelative(value: string | Date | null | undefined): string {
-  if (!value) return "—";
+  if (!value) return "Not recorded";
   const date = typeof value === "string" ? new Date(value) : value;
-  if (Number.isNaN(date.getTime())) return "—";
+  if (Number.isNaN(date.getTime())) return "Not recorded";
 
   const seconds = Math.round((date.getTime() - Date.now()) / 1000);
   const units: [Intl.RelativeTimeFormatUnit, number][] = [

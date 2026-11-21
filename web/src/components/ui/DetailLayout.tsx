@@ -129,7 +129,7 @@ export function DetailField({
   return (
     <div className={cn(wide && "sm:col-span-2 lg:col-span-3", className)}>
       <dt className="sasa-eyebrow">{label}</dt>
-      <dd className="mt-1 text-[0.9375rem] leading-relaxed text-ink-800">{children ?? "—"}</dd>
+      <dd className="mt-1 text-[0.9375rem] leading-relaxed text-ink-800">{children ?? "Not recorded"}</dd>
     </div>
   );
 }
