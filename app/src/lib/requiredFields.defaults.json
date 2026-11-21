@@ -1,0 +1,73 @@
+{
+    "grievance": [
+        "complainant_name",
+        "complainant_phone",
+        "complainant_email",
+        "complainant_type",
+        "complainant_language",
+        "preferred_contact_method",
+        "stakeholder_id",
+        "title",
+        "desired_resolution",
+        "location_id",
+        "location_text",
+        "demographics.gender"
+    ],
+    "commitment": [
+        "source_date",
+        "due_date",
+        "owner_id",
+        "owner_team",
+        "stakeholder_ids",
+        "location_id",
+        "notes"
+    ],
+    "engagement": [
+        "engagement_plan_id",
+        "method",
+        "project_phase",
+        "facilitator_id",
+        "location_id",
+        "venue",
+        "organised_by",
+        "stakeholder_ids",
+        "attendance_total",
+        "attendance_female",
+        "attendance_male",
+        "attendance_youth",
+        "attendance_elderly",
+        "attendance_disability",
+        "aim",
+        "discussion_points",
+        "outcomes"
+    ],
+    "stakeholder": [
+        "phone",
+        "preferred_language",
+        "preferred_contact_method",
+        "primary_location_id",
+        "physical_address",
+        "influence",
+        "interest",
+        "power",
+        "impact",
+        "concerns_expectations",
+        "notes"
+    ],
+    "eshs_anomaly": [
+        "location_id",
+        "root_cause",
+        "contractor_action",
+        "action_owner_name",
+        "action_owner_email",
+        "action_owner_phone",
+        "target_date"
+    ],
+    "incident": [
+        "company",
+        "location_id",
+        "site_detail",
+        "contractor_manager",
+        "resident_engineer"
+    ]
+}
