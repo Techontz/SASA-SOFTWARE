@@ -7,7 +7,6 @@ import {
   ArrowRight,
   Eye,
   EyeOff,
-  KeyRound,
   Loader2,
   Lock,
   Mail,
@@ -88,7 +87,7 @@ export default function SignInPage() {
   });
 
   return (
-    <div className="relative isolate flex min-h-dvh flex-col overflow-hidden bg-chrome-deep text-white">
+    <div className="relative isolate flex h-dvh min-h-[34rem] flex-col overflow-hidden bg-chrome-deep text-white">
       <BackgroundVideo
         src="/landing/hero-film.mp4"
         srcSmall="/landing/hero-film-sm.mp4"
@@ -99,7 +98,7 @@ export default function SignInPage() {
       <div className="absolute inset-0 -z-10 bg-chrome-deep/50" aria-hidden />
       <div className="absolute inset-0 -z-10 bg-gradient-to-tr from-chrome-deep via-chrome-deep/40 to-chrome-deep/30" aria-hidden />
 
-      <header className="mx-auto flex w-full max-w-[1240px] items-center justify-between gap-4 px-4 py-5 sm:px-6 md:px-10">
+      <header className="mx-auto flex w-full max-w-[1240px] items-center justify-between gap-4 px-4 py-4 sm:px-6 md:px-10">
         <Link href="/" aria-label="SASA Compliance home">
           <Logo onDark />
         </Link>
@@ -117,7 +116,7 @@ export default function SignInPage() {
         </div>
       </header>
 
-      <div className="mx-auto grid w-full max-w-[1240px] flex-1 items-center gap-10 px-4 pb-16 pt-4 sm:px-6 md:px-10 lg:grid-cols-[1fr_27rem] lg:gap-16">
+      <div className="mx-auto grid w-full max-w-[1240px] min-h-0 flex-1 items-center gap-10 px-4 pb-6 sm:px-6 md:px-10 lg:grid-cols-[1fr_26rem] lg:gap-16">
         <div className="hidden max-w-[34rem] lg:block">
           <p className="text-[0.9375rem] font-medium text-chrome-fg">Stakeholder intelligence for infrastructure projects</p>
           <h2 className="mt-4 text-[3.5rem] font-semibold leading-[1] tracking-[-0.05em] text-white">
@@ -136,15 +135,15 @@ export default function SignInPage() {
         </div>
 
         {/* --------------------------- the form: frosted glass ------------- */}
-        <main className="sasa-signin-card mx-auto w-full max-w-[27rem] rounded-[1.75rem] p-7 text-ink-900 sm:p-9">
-          <LogoMark className="h-12 w-12" />
-          <h1 className="mt-6 text-[2rem] font-semibold leading-tight tracking-[-0.04em] text-ink-900">
+        <main className="sasa-signin-card mx-auto w-full max-w-[26rem] rounded-[1.75rem] p-6 text-ink-900 sm:p-8">
+          <LogoMark className="h-10 w-10" />
+          <h1 className="mt-4 text-[1.75rem] font-semibold leading-tight tracking-[-0.04em] text-ink-900">
             Welcome back
           </h1>
-          <p className="mt-2 text-[0.96875rem] text-ink-600">Sign in to pick up where your team left off.</p>
+          <p className="mt-1 text-[0.9375rem] text-ink-600">Sign in to pick up where your team left off.</p>
 
           {!online ? (
-            <div className="mt-6 flex items-start gap-2.5 rounded-xl bg-warning-50 p-3.5 text-sm text-warning-700">
+            <div className="mt-4 flex items-start gap-2.5 rounded-xl bg-warning-50 p-3 text-sm text-warning-700">
               <WifiOff className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
               <p>
                 You are offline. Signing in for the first time on a device needs a connection. After that, SASA opens
@@ -153,7 +152,7 @@ export default function SignInPage() {
             </div>
           ) : null}
 
-          <form onSubmit={onSubmit} className="mt-8 space-y-5" noValidate>
+          <form onSubmit={onSubmit} className="mt-6 space-y-4" noValidate>
             <Field label="Email address" error={errors.email?.message} htmlFor="email">
               <div className="relative">
                 <Mail className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-500" aria-hidden />
@@ -164,7 +163,7 @@ export default function SignInPage() {
                   autoCapitalize="none"
                   spellCheck={false}
                   placeholder="you@organisation.org"
-                  className="h-12 rounded-[0.625rem] pl-10"
+                  className="h-11 rounded-[0.625rem] pl-10"
                   invalid={Boolean(errors.email)}
                   {...register("email")}
                 />
@@ -179,7 +178,7 @@ export default function SignInPage() {
                   type={showPassword ? "text" : "password"}
                   autoComplete="current-password"
                   placeholder="••••••••"
-                  className="h-12 rounded-[0.625rem] pl-10 pr-12"
+                  className="h-11 rounded-[0.625rem] pl-10 pr-12"
                   invalid={Boolean(errors.password)}
                   {...register("password")}
                 />
@@ -208,27 +207,25 @@ export default function SignInPage() {
               size="lg"
               fullWidth
               loading={isSubmitting}
-              className="h-12 rounded-full"
+              className="h-11 rounded-full"
               iconRight={isSubmitting ? undefined : <ArrowRight className="h-4 w-4" />}
             >
               {isSubmitting ? "Signing in" : "Sign in"}
             </Button>
           </form>
 
-          <div className="mt-6 flex items-start gap-3 rounded-2xl bg-ink-100/70 p-4 text-sm text-ink-600">
-            <KeyRound className="mt-0.5 h-4 w-4 shrink-0 text-ink-500" aria-hidden />
-            <p>Forgotten your password, or need an account? Your project administrator can set one up for you.</p>
+          <div className="mt-5 space-y-1.5 text-center text-sm text-ink-600">
+            <p>Forgotten your password? Your project administrator can reset it.</p>
+            <p>
+              New to SASA?{" "}
+              <Link href="/pricing" className="font-semibold text-brand-700 hover:underline">
+                See the plans
+              </Link>
+            </p>
           </div>
 
-          <p className="mt-6 text-center text-sm text-ink-600">
-            New to SASA?{" "}
-            <Link href="/pricing" className="font-semibold text-brand-700 hover:underline">
-              See the plans and subscribe
-            </Link>
-          </p>
-
           {loading ? (
-            <p className="mt-6 flex items-center justify-center gap-2 text-sm text-ink-500">
+            <p className="mt-4 flex items-center justify-center gap-2 text-sm text-ink-500">
               <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
               Checking your session…
             </p>
@@ -236,14 +233,6 @@ export default function SignInPage() {
 
           {process.env.NEXT_PUBLIC_SHOW_DEMO_LOGINS === "true" ? <DemoAccounts /> : null}
 
-          <p className="mt-7 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 border-t border-hairline pt-5 text-xs text-ink-500">
-            <span className="inline-flex items-center gap-1.5">
-              <ShieldCheck className="h-3.5 w-3.5" aria-hidden /> Confidential by design
-            </span>
-            <span className="inline-flex items-center gap-1.5">
-              <WifiOff className="h-3.5 w-3.5" aria-hidden /> Works offline after first sign-in
-            </span>
-          </p>
         </main>
       </div>
     </div>
