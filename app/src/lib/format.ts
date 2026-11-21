@@ -35,7 +35,7 @@ export function humanise(value: string | null | undefined): string {
 
 /** The API's labels use a long dash; the app's copy does not. */
 export function plain(label: string | null | undefined): string {
-  return (label ?? "").replace(/\s*[—–]\s*/g, ", ");
+  return (label ?? "").replace(/\s*[\u2014\u2013]\s*/g, ", ");
 }
 
 const DAY = 86_400_000;
