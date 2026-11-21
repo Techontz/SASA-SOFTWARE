@@ -32,7 +32,7 @@ class AiController extends Controller
             'min_confidence' => config('sasa.ai.min_confidence_to_suggest'),
             'never_owns' => config('sasa.ai.never_owns'),
             'note' => 'AI proposes a category, subcategory, severity and summary. A person confirms every one of them, '
-                .'and the case shows "AI suggested — confirm" until they do.',
+                .'and the case shows "AI suggested: confirm" until they do.',
         ]);
     }
 

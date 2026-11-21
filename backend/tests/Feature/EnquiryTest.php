@@ -190,7 +190,7 @@ class EnquiryTest extends TestCase
 
         $this->assertSame(
             ['id', 'public_id', 'reference', 'type', 'full_name', 'email', 'organization', 'sector', 'phone',
-                'modules', 'details', 'message', 'status', 'admin_notes', 'handled_by', 'handled_at', 'created_at'],
+                'modules', 'details', 'message', 'status', 'admin_notes', 'handled_by', 'handled_at', 'created_at', 'demo'],
             array_keys($list->json('data.0')),
         );
         $this->assertArrayNotHasKey('ip_hash', $list->json('data.0'));

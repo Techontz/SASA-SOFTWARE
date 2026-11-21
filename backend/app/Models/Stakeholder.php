@@ -173,6 +173,6 @@ class Stakeholder extends Model
     public function displayLocation(): string
     {
         return collect([$this->village, $this->ward, $this->district, $this->region])
-            ->filter()->implode(', ') ?: ($this->primaryLocation?->path ?? '—');
+            ->filter()->implode(', ') ?: ($this->primaryLocation?->path ?? 'Not recorded');
     }
 }

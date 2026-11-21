@@ -2,6 +2,7 @@
 
 namespace App\Domain\Billing;
 
+use App\Domain\Demo\DemoService;
 use App\Models\Organisation;
 use App\Models\OrganisationAgreement;
 use App\Models\Project;
@@ -22,9 +23,13 @@ use Illuminate\Support\Str;
  *
  * Every change is audited by the Auditable trait (agreement.created,
  * agreement.updated, agreement.status_changed).
+ *
+ * Creating an agreement for a demo organisation converts its demo.
  */
 final class AgreementService
 {
+    public function __construct(private readonly DemoService $demos) {}
+
     /** @param array<string,mixed> $data */
     public function create(array $data, User $admin): OrganisationAgreement
     {
@@ -54,6 +59,10 @@ final class AgreementService
             $agreement->auto_pay = false;
             $agreement->created_by = $admin->id;
             $agreement->save();
+
+            // A demo workspace whose company signs becomes theirs: the demo
+            // converts and its project is no longer shut when the period ends.
+            $this->demos->convertOrganisation($organisation->id);
 
             return $agreement->fresh(['organisation:id,name']);
         });

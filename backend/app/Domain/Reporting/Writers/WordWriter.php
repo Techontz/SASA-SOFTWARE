@@ -36,7 +36,7 @@ final class WordWriter
             'marginRight' => Converter::cmToTwip(2),
         ]);
 
-        $section->addText('SASA · Stakeholder Intelligence & Voice', ['size' => 9, 'bold' => true, 'color' => self::MUTED]);
+        $section->addText('SASA Compliance', ['size' => 9, 'bold' => true, 'color' => self::MUTED]);
         $section->addTitle($document->title, 1);
         $section->addText($document->projectName.' · '.$document->organisationName, ['size' => 11, 'color' => self::INK]);
         $section->addText('Reporting period: '.$document->periodLabel, ['size' => 10, 'color' => self::MUTED]);

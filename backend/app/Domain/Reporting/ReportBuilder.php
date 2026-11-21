@@ -127,18 +127,18 @@ final class ReportBuilder
                 $g->received_at?->toDateString(),
                 str_replace('_', ' ', $g->channel),
                 $g->category?->name ?? 'Not classified',
-                $g->subcategory?->name ?? '—',
+                $g->subcategory?->name ?? 'Not recorded',
                 $g->severity ? 'Level '.$g->severity : 'Not assessed',
-                $g->location?->path ?? $g->location_text ?? '—',
+                $g->location?->path ?? $g->location_text ?? 'Not recorded',
                 str_replace('_', ' ', $g->status),
                 $g->assignee?->name ?? 'Unassigned',
                 $g->acknowledged_at?->toDateString() ?? ($g->acknowledgement_possible ? 'Not yet' : 'Not possible'),
-                $g->resolved_at?->toDateString() ?? '—',
+                $g->resolved_at?->toDateString() ?? 'Not recorded',
                 $g->daysOpen(),
             ];
 
             if (! $stripIdentity) {
-                $row[] = $g->isAnonymous() ? 'Anonymous' : ($g->complainant_name ?? '—');
+                $row[] = $g->isAnonymous() ? 'Anonymous' : ($g->complainant_name ?? 'Not recorded');
             }
 
             return $row;
@@ -163,7 +163,7 @@ final class ReportBuilder
             'On-time performance by clock',
             ['Clock', 'Met on time', 'Total finished', 'Compliance %'],
             collect($data['by_clock'])->map(fn ($row) => [
-                ucfirst($row['clock']), $row['on_time'], $row['total'], $row['percent'] ?? '—',
+                ucfirst($row['clock']), $row['on_time'], $row['total'], $row['percent'] ?? 'Not recorded',
             ])->all(),
         ));
 
@@ -171,7 +171,7 @@ final class ReportBuilder
             'By category',
             ['Category', 'On time', 'Breached', 'Total', 'Compliance %'],
             collect($data['by_category'])->map(fn ($row) => [
-                $row['bucket'], $row['on_time'], $row['breached'], $row['total'], $row['compliance_percent'] ?? '—',
+                $row['bucket'], $row['on_time'], $row['breached'], $row['total'], $row['compliance_percent'] ?? 'Not recorded',
             ])->all(),
         ));
 
@@ -179,7 +179,7 @@ final class ReportBuilder
             'By severity',
             ['Severity', 'On time', 'Breached', 'Total', 'Compliance %'],
             collect($data['by_severity'])->map(fn ($row) => [
-                $row['bucket'], $row['on_time'], $row['breached'], $row['total'], $row['compliance_percent'] ?? '—',
+                $row['bucket'], $row['on_time'], $row['breached'], $row['total'], $row['compliance_percent'] ?? 'Not recorded',
             ])->all(),
         ));
 
@@ -187,7 +187,7 @@ final class ReportBuilder
             'Paused clocks',
             ['Case', 'Clock', 'Reason', 'Paused since'],
             collect($data['paused_detail'])->map(fn ($row) => [
-                $row->subject_id, $row->clock, $row->pause_reason ?? '—', $row->paused_at,
+                $row->subject_id, $row->clock, $row->pause_reason ?? 'Not recorded', $row->paused_at,
             ])->all(),
             'Pauses are reported so the mechanism cannot be used to make breaches disappear.'
         ));
@@ -208,7 +208,7 @@ final class ReportBuilder
                 $s->name,
                 ucfirst(str_replace('_', ' ', $s->type)),
                 $s->displayLocation(),
-                $s->phone ?? '—',
+                $s->phone ?? 'Not recorded',
                 ucfirst((string) $s->influence),
                 ucfirst((string) $s->interest),
                 ucfirst((string) $s->power),
@@ -216,11 +216,11 @@ final class ReportBuilder
                 $s->priority_score,
                 ucfirst((string) $s->calculated_priority),
                 ucfirst((string) $s->priority).($s->priority_overridden ? ' (overridden)' : ''),
-                $s->communication_frequency ?? '—',
+                $s->communication_frequency ?? 'Not recorded',
                 $s->is_vulnerable ? 'Yes' : 'No',
                 ucfirst(str_replace('_', ' ', (string) $s->consent_status)),
-                $s->owner?->name ?? '—',
-                $s->review_date?->toDateString() ?? '—',
+                $s->owner?->name ?? 'Not recorded',
+                $s->review_date?->toDateString() ?? 'Not recorded',
             ])->all();
 
         $document->add(ReportSection::table(
@@ -244,14 +244,14 @@ final class ReportBuilder
             ->map(fn (Commitment $c) => [
                 $c->reference,
                 mb_substr($c->commitment_text, 0, 300),
-                $c->engagement?->reference ?? '—',
-                $c->source_date?->toDateString() ?? '—',
-                $c->stakeholders->pluck('name')->implode(', ') ?: '—',
+                $c->engagement?->reference ?? 'Not recorded',
+                $c->source_date?->toDateString() ?? 'Not recorded',
+                $c->stakeholders->pluck('name')->implode(', ') ?: 'None',
                 $c->owner?->name ?? 'Unassigned',
-                $c->due_date?->toDateString() ?? '—',
+                $c->due_date?->toDateString() ?? 'Not recorded',
                 ucfirst($c->risk_level),
                 ucfirst(str_replace('_', ' ', $c->status)),
-                $c->completed_on?->toDateString() ?? '—',
+                $c->completed_on?->toDateString() ?? 'Not recorded',
                 ucfirst($c->verification_status),
             ])->all();
 
@@ -281,12 +281,12 @@ final class ReportBuilder
                 $e->reference,
                 $e->held_at?->toDateString(),
                 $e->topic,
-                $e->method ?? '—',
-                $e->location?->path ?? $e->location_text ?? '—',
+                $e->method ?? 'Not recorded',
+                $e->location?->path ?? $e->location_text ?? 'Not recorded',
                 $e->plan?->reference ?? 'Unplanned',
-                $e->plan?->target_date?->toDateString() ?? '—',
+                $e->plan?->target_date?->toDateString() ?? 'Not recorded',
                 str_replace('_', ' ', $e->planned_vs_actual),
-                $e->variance_days ?? '—',
+                $e->variance_days ?? 'Not recorded',
                 $e->attendance_total,
                 $e->attendance_female,
                 $e->attendance_vulnerable,

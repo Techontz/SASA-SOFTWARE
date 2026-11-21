@@ -186,7 +186,7 @@ final class VoiceAgentService
         $this->audit->record(
             action: 'voice.consent_not_granted',
             entity: $call,
-            summary: 'Consent Not Granted — routed to the human call-back queue. No grievance was created.',
+            summary: 'Consent not granted: routed to the human call-back queue. No grievance was created.',
         );
 
         $this->notifications->dispatch(

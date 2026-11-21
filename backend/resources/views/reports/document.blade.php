@@ -79,7 +79,7 @@
                             <div class="value">
                                 @php $value = $kpi['value'] ?? null; @endphp
                                 @if ($value === null)
-                                    —
+                                    No data
                                 @elseif (($kpi['unit'] ?? '') === 'percent')
                                     {{ $value }}%
                                 @elseif (($kpi['unit'] ?? '') === 'days')

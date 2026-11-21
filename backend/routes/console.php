@@ -1,6 +1,7 @@
 <?php
 
 use App\Console\Commands\BackupDatabase;
+use App\Console\Commands\ExpireDemos;
 use App\Console\Commands\MarkMissedEngagements;
 use App\Console\Commands\NotifyStakeholderReviews;
 use App\Console\Commands\RunBillingCycle;
@@ -42,6 +43,13 @@ Schedule::command(NotifyStakeholderReviews::class)
 // the payer with their PIN), and mark unpaid ones overdue. Idempotent.
 Schedule::command(RunBillingCycle::class)
     ->dailyAt('06:00')
+    ->withoutOverlapping()
+    ->onOneServer();
+
+// Demo workspaces past their end date. Access already stops at ends_at;
+// this keeps the recorded status honest. Idempotent.
+Schedule::command(ExpireDemos::class)
+    ->dailyAt('00:15')
     ->withoutOverlapping()
     ->onOneServer();
 

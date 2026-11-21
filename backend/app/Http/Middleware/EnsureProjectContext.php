@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Domain\Demo\DemoAccess;
 use App\Domain\Tenancy\TenantContext;
 use App\Models\Project;
 use App\Models\ProjectMembership;
@@ -21,7 +22,10 @@ use Illuminate\Http\Request;
  */
 class EnsureProjectContext
 {
-    public function __construct(private readonly TenantContext $context) {}
+    public function __construct(
+        private readonly TenantContext $context,
+        private readonly DemoAccess $demos,
+    ) {}
 
     public function handle(Request $request, Closure $next, string $mode = 'required')
     {
@@ -86,6 +90,12 @@ class EnsureProjectContext
 
         if (! $project || $project->status === 'archived') {
             return ApiResponse::error('not_found', 'That project is no longer available.', [], 404);
+        }
+
+        // A demo workspace past its end (or ended early) is shut to everyone
+        // but the SASA team, until it is extended or the company signs.
+        if (! $user->is_system_admin && $this->demos->blockingFor($project->id)) {
+            return ApiResponse::error('demo_ended', DemoAccess::ENDED_MESSAGE, [], 403);
         }
 
         $this->context->setProject($project, $membership);

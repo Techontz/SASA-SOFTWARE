@@ -45,7 +45,7 @@ final class ConfigurationKeys
             self::STAKEHOLDER_TYPES => ['label' => 'Stakeholder types', 'group' => 'Register', 'description' => 'The list of stakeholder types available when adding a record.'],
             self::VULNERABILITY_CATEGORIES => ['label' => 'Vulnerability categories', 'group' => 'Register', 'description' => 'Categories used to flag vulnerable stakeholders.'],
             self::PRIORITY => ['label' => 'Priority weighting', 'group' => 'Register', 'description' => 'Weights and thresholds for the stakeholder priority score. A weight of 0 disables a dimension.'],
-            self::ENGAGEMENT_METHODS => ['label' => 'Engagement methods', 'group' => 'Engagement', 'description' => 'How engagements are carried out — meeting, radio, door-to-door and so on.'],
+            self::ENGAGEMENT_METHODS => ['label' => 'Engagement methods', 'group' => 'Engagement', 'description' => 'How engagements are carried out: meeting, radio, door-to-door and so on.'],
             self::PROJECT_PHASES => ['label' => 'Project phases', 'group' => 'Engagement', 'description' => 'The phases an engagement or plan can belong to.'],
             self::COMMITMENT_REMINDERS => ['label' => 'Commitment reminders', 'group' => 'Engagement', 'description' => 'When commitment owners are reminded, relative to the due date.'],
             self::SEVERITY_LEVELS => ['label' => 'Severity levels', 'group' => 'Grievances', 'description' => 'The 1–5 severity scale and what each level means on this project.'],
@@ -54,7 +54,7 @@ final class ConfigurationKeys
             self::DISAGGREGATION_DIMENSIONS => ['label' => 'Disaggregation dimensions', 'group' => 'Reporting', 'description' => 'Which optional demographic dimensions this project collects. Sensitive dimensions are never mandatory.'],
             self::CUSTOM_FIELDS => ['label' => 'Custom fields', 'group' => 'Register', 'description' => 'Extra project-specific fields on stakeholders, engagements, grievances and commitments.'],
             self::VOICE => ['label' => 'AI voice agent', 'group' => 'AI', 'description' => 'Call length cap, behaviour at the cap, consent wording and languages.'],
-            self::REQUIRED_FIELDS => ['label' => 'Mandatory fields', 'group' => 'Forms', 'description' => 'Which fields must be filled in before each form saves — grievance, commitment, engagement, stakeholder, ESHS anomaly and incident.'],
+            self::REQUIRED_FIELDS => ['label' => 'Mandatory fields', 'group' => 'Forms', 'description' => 'Which fields must be filled in before each form saves: grievance, commitment, engagement, stakeholder, ESHS anomaly and incident.'],
             self::REPORTING => ['label' => 'Reporting calendar', 'group' => 'Reporting', 'description' => 'Fiscal year start and default reporting periods.'],
         ];
     }

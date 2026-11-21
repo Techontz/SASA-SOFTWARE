@@ -72,7 +72,7 @@ final class ApiExceptionRenderer
             default => [
                 500,
                 'server_error',
-                'We could not complete that action. Nothing was saved on the server — please try again in a moment.',
+                'We could not complete that action. Nothing was saved on the server. Please try again in a moment.',
                 [],
             ],
         };

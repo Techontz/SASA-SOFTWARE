@@ -176,7 +176,7 @@ final class PapService
         ], fn ($value) => $value !== null));
 
         $address = collect([$pap->physical_address, $pap->kitongoji ? 'Kitongoji '.$pap->kitongoji : null])
-            ->filter()->implode(' — ');
+            ->filter()->implode(' · ');
 
         return [
             'name' => $pap->full_name,

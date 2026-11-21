@@ -138,6 +138,28 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Demo workspaces (platform level)
+    |--------------------------------------------------------------------------
+    |
+    | A company that asked for a demo gets its own organisation and project,
+    | filled with sample data, for `default_days` (an administrator may choose
+    | 1 to `max_days`). The invitation's "set your password" link lasts
+    | `invite_hours`. `invite_email` e-mails the link; empty means on unless
+    | MAIL_MAILER is log or array (the administrator can always copy the link).
+    |
+    */
+    'demos' => [
+        'default_days' => (int) env('SASA_DEMO_DAYS', 14),
+        'max_days' => 60,
+        'invite_hours' => (int) env('SASA_DEMO_INVITE_HOURS', 72),
+        'invite_email' => ! in_array(env('SASA_DEMO_INVITE_EMAIL'), [null, ''], true)
+            ? filter_var(env('SASA_DEMO_INVITE_EMAIL'), FILTER_VALIDATE_BOOL)
+            : ! in_array(env('MAIL_MAILER', 'log'), ['log', 'array'], true),
+        'project_code_prefix' => 'DEMO',
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Public contact details
     |--------------------------------------------------------------------------
     |
@@ -322,11 +344,11 @@ return [
 
     'grievances' => [
         'severity_levels' => [
-            1 => ['label' => 'Level 1 — Minor', 'description' => 'Localised, easily resolved, no lasting effect.'],
-            2 => ['label' => 'Level 2 — Moderate', 'description' => 'Affects a household or small group; resolvable at project level.'],
-            3 => ['label' => 'Level 3 — Significant', 'description' => 'Affects a community or recurs; requires management attention.'],
-            4 => ['label' => 'Level 4 — Major', 'description' => 'Serious harm, legal exposure or widespread impact. Management alert.'],
-            5 => ['label' => 'Level 5 — Critical', 'description' => 'Life-threatening, rights violation or reputational crisis. Executive alert.'],
+            1 => ['label' => 'Level 1: Minor', 'description' => 'Localised, easily resolved, no lasting effect.'],
+            2 => ['label' => 'Level 2: Moderate', 'description' => 'Affects a household or small group; resolvable at project level.'],
+            3 => ['label' => 'Level 3: Significant', 'description' => 'Affects a community or recurs; requires management attention.'],
+            4 => ['label' => 'Level 4: Major', 'description' => 'Serious harm, legal exposure or widespread impact. Management alert.'],
+            5 => ['label' => 'Level 5: Critical', 'description' => 'Life-threatening, rights violation or reputational crisis. Executive alert.'],
         ],
         'management_alert_from_severity' => 4,
         'anonymous_allowed' => true,
@@ -484,7 +506,7 @@ return [
 
         // Part E — crop and tree inventory
         'productive_statuses' => [
-            'mature_productive' => 'Mature — productive', 'immature' => 'Immature',
+            'mature_productive' => 'Mature and productive', 'immature' => 'Immature',
             'declining' => 'Declining', 'not_productive' => 'Not productive',
         ],
         'crop_rate_bases' => ['per_plant' => 'Per plant / tree', 'per_hectare' => 'Per hectare'],
@@ -526,7 +548,7 @@ return [
             'not_started' => 'Not started', 'active' => 'Active', 'completed' => 'Completed', 'needs_follow_up' => 'Needs follow up',
         ],
         'income_restored_options' => [
-            'yes' => 'Yes — restored or improved', 'partially' => 'Partially', 'no' => 'Not yet',
+            'yes' => 'Yes, restored or improved', 'partially' => 'Partially', 'no' => 'Not yet',
         ],
 
         // Part K — grievances live in the grievance module; these are the

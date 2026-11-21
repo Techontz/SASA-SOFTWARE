@@ -18,7 +18,7 @@ final class EshsDashboard
     /** One definition per figure — shown beside the number and nowhere else invented. */
     public const DEFINITIONS = [
         'total' => 'Every anomaly raised that matches the current filters, whatever its status. Archived anomalies are excluded.',
-        'open' => 'Anomalies whose status is Open or In progress — not yet closed by the supervision team.',
+        'open' => 'Anomalies whose status is Open or In progress, not yet closed by the supervision team.',
         'overdue' => 'Anomalies that are not closed and whose target date is before today. Worked out on the day; never stored.',
         'awaiting_verification' => 'Anomalies where the contractor has submitted closure evidence and the supervision team has not yet closed or returned it.',
         'closure_rate' => 'Closed anomalies divided by all anomalies raised, as a percentage.',

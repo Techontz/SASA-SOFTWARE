@@ -58,4 +58,10 @@ class Enquiry extends Model
     {
         return $this->belongsTo(User::class, 'handled_by');
     }
+
+    /** The most recent demo workspace given in answer to this enquiry. */
+    public function latestDemo()
+    {
+        return $this->hasOne(Demo::class)->latestOfMany();
+    }
 }

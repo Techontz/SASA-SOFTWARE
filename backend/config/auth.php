@@ -99,6 +99,15 @@ return [
             'expire' => 60,
             'throttle' => 60,
         ],
+
+        // "Set your password" links in invitations (demo workspaces). Their own
+        // table, so their longer life never applies to a forgot-password link.
+        'invites' => [
+            'provider' => 'users',
+            'table' => 'password_invite_tokens',
+            'expire' => 60 * (int) env('SASA_DEMO_INVITE_HOURS', 72),
+            'throttle' => 0,
+        ],
     ],
 
     /*

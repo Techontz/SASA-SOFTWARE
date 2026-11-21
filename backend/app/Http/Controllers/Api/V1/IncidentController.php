@@ -142,7 +142,7 @@ class IncidentController extends Controller
                     $i->reference,
                     $i->occurred_at?->format('Y-m-d H:i'),
                     $i->company,
-                    collect([$i->location?->path, $i->site_detail])->filter()->implode(' — '),
+                    collect([$i->location?->path, $i->site_detail])->filter()->implode(' · '),
                     $options->categoryLabel($i->category),
                     $options->typeLabel($i->incident_type),
                     $options->levelLabel($i->actual_consequence),

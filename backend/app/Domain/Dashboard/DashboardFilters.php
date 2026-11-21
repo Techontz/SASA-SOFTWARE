@@ -82,7 +82,7 @@ final class DashboardFilters
 
     public function label(): string
     {
-        return $this->from->format('j M Y').' — '.$this->to->format('j M Y');
+        return $this->from->format('j M Y').' to '.$this->to->format('j M Y');
     }
 
     public function days(): int

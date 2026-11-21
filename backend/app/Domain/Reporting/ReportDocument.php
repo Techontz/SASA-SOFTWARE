@@ -59,6 +59,6 @@ final class ReportDocument
             $parts[] = ucfirst(str_replace('_', ' ', $key)).': '.(is_array($value) ? implode(', ', $value) : $value);
         }
 
-        return $parts === [] ? 'No filters applied — all records in the period.' : implode(' · ', $parts);
+        return $parts === [] ? 'No filters applied: all records in the period.' : implode(' · ', $parts);
     }
 }

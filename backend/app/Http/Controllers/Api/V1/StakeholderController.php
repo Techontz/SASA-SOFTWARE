@@ -236,7 +236,7 @@ class StakeholderController extends Controller
             'formula' => 'score = (influence x w1) + (interest x w2) + (power x w3) + (impact x w4)',
             'note' => 'High counts 3, Medium 2, Low 1. A weight of 0 removes that dimension from the score. '
                 .'The source stakeholder matrix was internally inconsistent, so these numbers are configuration, '
-                .'not code — set them to whatever the project has agreed.',
+                .'not code: set them to whatever the project has agreed.',
         ]);
     }
 

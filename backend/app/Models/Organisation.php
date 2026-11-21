@@ -21,7 +21,7 @@ class Organisation extends Model
 
     protected function casts(): array
     {
-        return ['archived_at' => 'datetime'];
+        return ['archived_at' => 'datetime', 'is_demo' => 'boolean'];
     }
 
     public function projects()
@@ -42,5 +42,11 @@ class Organisation extends Model
     public function configurations()
     {
         return $this->hasMany(Configuration::class);
+    }
+
+    /** A demo workspace's organisation carries is_demo until it converts. */
+    public function demos()
+    {
+        return $this->hasMany(Demo::class);
     }
 }

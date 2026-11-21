@@ -88,7 +88,7 @@ final class NullAiProvider implements AiProvider
         if (! $bestKey) {
             return new AiClassification(
                 confidence: 0.0,
-                rationale: 'No recognisable keywords — a person should classify this case.',
+                rationale: 'No recognisable keywords, so a person should classify this case.',
                 raw: ['provider' => 'keyword'],
             );
         }

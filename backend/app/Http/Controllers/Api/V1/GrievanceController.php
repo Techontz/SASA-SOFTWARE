@@ -259,7 +259,7 @@ class GrievanceController extends Controller
             'corrective_action' => ['nullable', 'string', 'max:50000'],
         ], [
             'resolution_summary.required' => 'Describe how the case was resolved.',
-            'resolution_summary.min' => 'A resolution needs more than a few words — the complainant and any auditor will read this.',
+            'resolution_summary.min' => 'A resolution needs more than a few words. The complainant and any auditor will read this.',
         ]);
 
         $updated = $this->grievances->resolve($grievance, $data['resolution_summary'], $data['corrective_action'] ?? null);
@@ -384,7 +384,7 @@ class GrievanceController extends Controller
             'sent_at' => $communication->sent_at?->toIso8601String(),
             'note' => $grievance->acknowledgement_possible
                 ? 'Message logged against the case.'
-                : 'Recorded, but this case has no reachable contact — the message was not sent.',
+                : 'Recorded, but this case has no reachable contact, so the message was not sent.',
         ], [], 201);
     }
 

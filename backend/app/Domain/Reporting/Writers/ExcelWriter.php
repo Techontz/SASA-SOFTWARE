@@ -48,7 +48,7 @@ final class ExcelWriter
     private function writeCover($sheet, ReportDocument $document): void
     {
         $rows = [
-            ['SASA — Stakeholder Intelligence & Voice', ''],
+            ['SASA Compliance', ''],
             ['Report', $document->title],
             ['Organisation', $document->organisationName],
             ['Project', $document->projectName],

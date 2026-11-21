@@ -91,7 +91,7 @@ final class PapDashboard
                 $kpi('vulnerable_paps', 'Vulnerable PAPs', 'Active PAPs with any vulnerability category other than "None".', 'count', $paps()->vulnerable()->count(), [], '/paps?vulnerable=1'),
                 $kpi('compensation_budget', 'Compensation budget', 'Sum of each active PAP\'s most recent approved valuation (total compensation value). Draft and unapproved valuations are excluded.', 'currency', round($budget, 2)),
                 $kpi('compensation_paid', 'Compensation paid', 'Sum of the amount paid on every active payment record.', 'currency', round($paid, 2)),
-                $kpi('outstanding_payments', 'Outstanding payments', 'Sum of approved minus paid on every active payment record — money approved for payment but not yet paid.', 'currency', round($outstanding, 2), [
+                $kpi('outstanding_payments', 'Outstanding payments', 'Sum of approved minus paid on every active payment record: money approved for payment but not yet paid.', 'currency', round($outstanding, 2), [
                     'payments_not_fully_paid' => $payments()->where('outstanding_amount', '>', 0)->count(),
                 ]),
                 $kpi('grievances_total', 'Grievances', 'Grievances in the grievance module linked to an active PAP\'s stakeholder record. Restricted categories you cannot see are not counted.', 'count', $grievances()->count()),

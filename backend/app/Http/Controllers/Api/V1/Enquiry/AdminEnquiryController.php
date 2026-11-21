@@ -26,7 +26,7 @@ class AdminEnquiryController extends Controller
 
         $query = Enquiry::query()
             ->whereNull('archived_at')
-            ->with('handler:id,name')
+            ->with(['handler:id,name', 'latestDemo'])
             ->when($request->filled('type'), fn ($q) => $q->where('type', $request->input('type')))
             ->when($request->filled('status'), fn ($q) => $q->where('status', $request->input('status')))
             ->orderByDesc('created_at')

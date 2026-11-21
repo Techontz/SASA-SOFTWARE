@@ -387,7 +387,7 @@ final class GrievanceService
         }
 
         if ($grievance->isOpen() && $grievance->status !== 'awaiting_confirmation') {
-            throw new DomainRuleException('This case is still open — there is nothing to reopen.', 'not_closed');
+            throw new DomainRuleException('This case is still open, so there is nothing to reopen.', 'not_closed');
         }
 
         return DB::transaction(function () use ($grievance, $reason) {

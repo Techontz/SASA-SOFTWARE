@@ -77,7 +77,7 @@ final class NotificationEvents
                 'recipient_roles' => [],
                 'channels' => ['in_app', 'email'],
                 'template_subject' => 'You have been assigned {reference}',
-                'template_body' => '{reference} — {title} — is now yours. Acknowledgement is due by {acknowledgement_due}.',
+                'template_body' => '{reference} ({title}) is now yours. Acknowledgement is due by {acknowledgement_due}.',
             ],
             [
                 'event_key' => self::GRIEVANCE_REASSIGNED,
@@ -141,7 +141,7 @@ final class NotificationEvents
                 'recipient_roles' => [],
                 'channels' => ['in_app', 'email'],
                 'template_subject' => 'Commitment {reference} is due {due_date}',
-                'template_body' => '{commitment_text} — due {due_date}.',
+                'template_body' => '{commitment_text}, due {due_date}.',
             ],
             [
                 'event_key' => self::COMMITMENT_OVERDUE,

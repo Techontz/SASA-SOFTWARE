@@ -61,7 +61,7 @@ class EshsAnomalyRequest extends FormRequest
         return app(RequiredFields::class)->messages($this->project(), 'eshs_anomaly') + [
             'contractor.in' => 'Choose a contractor from this project\'s list.',
             'subcontractor.in' => 'Choose a subcontractor from this project\'s list.',
-            'description.required' => 'Describe what was found — what, where and why it matters.',
+            'description.required' => 'Describe what was found: what, where and why it matters.',
             'description.min' => 'Describe what was found in a little more detail.',
             'raised_on.before_or_equal' => 'The date raised cannot be in the future.',
         ];

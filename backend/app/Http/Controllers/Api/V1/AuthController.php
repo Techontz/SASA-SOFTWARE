@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Domain\Audit\AuditLogger;
+use App\Domain\Demo\DemoAccess;
 use App\Domain\Tenancy\TenantContext;
 use App\Http\Controllers\Controller;
 use App\Models\User;
@@ -184,21 +185,30 @@ class AuthController extends Controller
             'password' => ['required', 'confirmed', PasswordRule::defaults()],
         ]);
 
-        $status = Password::reset(
-            $request->only('email', 'password', 'password_confirmation', 'token'),
-            function (User $user, string $password) {
-                $user->forceFill([
-                    'password' => $password,
-                    'remember_token' => Str::random(60),
-                    'failed_login_attempts' => 0,
-                    'locked_until' => null,
-                ])->save();
+        $credentials = $request->only('email', 'password', 'password_confirmation', 'token');
 
-                $user->tokens()->delete();
+        $reset = function (User $user, string $password) {
+            $user->forceFill([
+                'password' => $password,
+                'remember_token' => Str::random(60),
+                'failed_login_attempts' => 0,
+                'locked_until' => null,
+                // Setting a password is how an invited person accepts the invitation.
+                'status' => $user->status === 'invited' ? 'active' : $user->status,
+            ])->save();
 
-                $this->audit->record(action: 'auth.password_reset', entity: $user, summary: 'Password reset');
-            }
-        );
+            $user->tokens()->delete();
+
+            $this->audit->record(action: 'auth.password_reset', entity: $user, summary: 'Password reset');
+        };
+
+        // The same page serves "forgot password" links and invitation links;
+        // invitations live in their own broker so they can last longer.
+        $status = Password::reset($credentials, $reset);
+
+        if ($status === Password::InvalidToken) {
+            $status = Password::broker('invites')->reset($credentials, $reset);
+        }
 
         return $status === Password::PasswordReset
             ? ApiResponse::message('Your password has been reset. You can sign in now.')
@@ -208,6 +218,7 @@ class AuthController extends Controller
     private function userPayload(User $user): array
     {
         $memberships = $user->activeMemberships()->get();
+        $demos = app(DemoAccess::class)->forProjects($memberships->pluck('project_id')->all());
 
         return [
             'id' => $user->id,
@@ -239,6 +250,8 @@ class AuthController extends Controller
                 ],
                 'permissions' => $membership->role->permissionKeys(),
                 'handling_groups' => $membership->handling_groups ?? [],
+                // A demo workspace: when it ends, so the app can say so. Null otherwise.
+                'demo' => $demos->has($membership->project_id) ? DemoAccess::summary($demos[$membership->project_id]) : null,
             ])->values(),
         ];
     }

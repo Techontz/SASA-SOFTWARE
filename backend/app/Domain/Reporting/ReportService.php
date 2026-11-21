@@ -48,7 +48,7 @@ final class ReportService
             'organisation_id' => $project->organisation_id,
             'project_id' => $project->id,
             'report_definition_id' => $definition?->id,
-            'name' => $name ?? (ReportBuilder::TEMPLATES[$template].' — '.$filters->label()),
+            'name' => $name ?? (ReportBuilder::TEMPLATES[$template].', '.$filters->label()),
             'template' => $template,
             'format' => $format,
             'filters' => $filters->toArray(),

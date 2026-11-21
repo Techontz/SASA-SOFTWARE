@@ -32,6 +32,12 @@ class EnquiryResource extends JsonResource
             'handled_by' => $this->handler ? ['id' => $this->handler->id, 'name' => $this->handler->name] : null,
             'handled_at' => $this->handled_at?->toIso8601String(),
             'created_at' => $this->created_at?->toIso8601String(),
+            // The latest demo workspace given in answer to this enquiry, if any.
+            'demo' => $this->latestDemo ? [
+                'public_id' => $this->latestDemo->public_id,
+                'status' => $this->latestDemo->effectiveStatus(),
+                'ends_at' => $this->latestDemo->ends_at?->toIso8601String(),
+            ] : null,
         ];
     }
 }

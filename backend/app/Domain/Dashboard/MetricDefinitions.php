@@ -20,7 +20,7 @@ final class MetricDefinitions
             ],
             'active_stakeholders' => [
                 'label' => 'Active stakeholders',
-                'definition' => 'Stakeholders with register status "active" — excludes inactive, merged and archived records.',
+                'definition' => 'Stakeholders with register status "active". Excludes inactive, merged and archived records.',
                 'unit' => 'count',
             ],
             'high_priority_stakeholders' => [
@@ -80,7 +80,7 @@ final class MetricDefinitions
             ],
             'grievances_open' => [
                 'label' => 'Open grievances',
-                'definition' => 'Cases not currently closed, rejected or withdrawn — measured now, not within the period.',
+                'definition' => 'Cases not currently closed, rejected or withdrawn, measured now rather than within the period.',
                 'unit' => 'count',
             ],
             'grievances_closed' => [

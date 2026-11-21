@@ -23,6 +23,7 @@ use App\Models\Incident;
 use App\Models\Pap;
 use App\Models\Stakeholder;
 use App\Models\User;
+use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Request;
@@ -84,6 +85,14 @@ class AppServiceProvider extends ServiceProvider
             ->mixedCase()
             ->numbers()
             ->uncompromised(false));
+
+        // Every "set your password" link (forgot password and invitations)
+        // opens the web app's page, never a backend route.
+        ResetPassword::createUrlUsing(fn ($user, string $token) => rtrim((string) config('sasa.web_url'), '/')
+            .'/set-password?token='.urlencode($token).'&email='.urlencode($user->getEmailForPasswordReset()));
+
+        // Invitation links last as long as config/sasa.php says.
+        config(['auth.passwords.invites.expire' => 60 * (int) config('sasa.demos.invite_hours', 72)]);
 
         // A system administrator carries every ability everywhere.
         Gate::before(fn ($user) => $user->is_system_admin ? true : null);

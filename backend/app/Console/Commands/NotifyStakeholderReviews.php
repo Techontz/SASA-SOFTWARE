@@ -65,7 +65,7 @@ class NotifyStakeholderReviews extends Command
                             'reference' => $plan->reference,
                             'title' => $plan->title,
                             'target_date' => $plan->target_date?->toFormattedDateString(),
-                            'location' => $plan->location_text ?? '—',
+                            'location' => $plan->location_text ?? 'no location recorded',
                             'url' => "/engagements/plans/{$plan->id}",
                         ],
                         extraUserIds: array_filter([$plan->owner_id]),
