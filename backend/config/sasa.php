@@ -29,7 +29,10 @@ return [
     |
     */
     'billing' => [
-        'driver' => (env('SASA_PAYMENT_DRIVER') ?: 'sandbox'), // sandbox | snippe
+        // sandbox | snippe. The sandbox approves payments that never happened,
+        // so a production server never falls back to it: it must be asked for
+        // by name.
+        'driver' => (env('SASA_PAYMENT_DRIVER') ?: (env('APP_ENV') === 'production' ? 'snippe' : 'sandbox')),
 
         // Currencies a person may choose when requesting a subscription.
         'currencies' => ['USD', 'TZS'],
