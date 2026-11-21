@@ -94,6 +94,8 @@ final class PermissionCatalogue
             $p('audit.view_sensitive', 'Administration', 'See sensitive-view audit events', 'See who opened confidential cases.', true),
             $p('sync.resolve_conflicts', 'Administration', 'Resolve sync conflicts', 'Decide which version of a record is correct after an offline edit clashed.'),
             $p('billing.manage', 'Platform', 'Manage plans and subscriptions', 'Add, edit and archive subscription plans, and review subscription requests and their payments. Platform wide, not per project.', true),
+            $p('enquiry.manage', 'Platform', 'Manage website enquiries', 'See and follow up the Register interest and Book a demo forms sent from the public website. Platform wide, not per project.', true),
+            $p('organisation.billing', 'Organisation', 'See and pay your organisation\'s SASA plan', 'See the plan your organisation agreed with SASA, its invoices and what each role can do, pay invoices by mobile money or card, and turn auto-pay on or off.', true),
             $p('ai.review', 'AI', 'Review AI suggestions', 'Accept, change or reject a classification the AI proposed.'),
             $p('ai.configure', 'AI', 'Configure the AI voice agent', 'Change consent wording, call length and languages.', true),
         ];
@@ -124,7 +126,7 @@ final class PermissionCatalogue
                 'name' => 'Project administrator',
                 'description' => 'Runs one project: its configuration, its people and its data.',
                 'escalation_rank' => 10,
-                'permissions' => array_values(array_diff($all, ['grievance.view_restricted', 'billing.manage'])),
+                'permissions' => array_values(array_diff($all, ['grievance.view_restricted', 'billing.manage', 'enquiry.manage'])),
                 'handling_groups' => ['general'],
             ],
             [

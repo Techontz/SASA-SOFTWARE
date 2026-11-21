@@ -63,6 +63,9 @@ Route::prefix('v1')->group(function () {
     // Subscriptions and payments: public journey + platform administration.
     require __DIR__.'/api/billing.php';
 
+    // Website enquiries: the public forms + platform administration.
+    require __DIR__.'/api/enquiries.php';
+
     // ------------------------------------------------------------- protected
     Route::middleware('auth:sanctum')->group(function () {
 
@@ -185,6 +188,9 @@ Route::prefix('v1')->group(function () {
             require __DIR__.'/api/pap.php';
             require __DIR__.'/api/eshs.php';
             require __DIR__.'/api/incidents.php';
+
+            // --- The organisation's own SASA plan, invoices and roles ----------
+            require __DIR__.'/api/organisation.php';
 
             // --- Search and saved views ---------------------------------------
             Route::get('search', SearchController::class);

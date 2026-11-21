@@ -4,28 +4,38 @@ namespace App\Domain\Billing;
 
 use App\Domain\Audit\AuditLogger;
 use App\Domain\Billing\Gateways\GatewayResult;
+use App\Domain\Billing\Gateways\PaymentContext;
 use App\Domain\Billing\Gateways\PaymentGateway;
 use App\Domain\Billing\Gateways\SnippeGateway;
+use App\Models\Invoice;
 use App\Models\Payment;
 use App\Models\SubscriptionRequest;
+use App\Models\User;
 use App\Support\DomainRuleException;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 /**
- * Paying for a subscription request: start a payment, follow it to an outcome,
- * and move the request to "paid" the moment money is confirmed.
+ * Paying for a subscription request (the public website journey) or for an
+ * organisation's invoice (its agreed monthly plan): start a payment, follow it
+ * to an outcome, and mark the request or invoice paid the moment money is
+ * confirmed.
  *
- * Every status change on a payment or a request is written to the audit trail
- * by the Auditable trait (payment.status_changed, subscription_request.status_changed).
+ * Mobile money is always a USSD push: the payer approves it on their phone
+ * with their PIN. Nothing here can take money from anyone without that.
+ *
+ * Every status change on a payment, request or invoice is written to the audit
+ * trail by the Auditable trait (payment.status_changed, ...status_changed).
  */
 final class PaymentService
 {
     public function __construct(
         private readonly PaymentGateway $gateway,
         private readonly AuditLogger $audit,
+        private readonly InvoiceSettlement $settlement,
     ) {}
 
     /**
@@ -85,6 +95,53 @@ final class PaymentService
         $charge = $this->chargeFor($request, $method)
             ?? throw new DomainRuleException('This plan cannot be paid that way. Choose another payment method.', 'method_unavailable');
 
+        return $this->begin(
+            ['subscription_request_id' => $request->id],
+            fn () => $request->payments(),
+            PaymentContext::forSubscription($request),
+            $method,
+            $phone,
+            $charge,
+        );
+    }
+
+    /**
+     * Pay an organisation's invoice. `$payer` is the person paying from the
+     * organisation's panel, or null for auto-pay (the billing cycle sending
+     * the prompt by itself). Either way, mobile money is a prompt on the
+     * phone that the payer must approve with their PIN.
+     */
+    public function startForInvoice(Invoice $invoice, string $method, ?string $phone, ?User $payer = null): Payment
+    {
+        match ($invoice->status) {
+            'open', 'overdue' => null,
+            'paid' => throw new DomainRuleException("{$invoice->number} is already paid.", 'already_paid'),
+            default => throw new DomainRuleException("{$invoice->number} was cancelled and can no longer be paid.", 'invoice_void'),
+        };
+
+        $allowed = (array) config("sasa.billing.charge_currencies.{$method}", []);
+
+        if ($allowed !== [] && ! in_array($invoice->currency, $allowed, true)) {
+            throw new DomainRuleException('This invoice cannot be paid that way. Choose another payment method.', 'method_unavailable');
+        }
+
+        return $this->begin(
+            ['invoice_id' => $invoice->id],
+            fn () => $invoice->payments(),
+            PaymentContext::forInvoice($invoice, $payer, $phone),
+            $method,
+            $phone,
+            ['amount' => (string) $invoice->amount, 'currency' => $invoice->currency],
+        );
+    }
+
+    /**
+     * @param  array<string,int>  $owner  subscription_request_id or invoice_id
+     * @param  \Closure():HasMany  $attempts  the owner's payments
+     * @param  array{amount:string,currency:string}  $charge
+     */
+    private function begin(array $owner, \Closure $attempts, PaymentContext $context, string $method, ?string $phone, array $charge): Payment
+    {
         $normalisedPhone = $method === 'mobile_money' ? PhoneNumber::normaliseTanzanian($phone) : null;
 
         if ($method === 'mobile_money' && $normalisedPhone === null) {
@@ -99,16 +156,15 @@ final class PaymentService
             throw new DomainRuleException("The payment provider's minimum is TZS {$minimum}.", 'amount_below_minimum');
         }
 
-        $payment = DB::transaction(function () use ($request, $method, $normalisedPhone, $charge) {
+        $payment = DB::transaction(function () use ($owner, $attempts, $method, $normalisedPhone, $charge) {
             // Only one attempt is live at a time. An older pending attempt is
             // closed here; if its money still arrives, it is honoured.
-            $request->payments()->where('status', 'pending')->get()->each(function (Payment $old) {
+            $attempts()->where('status', 'pending')->get()->each(function (Payment $old) {
                 $old->forceFill(['status' => 'cancelled', 'failure_reason' => 'Replaced by a newer payment attempt.'])->save();
             });
 
             $payment = new Payment;
-            $payment->fill([
-                'subscription_request_id' => $request->id,
+            $payment->fill($owner + [
                 'provider' => $this->gateway->name(),
                 'method' => $method,
                 'phone' => $normalisedPhone,
@@ -123,8 +179,8 @@ final class PaymentService
         });
 
         $result = $method === 'mobile_money'
-            ? $this->gateway->startMobileMoney($payment, $request)
-            : $this->gateway->startCard($payment, $request);
+            ? $this->gateway->startMobileMoney($payment, $context)
+            : $this->gateway->startCard($payment, $context);
 
         $this->apply($payment, $result, 'create');
 
@@ -284,7 +340,7 @@ final class PaymentService
         });
     }
 
-    /** Move a payment to an outcome; success marks the request paid. */
+    /** Move a payment to an outcome; success marks the request or invoice paid. */
     private function transition(Payment $payment, string $status, ?string $reason): void
     {
         $payment->status = $status;
@@ -295,6 +351,12 @@ final class PaymentService
         }
 
         $payment->save();
+
+        if ($status === 'succeeded' && $payment->invoice_id !== null) {
+            $this->settlement->paidByPayment($payment);
+
+            return;
+        }
 
         if ($status === 'succeeded') {
             $request = SubscriptionRequest::query()->lockForUpdate()->find($payment->subscription_request_id);

@@ -3,7 +3,6 @@
 namespace App\Domain\Billing\Gateways;
 
 use App\Models\Payment;
-use App\Models\SubscriptionRequest;
 
 /**
  * A payment provider. The application is never written around one vendor:
@@ -15,10 +14,10 @@ interface PaymentGateway
     public function name(): string;
 
     /** Send a USSD push to `$payment->phone`. Must not throw for a refusal. */
-    public function startMobileMoney(Payment $payment, SubscriptionRequest $request): GatewayResult;
+    public function startMobileMoney(Payment $payment, PaymentContext $context): GatewayResult;
 
     /** Create a hosted card checkout. The result carries the checkout URL. */
-    public function startCard(Payment $payment, SubscriptionRequest $request): GatewayResult;
+    public function startCard(Payment $payment, PaymentContext $context): GatewayResult;
 
     /** The provider's current view of a pending payment, or null when it cannot say. */
     public function fetchStatus(Payment $payment): ?GatewayResult;

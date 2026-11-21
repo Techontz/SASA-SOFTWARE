@@ -3,6 +3,7 @@
 use App\Console\Commands\BackupDatabase;
 use App\Console\Commands\MarkMissedEngagements;
 use App\Console\Commands\NotifyStakeholderReviews;
+use App\Console\Commands\RunBillingCycle;
 use App\Console\Commands\RunCommitmentReminders;
 use App\Console\Commands\RunSlaSweep;
 use Illuminate\Support\Facades\Schedule;
@@ -36,6 +37,13 @@ Schedule::command(MarkMissedEngagements::class)
 Schedule::command(NotifyStakeholderReviews::class)
     ->dailyAt('07:15')
     ->withoutOverlapping();
+
+// Agreed plans: raise the day's invoices, send auto-pay prompts (approved by
+// the payer with their PIN), and mark unpaid ones overdue. Idempotent.
+Schedule::command(RunBillingCycle::class)
+    ->dailyAt('06:00')
+    ->withoutOverlapping()
+    ->onOneServer();
 
 Schedule::command(BackupDatabase::class)
     ->dailyAt('02:00')

@@ -3,7 +3,6 @@
 namespace App\Domain\Billing\Gateways;
 
 use App\Models\Payment;
-use App\Models\SubscriptionRequest;
 
 /**
  * Payments without a provider, for development and demos. Mobile money
@@ -17,17 +16,14 @@ final class SandboxGateway implements PaymentGateway
         return 'sandbox';
     }
 
-    public function startMobileMoney(Payment $payment, SubscriptionRequest $request): GatewayResult
+    public function startMobileMoney(Payment $payment, PaymentContext $context): GatewayResult
     {
         return GatewayResult::pending('sandbox_'.$payment->public_id, null, ['simulated' => 'ussd_push']);
     }
 
-    public function startCard(Payment $payment, SubscriptionRequest $request): GatewayResult
+    public function startCard(Payment $payment, PaymentContext $context): GatewayResult
     {
-        $url = strtr((string) config('sasa.billing.sandbox.card_checkout_url'), [
-            '{web_url}' => rtrim((string) config('sasa.web_url'), '/'),
-            '{payment}' => $payment->public_id,
-        ]);
+        $url = PaymentContext::url($context->sandboxCardCheckoutUrl, $payment->public_id);
 
         return GatewayResult::pending('sandbox_'.$payment->public_id, $url, ['simulated' => 'card_checkout']);
     }

@@ -54,6 +54,24 @@ return [
         'card_return_url' => '{web_url}/subscribe/return?payment={payment}',
         'card_cancel_url' => '{web_url}/subscribe/return?payment={payment}&outcome=cancelled',
 
+        // The same, for an organisation paying an invoice from its own panel.
+        'invoice_card_return_url' => '{web_url}/subscription?payment={payment}',
+        'invoice_card_cancel_url' => '{web_url}/subscription?payment={payment}&outcome=cancelled',
+
+        // Agreed plans and monthly invoices (INV-2026-0001).
+        'invoice_reference' => ['prefix' => 'INV', 'pad' => 4],
+
+        // An open invoice becomes overdue, and its agreement past_due, once
+        // its due date is more than this many days ago. Nothing is ever
+        // suspended automatically: that is a decision for a person.
+        'grace_days' => (int) (env('SASA_BILLING_GRACE_DAYS') ?: 7),
+
+        // Tell the organisation's billing users by e-mail when an invoice is
+        // issued (as well as in SASA). Off when mail goes nowhere (log/array).
+        'invoice_email' => ! in_array(env('SASA_BILLING_INVOICE_EMAIL'), [null, ''], true)
+            ? filter_var(env('SASA_BILLING_INVOICE_EMAIL'), FILTER_VALIDATE_BOOLEAN)
+            : ! in_array(env('MAIL_MAILER', 'log'), ['log', 'array'], true),
+
         'sandbox' => [
             // A pending sandbox mobile money payment succeeds the first time its
             // status is read after this many seconds.
@@ -62,6 +80,9 @@ return [
             // so the failure path can be tested too.
             'failing_phone_suffix' => '0000',
             'card_checkout_url' => '{web_url}/subscribe/sandbox-card?payment={payment}',
+            // An invoice payment's test card page sends the person back to
+            // the organisation's plan page afterwards.
+            'invoice_card_checkout_url' => '{web_url}/subscribe/sandbox-card?payment={payment}&return=/subscription',
         ],
 
         'snippe' => [
@@ -98,6 +119,36 @@ return [
                 'country' => (env('SNIPPE_CARD_DEFAULT_COUNTRY') ?: 'TZ'),
             ],
         ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Website enquiries (platform level, not per project)
+    |--------------------------------------------------------------------------
+    |
+    | "Register interest" and "Book a demo" from the public site. `notify` is a
+    | comma-separated list of addresses told about each enquiry; empty sends
+    | nothing.
+    |
+    */
+    'enquiries' => [
+        'notify' => env('SASA_ENQUIRY_NOTIFY', ''),
+        'reference' => ['prefix' => 'ENQ', 'pad' => 4],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Public contact details
+    |--------------------------------------------------------------------------
+    |
+    | Shown on the website (GET /api/v1/public/contact) so a company can reach
+    | the SASA team. Each is optional; an unset one is returned as null.
+    |
+    */
+    'contact' => [
+        'email' => env('SASA_CONTACT_EMAIL') ?: null,
+        'phone' => env('SASA_CONTACT_PHONE') ?: null,
+        'whatsapp' => env('SASA_CONTACT_WHATSAPP') ?: null,
     ],
 
     'auth' => [

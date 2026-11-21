@@ -131,6 +131,10 @@ class AppServiceProvider extends ServiceProvider
         RateLimiter::for('billing-webhook', fn (Request $request) => Limit::perMinute(240)
             ->by('billing-webhook:'.$request->ip()));
 
+        // The website's "Register interest" and "Book a demo" forms.
+        RateLimiter::for('enquiries', fn (Request $request) => Limit::perMinute(10)
+            ->by('enquiries:'.$request->ip()));
+
         RateLimiter::for('reports', fn (Request $request) => Limit::perMinute(10)
             ->by('reports:'.($request->user()?->id ?? $request->ip())));
     }

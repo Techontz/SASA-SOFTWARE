@@ -2,9 +2,7 @@
 
 namespace App\Domain\Billing\Gateways;
 
-use App\Domain\Billing\PhoneNumber;
 use App\Models\Payment;
-use App\Models\SubscriptionRequest;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Http\Client\Response;
@@ -27,7 +25,7 @@ final class SnippeGateway implements PaymentGateway
         return 'snippe';
     }
 
-    public function startMobileMoney(Payment $payment, SubscriptionRequest $request): GatewayResult
+    public function startMobileMoney(Payment $payment, PaymentContext $context): GatewayResult
     {
         return $this->create($payment, [
             'payment_type' => 'mobile',
@@ -36,32 +34,32 @@ final class SnippeGateway implements PaymentGateway
                 'currency' => $payment->currency,
             ],
             'phone_number' => $payment->phone,
-            'customer' => $this->customer($request),
-        ] + $this->common($payment, $request));
+            'customer' => $this->customer($context),
+        ] + $this->common($payment, $context));
     }
 
-    public function startCard(Payment $payment, SubscriptionRequest $request): GatewayResult
+    public function startCard(Payment $payment, PaymentContext $context): GatewayResult
     {
         $defaults = (array) config('sasa.billing.snippe.card_customer_defaults', []);
-        $country = strtoupper(trim((string) $request->country));
+        $country = strtoupper(trim((string) $context->country));
 
         return $this->create($payment, [
             'payment_type' => 'card',
             'details' => [
                 'amount' => $this->minorUnits($payment),
                 'currency' => $payment->currency,
-                'redirect_url' => $this->url('card_return_url', $payment),
-                'cancel_url' => $this->url('card_cancel_url', $payment),
+                'redirect_url' => PaymentContext::url($context->cardReturnUrl, $payment->public_id),
+                'cancel_url' => PaymentContext::url($context->cardCancelUrl, $payment->public_id),
             ],
-            'phone_number' => PhoneNumber::normaliseTanzanian($request->phone) ?? preg_replace('/\D+/', '', (string) $request->phone),
-            'customer' => $this->customer($request) + [
+            'phone_number' => $context->phone,
+            'customer' => $this->customer($context) + [
                 'address' => (string) ($defaults['address'] ?? ''),
                 'city' => (string) ($defaults['city'] ?? ''),
                 'state' => (string) ($defaults['state'] ?? ''),
                 'postcode' => (string) ($defaults['postcode'] ?? ''),
                 'country' => preg_match('/^[A-Z]{2}$/', $country) ? $country : (string) ($defaults['country'] ?? 'TZ'),
             ],
-        ] + $this->common($payment, $request));
+        ] + $this->common($payment, $context));
     }
 
     public function fetchStatus(Payment $payment): ?GatewayResult
@@ -164,38 +162,23 @@ final class SnippeGateway implements PaymentGateway
     }
 
     /** @return array<string,mixed> */
-    private function common(Payment $payment, SubscriptionRequest $request): array
+    private function common(Payment $payment, PaymentContext $context): array
     {
         return [
             'webhook_url' => (string) config('sasa.billing.snippe.webhook_url'),
-            'metadata' => [
-                'payment_id' => $payment->public_id,
-                'subscription_reference' => $request->reference,
-            ],
+            'metadata' => ['payment_id' => $payment->public_id] + $context->metadata,
         ];
     }
 
     /** @return array{firstname:string,lastname:string,email:string} */
-    private function customer(SubscriptionRequest $request): array
+    private function customer(PaymentContext $context): array
     {
-        $parts = preg_split('/\s+/', trim((string) $request->contact_name)) ?: [];
-        $first = array_shift($parts) ?: (string) $request->organisation_name;
-        $last = $parts !== [] ? implode(' ', $parts) : $first;
-
-        return ['firstname' => $first, 'lastname' => $last, 'email' => (string) $request->email];
+        return ['firstname' => $context->firstname, 'lastname' => $context->lastname, 'email' => $context->email];
     }
 
     private function minorUnits(Payment $payment): int
     {
         return (int) round((float) $payment->amount * (int) config('sasa.billing.snippe.amount_multiplier', 1));
-    }
-
-    private function url(string $key, Payment $payment): string
-    {
-        return strtr((string) config('sasa.billing.'.$key), [
-            '{web_url}' => rtrim((string) config('sasa.web_url'), '/'),
-            '{payment}' => $payment->public_id,
-        ]);
     }
 
     private function http(): PendingRequest

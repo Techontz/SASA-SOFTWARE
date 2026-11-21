@@ -6,7 +6,9 @@ use App\Models\Concerns\Auditable;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * One attempt to pay for a subscription request. `raw` keeps every provider
+ * One attempt to pay for a subscription request (the public website journey)
+ * or for an invoice (an organisation's agreed monthly plan). Exactly one of
+ * subscription_request_id and invoice_id is set. `raw` keeps every provider
  * payload for reconciliation; it is never returned by the API or audited.
  */
 class Payment extends Model
@@ -24,7 +26,7 @@ class Payment extends Model
     protected $hidden = ['raw'];
 
     protected $fillable = [
-        'subscription_request_id', 'provider', 'method', 'phone', 'amount', 'currency',
+        'subscription_request_id', 'invoice_id', 'provider', 'method', 'phone', 'amount', 'currency',
     ];
 
     protected function casts(): array
@@ -39,6 +41,11 @@ class Payment extends Model
     public function subscriptionRequest()
     {
         return $this->belongsTo(SubscriptionRequest::class);
+    }
+
+    public function invoice()
+    {
+        return $this->belongsTo(Invoice::class);
     }
 
     public function isPending(): bool

@@ -1,5 +1,8 @@
 <?php
 
+use App\Http\Controllers\Api\V1\Billing\AdminAgreementController;
+use App\Http\Controllers\Api\V1\Billing\AdminInvoiceController;
+use App\Http\Controllers\Api\V1\Billing\AdminOrganisationController;
 use App\Http\Controllers\Api\V1\Billing\AdminPlanController;
 use App\Http\Controllers\Api\V1\Billing\AdminSubscriptionController;
 use App\Http\Controllers\Api\V1\Billing\PublicPaymentController;
@@ -42,4 +45,14 @@ Route::middleware(['auth:sanctum', 'permission:billing.manage'])->prefix('admin'
     Route::get('subscriptions', [AdminSubscriptionController::class, 'index']);
     Route::get('subscriptions/{subscription:public_id}', [AdminSubscriptionController::class, 'show']);
     Route::patch('subscriptions/{subscription:public_id}', [AdminSubscriptionController::class, 'update']);
+
+    // Agreed plans (one per organisation) and their monthly invoices.
+    Route::get('organisations', [AdminOrganisationController::class, 'index']);
+    Route::get('agreements', [AdminAgreementController::class, 'index']);
+    Route::post('agreements', [AdminAgreementController::class, 'store']);
+    Route::patch('agreements/{agreement:public_id}', [AdminAgreementController::class, 'update']);
+    Route::post('agreements/{agreement:public_id}/invoices', [AdminAgreementController::class, 'issueInvoice']);
+    Route::get('invoices', [AdminInvoiceController::class, 'index']);
+    Route::post('invoices/{invoice:public_id}/mark-paid', [AdminInvoiceController::class, 'markPaid']);
+    Route::post('invoices/{invoice:public_id}/void', [AdminInvoiceController::class, 'void']);
 });
