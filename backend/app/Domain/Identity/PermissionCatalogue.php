@@ -93,6 +93,7 @@ final class PermissionCatalogue
             $p('audit.view', 'Administration', 'See the audit trail', 'Search who did what, and when.', true),
             $p('audit.view_sensitive', 'Administration', 'See sensitive-view audit events', 'See who opened confidential cases.', true),
             $p('sync.resolve_conflicts', 'Administration', 'Resolve sync conflicts', 'Decide which version of a record is correct after an offline edit clashed.'),
+            $p('billing.manage', 'Platform', 'Manage plans and subscriptions', 'Add, edit and archive subscription plans, and review subscription requests and their payments. Platform wide, not per project.', true),
             $p('ai.review', 'AI', 'Review AI suggestions', 'Accept, change or reject a classification the AI proposed.'),
             $p('ai.configure', 'AI', 'Configure the AI voice agent', 'Change consent wording, call length and languages.', true),
         ];
@@ -123,7 +124,7 @@ final class PermissionCatalogue
                 'name' => 'Project administrator',
                 'description' => 'Runs one project: its configuration, its people and its data.',
                 'escalation_rank' => 10,
-                'permissions' => array_values(array_diff($all, ['grievance.view_restricted'])),
+                'permissions' => array_values(array_diff($all, ['grievance.view_restricted', 'billing.manage'])),
                 'handling_groups' => ['general'],
             ],
             [

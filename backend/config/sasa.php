@@ -18,6 +18,85 @@ return [
 
     'web_url' => env('SASA_WEB_URL', 'http://localhost:3000'),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Subscriptions and payments (platform level, not per project)
+    |--------------------------------------------------------------------------
+    |
+    | The payment driver is swappable. `sandbox` needs no keys and simulates
+    | both flows so the subscribe journey can be exercised end to end; `snippe`
+    | talks to the Snippe gateway (https://docs.snippe.sh, API 2026-01-25).
+    |
+    */
+    'billing' => [
+        'driver' => (env('SASA_PAYMENT_DRIVER') ?: 'sandbox'), // sandbox | snippe
+
+        // Currencies a person may choose when requesting a subscription.
+        'currencies' => ['USD', 'TZS'],
+
+        // Currencies each payment method can actually be CHARGED in. Snippe's
+        // Payments API accepts TZS only, for mobile money and for card ("Other
+        // currencies return a 400 validation error"). A request priced in USD
+        // is therefore charged the plan's TZS price. The sandbox follows the
+        // same rule so what you test is what goes live.
+        'charge_currencies' => [
+            'mobile_money' => ['TZS'],
+            'card' => ['TZS'],
+        ],
+
+        'reference' => ['prefix' => 'SUB', 'pad' => 4],
+
+        // Where the card checkout sends the person back to. {web_url} is
+        // sasa.web_url and {payment} the payment's public id.
+        'card_return_url' => '{web_url}/subscribe/return?payment={payment}',
+        'card_cancel_url' => '{web_url}/subscribe/return?payment={payment}&outcome=cancelled',
+
+        'sandbox' => [
+            // A pending sandbox mobile money payment succeeds the first time its
+            // status is read after this many seconds.
+            'auto_succeed_after_seconds' => (int) (env('SASA_SANDBOX_AUTO_SUCCEED_SECONDS') ?: 6),
+            // A sandbox mobile money payment to a number ending in this fails,
+            // so the failure path can be tested too.
+            'failing_phone_suffix' => '0000',
+            'card_checkout_url' => '{web_url}/subscribe/sandbox-card?payment={payment}',
+        ],
+
+        'snippe' => [
+            // Docs list one base URL. There is no separate sandbox host
+            // documented; test and live are told apart by the API key.
+            'base_url' => (env('SNIPPE_BASE_URL') ?: 'https://api.snippe.sh'),
+            // Dashboard: Settings > API Keys > Create API Key. Needs the
+            // collection:create and collection:read scopes. Starts with snp_.
+            'api_key' => env('SNIPPE_API_KEY'),
+            // Dashboard: Settings > Webhook Secret. Signs every webhook
+            // (HMAC-SHA256 over "{X-Webhook-Timestamp}.{raw body}").
+            'webhook_secret' => env('SNIPPE_WEBHOOK_SECRET'),
+            // Sent on every payment as webhook_url. Must be HTTPS in production.
+            'webhook_url' => env('SNIPPE_WEBHOOK_URL') ?: rtrim((string) (env('APP_URL') ?: 'http://localhost'), '/').'/api/v1/public/payments/snippe/webhook',
+            // Reject webhooks whose timestamp is older than this (replay guard).
+            'webhook_tolerance_seconds' => (int) (env('SNIPPE_WEBHOOK_TOLERANCE_SECONDS') ?: 300),
+            'timeout_seconds' => (int) (env('SNIPPE_TIMEOUT_SECONDS') ?: 20),
+            // Amounts are sent as integers "in the smallest currency unit". The
+            // docs' own examples (minimum 500 TZS, 500 TZS charged) read as
+            // whole shillings, so the multiplier is 1. UNVERIFIED with Snippe.
+            'amount_multiplier' => (int) (env('SNIPPE_AMOUNT_MULTIPLIER') ?: 1),
+            'minimum_amount' => 500,
+            // While a payment is pending, ask Snippe for its status at most
+            // this often (their limit is 60 requests a minute per key).
+            'status_poll_seconds' => (int) (env('SNIPPE_STATUS_POLL_SECONDS') ?: 5),
+            // Card payments require a billing address. The subscribe form does
+            // not collect one, so these are sent. UNVERIFIED whether Snippe or
+            // its card processor validates them.
+            'card_customer_defaults' => [
+                'address' => (env('SNIPPE_CARD_DEFAULT_ADDRESS') ?: 'Not provided'),
+                'city' => (env('SNIPPE_CARD_DEFAULT_CITY') ?: 'Dar es Salaam'),
+                'state' => (env('SNIPPE_CARD_DEFAULT_STATE') ?: 'DSM'),
+                'postcode' => (env('SNIPPE_CARD_DEFAULT_POSTCODE') ?: '14101'),
+                'country' => (env('SNIPPE_CARD_DEFAULT_COUNTRY') ?: 'TZ'),
+            ],
+        ],
+    ],
+
     'auth' => [
         'token_ttl_minutes' => (int) env('SASA_TOKEN_TTL_MINUTES', 720),
         'admin_token_ttl_minutes' => (int) env('SASA_ADMIN_TOKEN_TTL_MINUTES', 240),

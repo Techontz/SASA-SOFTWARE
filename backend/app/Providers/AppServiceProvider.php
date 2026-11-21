@@ -5,6 +5,9 @@ namespace App\Providers;
 use App\Domain\Ai\AiProvider;
 use App\Domain\Ai\ClaudeAiProvider;
 use App\Domain\Ai\NullAiProvider;
+use App\Domain\Billing\Gateways\PaymentGateway;
+use App\Domain\Billing\Gateways\SandboxGateway;
+use App\Domain\Billing\Gateways\SnippeGateway;
 use App\Domain\Tenancy\TenantContext;
 use App\Domain\Voice\NullVoiceProvider;
 use App\Domain\Voice\VoiceProvider;
@@ -13,8 +16,11 @@ use App\Models\Commitment;
 use App\Models\Concern;
 use App\Models\Engagement;
 use App\Models\EngagementPlan;
+use App\Models\EshsAnomaly;
 use App\Models\Grievance;
 use App\Models\GrievanceFollowUp;
+use App\Models\Incident;
+use App\Models\Pap;
 use App\Models\Stakeholder;
 use App\Models\User;
 use Illuminate\Cache\RateLimiting\Limit;
@@ -41,6 +47,13 @@ class AppServiceProvider extends ServiceProvider
             };
         });
 
+        $this->app->bind(PaymentGateway::class, function () {
+            return match (config('sasa.billing.driver')) {
+                'snippe' => new SnippeGateway,
+                default => new SandboxGateway,
+            };
+        });
+
         $this->app->bind(VoiceProvider::class, function () {
             return match (config('sasa.voice.provider')) {
                 default => new NullVoiceProvider,
@@ -59,9 +72,9 @@ class AppServiceProvider extends ServiceProvider
             'commitment' => Commitment::class,
             'grievance' => Grievance::class,
             'grievance_follow_up' => GrievanceFollowUp::class,
-            'pap' => \App\Models\Pap::class,
-            'eshs_anomaly' => \App\Models\EshsAnomaly::class,
-            'incident' => \App\Models\Incident::class,
+            'pap' => Pap::class,
+            'eshs_anomaly' => EshsAnomaly::class,
+            'incident' => Incident::class,
             'attachment' => Attachment::class,
             'user' => User::class,
         ]);
@@ -106,6 +119,17 @@ class AppServiceProvider extends ServiceProvider
 
         RateLimiter::for('sync', fn (Request $request) => Limit::perMinute(60)
             ->by('sync:'.($request->user()?->id ?? $request->ip())));
+
+        // The public subscribe journey: writes are tight, the status polling
+        // (every two or three seconds while a phone prompt is open) is not.
+        RateLimiter::for('billing', fn (Request $request) => Limit::perMinute(30)
+            ->by('billing:'.$request->ip()));
+
+        RateLimiter::for('billing-poll', fn (Request $request) => Limit::perMinute(120)
+            ->by('billing-poll:'.$request->ip()));
+
+        RateLimiter::for('billing-webhook', fn (Request $request) => Limit::perMinute(240)
+            ->by('billing-webhook:'.$request->ip()));
 
         RateLimiter::for('reports', fn (Request $request) => Limit::perMinute(10)
             ->by('reports:'.($request->user()?->id ?? $request->ip())));

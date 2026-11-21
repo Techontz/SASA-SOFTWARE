@@ -60,6 +60,9 @@ Route::prefix('v1')->group(function () {
     Route::get('attachments/{attachment}/download', [AttachmentController::class, 'download'])
         ->name('attachments.download');
 
+    // Subscriptions and payments: public journey + platform administration.
+    require __DIR__.'/api/billing.php';
+
     // ------------------------------------------------------------- protected
     Route::middleware('auth:sanctum')->group(function () {
 
