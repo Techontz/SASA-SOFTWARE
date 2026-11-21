@@ -37,7 +37,7 @@ export function PageHeader({
       <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between md:gap-8">
         <div className="min-w-0">
           {eyebrow ? <p className="sasa-eyebrow mb-2">{eyebrow}</p> : null}
-          <h1 className="text-[1.75rem] font-semibold leading-[1.12] tracking-[-0.028em] text-ink-900 sm:text-[2.25rem]">
+          <h1 className="text-[2rem] font-bold leading-[1.08] tracking-[-0.032em] text-ink-900 sm:text-[2.625rem]">
             {title}
           </h1>
           {description ? (

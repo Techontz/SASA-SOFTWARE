@@ -6,21 +6,22 @@ import { useEffect, useState } from "react";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { cn } from "@/lib/utils";
 import { useSession } from "@/providers/SessionProvider";
-import { BrandMark } from "./Brand";
+import { Logo } from "./Brand";
 import { Pill } from "./Pill";
 
 const LINKS = [
-  { href: "#platform", label: "Platform" },
-  { href: "#how", label: "How it works" },
-  { href: "#safeguards", label: "Safeguards" },
-  { href: "#faq", label: "FAQ" },
+  { href: "/#platform", label: "Platform" },
+  { href: "/#how", label: "How it works" },
+  { href: "/#product", label: "Product" },
+  { href: "/#field", label: "In the field" },
+  { href: "/pricing", label: "Pricing" },
 ];
 
 /**
- * Transparent over the hero, glass once the page scrolls. Someone already
+ * Clear over the hero film, a solid bar once the page scrolls. Someone already
  * signed in on this device is offered their dashboard instead of a sign-in.
  */
-export function LandingNav() {
+export function LandingNav({ solid: alwaysSolid = false }: { solid?: boolean } = {}) {
   const { user, loading } = useSession();
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
@@ -33,26 +34,29 @@ export function LandingNav() {
   }, []);
 
   const signedIn = !loading && Boolean(user);
+  const solid = alwaysSolid || scrolled || open;
 
   return (
     <header
       className={cn(
         "fixed inset-x-0 top-0 z-50 transition-colors duration-300",
-        scrolled || open ? "border-b border-chrome-line bg-chrome-deep/85 backdrop-blur-xl" : "border-b border-transparent",
+        solid ? "border-b border-hairline bg-surface/95 backdrop-blur-xl" : "border-b border-transparent",
       )}
     >
-      <nav className="mx-auto flex h-[4.25rem] max-w-[1240px] items-center gap-6 px-4 sm:px-6 md:px-10" aria-label="Main">
-        <Link href="/" className="flex items-center gap-2.5" aria-label="SASA home">
-          <BrandMark className="h-9 w-9 text-base" />
-          <span className="text-lg font-semibold tracking-tight text-white">SASA</span>
+      <nav className="mx-auto flex h-[4.5rem] max-w-[1240px] items-center gap-6 px-4 sm:px-6 md:px-10" aria-label="Main">
+        <Link href="/" aria-label="SASA Compliance home" className="shrink-0">
+          <Logo onDark={!solid} />
         </Link>
 
-        <ul className="ml-6 hidden items-center gap-1 lg:flex">
+        <ul className="ml-8 hidden items-center gap-1 xl:flex">
           {LINKS.map((link) => (
             <li key={link.href}>
               <a
                 href={link.href}
-                className="rounded-full px-3.5 py-2 text-[0.9375rem] text-chrome-fg/80 transition-colors hover:bg-chrome-raised/60 hover:text-white"
+                className={cn(
+                  "rounded-lg px-3 py-2 text-[0.9375rem] font-medium transition-colors",
+                  solid ? "text-ink-700 hover:bg-surface-sunken hover:text-ink-900" : "text-chrome-fg/85 hover:text-white",
+                )}
               >
                 {link.label}
               </a>
@@ -61,22 +65,25 @@ export function LandingNav() {
         </ul>
 
         <div className="ml-auto flex items-center gap-2">
-          <div className="hidden sm:block">
+          <div className={cn("hidden sm:block", solid ? "" : "[&_button]:text-white")}>
             <ThemeToggle />
           </div>
           {signedIn ? (
-            <Pill href="/dashboard" className="hidden h-11 sm:inline-flex" arrow={false}>
+            <Pill href="/dashboard" className="hidden h-10 px-4 sm:inline-flex">
               Open SASA
             </Pill>
           ) : (
             <>
               <Link
                 href="/sign-in"
-                className="hidden rounded-full px-4 py-2.5 text-[0.9375rem] font-medium text-white transition-colors hover:bg-chrome-raised/60 sm:inline-flex"
+                className={cn(
+                  "hidden rounded-lg px-4 py-2.5 text-[0.9375rem] font-semibold transition-colors sm:inline-flex",
+                  solid ? "text-ink-900 hover:bg-surface-sunken" : "text-white hover:bg-chrome-fg/10",
+                )}
               >
                 Log in
               </Link>
-              <Pill href="/sign-in" className="hidden h-11 sm:inline-flex" arrow={false}>
+              <Pill href="/pricing" className="hidden h-10 px-4 sm:inline-flex" arrow={false}>
                 Get started
               </Pill>
             </>
@@ -84,7 +91,10 @@ export function LandingNav() {
           <button
             type="button"
             onClick={() => setOpen((value) => !value)}
-            className="grid h-11 w-11 place-items-center rounded-full text-white ring-1 ring-chrome-line lg:hidden"
+            className={cn(
+              "grid h-11 w-11 place-items-center rounded-lg ring-1 ring-inset xl:hidden",
+              solid ? "text-ink-900 ring-hairline-strong" : "text-white ring-chrome-fg/40",
+            )}
             aria-expanded={open}
             aria-controls="landing-menu"
             aria-label={open ? "Close the menu" : "Open the menu"}
@@ -95,36 +105,33 @@ export function LandingNav() {
       </nav>
 
       {open ? (
-        <div id="landing-menu" className="border-t border-chrome-line px-4 pb-6 pt-2 sm:px-6 lg:hidden">
-          <ul className="space-y-1">
+        <div id="landing-menu" className="max-h-[calc(100dvh-4.5rem)] overflow-y-auto border-t border-hairline px-4 pb-6 pt-2 sm:px-6 xl:hidden">
+          <ul>
             {LINKS.map((link) => (
-              <li key={link.href}>
+              <li key={link.href} className="border-b border-hairline">
                 <a
                   href={link.href}
                   onClick={() => setOpen(false)}
-                  className="block rounded-lg px-3 py-3 text-base text-chrome-fg hover:bg-chrome-raised/60"
+                  className="block py-3.5 text-base font-medium text-ink-900"
                 >
                   {link.label}
                 </a>
               </li>
             ))}
           </ul>
-          <div className="mt-4 flex flex-col gap-2.5">
+          <div className="mt-5 grid gap-2.5">
             {signedIn ? (
-              <Pill href="/dashboard" className="justify-between">
-                Open SASA
-              </Pill>
+              <Pill href="/dashboard">Open SASA</Pill>
             ) : (
               <>
-                <Pill href="/sign-in" className="justify-between">
-                  Get started
-                </Pill>
-                <Pill href="/sign-in" tone="glass" className="justify-between">
+                <Pill href="/pricing">Get started</Pill>
+                <Pill href="/sign-in" tone="light" arrow={false}>
                   Log in
                 </Pill>
               </>
             )}
-            <div className="pt-2">
+            <div className="flex items-center justify-between pt-3 text-sm text-ink-600">
+              Appearance
               <ThemeToggle />
             </div>
           </div>

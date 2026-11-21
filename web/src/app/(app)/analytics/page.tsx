@@ -244,10 +244,10 @@ function SlaBreakdownTable({
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-hairline bg-surface-sunken">
-                  <th className="px-5 py-2.5 text-left text-xs font-semibold uppercase tracking-wide text-ink-500">Group</th>
-                  <th className="px-3 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-ink-500">On time</th>
-                  <th className="px-3 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-ink-500">Breached</th>
-                  <th className="px-5 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-ink-500">Compliance</th>
+                  <th className="px-5 py-2.5 text-left text-[0.8125rem] font-medium text-ink-500">Group</th>
+                  <th className="px-3 py-2.5 text-right text-[0.8125rem] font-medium text-ink-500">On time</th>
+                  <th className="px-3 py-2.5 text-right text-[0.8125rem] font-medium text-ink-500">Breached</th>
+                  <th className="px-5 py-2.5 text-right text-[0.8125rem] font-medium text-ink-500">Compliance</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-hairline">
@@ -566,15 +566,15 @@ function DisaggregationDashboard({ query }: { query: Query }) {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-hairline bg-surface-sunken">
-                    <th className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-ink-500">
+                    <th className="px-5 py-3 text-left text-[0.8125rem] font-medium text-ink-500">
                       {humanise(dashboard?.dimension)}
                     </th>
                     {(dashboard?.columns ?? []).map((column) => (
-                      <th key={column} className="px-3 py-3 text-right text-xs font-semibold uppercase tracking-wide text-ink-500">
+                      <th key={column} className="px-3 py-3 text-right text-[0.8125rem] font-medium text-ink-500">
                         {column}
                       </th>
                     ))}
-                    <th className="px-5 py-3 text-right text-xs font-semibold uppercase tracking-wide text-ink-500">Total</th>
+                    <th className="px-5 py-3 text-right text-[0.8125rem] font-medium text-ink-500">Total</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-hairline">

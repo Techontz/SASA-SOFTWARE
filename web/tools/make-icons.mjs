@@ -19,7 +19,7 @@ for (const [size, name, padded] of [
 
   await page.setContent(`
     <style>
-      html,body{margin:0;padding:0;width:${size}px;height:${size}px;background:#0b2028;
+      html,body{margin:0;padding:0;width:${size}px;height:${size}px;background:#ffffff;
         display:flex;align-items:center;justify-content:center}
       svg{width:${Math.round(size * scale)}px;height:${Math.round(size * scale)}px}
     </style>

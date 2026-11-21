@@ -206,9 +206,9 @@ export default function ImportWizardPage() {
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="border-b border-hairline bg-surface-sunken">
-                      <th className="px-4 py-2.5 text-left text-xs font-semibold uppercase tracking-wide text-ink-500">Column</th>
-                      <th className="px-4 py-2.5 text-left text-xs font-semibold uppercase tracking-wide text-ink-500">Required</th>
-                      <th className="px-4 py-2.5 text-left text-xs font-semibold uppercase tracking-wide text-ink-500">Notes</th>
+                      <th className="px-4 py-2.5 text-left text-[0.8125rem] font-medium text-ink-500">Column</th>
+                      <th className="px-4 py-2.5 text-left text-[0.8125rem] font-medium text-ink-500">Required</th>
+                      <th className="px-4 py-2.5 text-left text-[0.8125rem] font-medium text-ink-500">Notes</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-hairline">
@@ -357,7 +357,7 @@ export default function ImportWizardPage() {
                     <thead>
                       <tr className="border-b border-hairline bg-surface-sunken">
                         {Object.keys(job.preview![0]).map((key) => (
-                          <th key={key} className="whitespace-nowrap px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-ink-500">
+                          <th key={key} className="whitespace-nowrap px-3 py-2 text-left text-[0.8125rem] font-medium text-ink-500">
                             {key.replace(/_/g, " ")}
                           </th>
                         ))}

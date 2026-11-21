@@ -9,7 +9,7 @@
  * next person who picks it up, and an HTTP cache would do exactly that.
  */
 
-const VERSION = "sasa-shell-v2";
+const VERSION = "sasa-shell-v3";
 const SHELL = [
   "/",
   "/dashboard",

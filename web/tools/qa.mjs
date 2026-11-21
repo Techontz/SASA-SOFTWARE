@@ -3,6 +3,9 @@ import fs from 'node:fs';
 
 const pages = [
   ['/', 'landing'],
+  ['/pricing', 'pricing'],
+  ['/subscribe?plan=professional', 'subscribe'],
+  ['/billing', 'billing'],
   ['/dashboard', 'dashboard'],
   ['/stakeholders', 'stakeholders'],
   ['/stakeholders/1', 'stakeholder-detail'],

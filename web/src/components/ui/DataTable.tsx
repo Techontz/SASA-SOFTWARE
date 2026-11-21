@@ -102,7 +102,7 @@ export function DataTable<T>({
                   }
                   style={column.width ? { width: column.width } : undefined}
                   className={cn(
-                    "px-4 py-3 text-left text-[0.6875rem] font-semibold uppercase tracking-[0.08em] text-ink-500 first:pl-6 last:pr-6",
+                    "px-4 py-3 text-left text-[0.8125rem] font-medium text-ink-500 first:pl-6 last:pr-6",
                     column.align === "right" && "text-right",
                     column.hideBelow === "lg" && "hidden lg:table-cell",
                     column.hideBelow === "xl" && "hidden xl:table-cell",

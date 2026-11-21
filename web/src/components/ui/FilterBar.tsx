@@ -112,7 +112,7 @@ export function FilterBar({
         <div className="grid gap-4 p-4 sm:grid-cols-2 lg:grid-cols-4">
           {filters.map((filter) => (
             <div key={filter.key}>
-              <label className="mb-1.5 block text-xs font-semibold uppercase tracking-[0.06em] text-ink-500">
+              <label className="mb-1.5 block text-[0.8125rem] font-medium text-ink-600">
                 {filter.label}
               </label>
               <select

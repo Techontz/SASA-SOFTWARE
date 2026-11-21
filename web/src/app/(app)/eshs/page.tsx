@@ -328,7 +328,7 @@ function Dashboard({ summary, loading }: { summary: EshsSummary | undefined; loa
                         <th
                           key={heading}
                           scope="col"
-                          className="whitespace-nowrap px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-ink-500"
+                          className="whitespace-nowrap px-4 py-3 text-left text-[0.8125rem] font-medium text-ink-500"
                         >
                           {heading}
                         </th>

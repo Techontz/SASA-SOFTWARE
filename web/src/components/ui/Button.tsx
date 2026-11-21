@@ -23,7 +23,7 @@ const VARIANTS: Record<Variant, string> = {
   accent:
     "bg-accent-solid text-on-primary shadow-[var(--shadow-button)] hover:bg-accent-solid-hover active:bg-accent-solid-active disabled:bg-ink-200 disabled:text-ink-400 disabled:shadow-none",
   secondary:
-    "border border-hairline-strong bg-surface text-ink-800 shadow-[var(--shadow-card)] hover:border-ink-300 hover:bg-ink-50 active:bg-ink-100 disabled:border-ink-200 disabled:text-ink-400 disabled:shadow-none",
+    "bg-ink-100 text-ink-900 hover:bg-ink-200 active:bg-ink-300 disabled:bg-ink-100 disabled:text-ink-400",
   ghost:
     "text-ink-700 hover:bg-ink-100 active:bg-ink-200 disabled:text-ink-400",
   quiet:
@@ -34,9 +34,9 @@ const VARIANTS: Record<Variant, string> = {
 
 /* 44px minimum on the primary sizes — a field officer taps this with a thumb. */
 const SIZES: Record<Size, string> = {
-  sm: "h-9 gap-1.5 px-3 text-sm rounded-md",
-  md: "h-11 gap-2 px-4 text-[0.9375rem] rounded-md",
-  lg: "h-12 gap-2.5 px-5 text-base rounded-lg",
+  sm: "h-9 gap-1.5 px-3.5 text-sm rounded-full",
+  md: "h-11 gap-2 px-5 text-[0.9375rem] rounded-full",
+  lg: "h-12 gap-2.5 px-6 text-base rounded-full",
 };
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button(
@@ -48,7 +48,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
       ref={ref}
       disabled={disabled || loading}
       className={cn(
-        "inline-flex select-none items-center justify-center whitespace-nowrap font-medium tracking-[-0.005em] transition-[background-color,border-color,color,box-shadow,transform] duration-[var(--duration-fast)] ease-[var(--ease-out-soft)] active:scale-[0.98] disabled:active:scale-100",
+        "inline-flex select-none items-center justify-center whitespace-nowrap font-semibold tracking-[-0.01em] transition-[background-color,border-color,color,box-shadow,transform] duration-[var(--duration-base)] ease-[var(--ease-spring)] active:scale-[0.97] disabled:active:scale-100",
         "disabled:cursor-not-allowed",
         VARIANTS[variant],
         SIZES[size],

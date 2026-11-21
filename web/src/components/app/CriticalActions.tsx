@@ -1,4 +1,4 @@
-import { AlertOctagon, AlertTriangle, ArrowRight, CheckCircle2, Info } from "lucide-react";
+import { AlertOctagon, AlertTriangle, CheckCircle2, ChevronRight, Info } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import type { CriticalAction } from "@/types/api";
@@ -6,21 +6,18 @@ import type { CriticalAction } from "@/types/api";
 const TONE = {
   danger: {
     icon: AlertOctagon,
-    wrapper: "border-danger-500/25 bg-danger-50 hover:border-danger-500/40",
-    iconClass: "bg-danger-100 text-danger-700",
-    count: "text-danger-700",
+    iconClass: "bg-danger-50 text-danger-600",
+    count: "text-danger-600",
   },
   warning: {
     icon: AlertTriangle,
-    wrapper: "border-warning-500/25 bg-warning-50 hover:border-warning-500/40",
-    iconClass: "bg-warning-100 text-warning-700",
-    count: "text-warning-700",
+    iconClass: "bg-warning-50 text-warning-600",
+    count: "text-warning-600",
   },
   info: {
     icon: Info,
-    wrapper: "border-brand-500/20 bg-brand-50 hover:border-brand-500/40",
-    iconClass: "bg-brand-100 text-brand-700",
-    count: "text-brand-700",
+    iconClass: "bg-brand-50 text-brand-600",
+    count: "text-ink-900",
   },
 };
 
@@ -46,7 +43,7 @@ export function CriticalActions({ actions }: { actions: CriticalAction[] }) {
   }
 
   return (
-    <ul className="grid gap-3 sm:grid-cols-2">
+    <ul className="sasa-card divide-y divide-hairline overflow-hidden">
       {actions.map((action) => {
         const tone = TONE[action.severity] ?? TONE.info;
         const Icon = tone.icon;
@@ -55,21 +52,14 @@ export function CriticalActions({ actions }: { actions: CriticalAction[] }) {
           <li key={action.kind}>
             <Link
               href={action.href}
-              className={cn(
-                "group flex items-center gap-4 rounded-xl border p-4 transition-all duration-[var(--duration-base)] hover:-translate-y-0.5 hover:shadow-[var(--shadow-card)]",
-                tone.wrapper,
-              )}
+              className="group flex items-center gap-4 px-5 py-4 transition-colors duration-[var(--duration-base)] hover:bg-surface-sunken sm:px-6"
             >
-              <span className={cn("flex h-11 w-11 shrink-0 items-center justify-center rounded-full", tone.iconClass)}>
+              <span className={cn("flex h-10 w-10 shrink-0 items-center justify-center rounded-xl", tone.iconClass)}>
                 <Icon className="h-5 w-5" aria-hidden />
               </span>
-              <span className="min-w-0 flex-1">
-                <span className={cn("tabular block text-2xl font-semibold leading-none", tone.count)}>
-                  {action.count}
-                </span>
-                <span className="mt-1 block text-sm font-medium text-ink-800">{action.label}</span>
-              </span>
-              <ArrowRight className="h-4 w-4 shrink-0 text-ink-400 transition group-hover:translate-x-0.5 group-hover:text-ink-700" aria-hidden />
+              <span className="min-w-0 flex-1 text-[0.9375rem] font-medium text-ink-900">{action.label}</span>
+              <span className={cn("tabular text-xl font-semibold tracking-[-0.02em]", tone.count)}>{action.count}</span>
+              <ChevronRight className="h-4 w-4 shrink-0 text-ink-400 transition group-hover:translate-x-0.5" aria-hidden />
             </Link>
           </li>
         );

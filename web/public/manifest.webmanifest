@@ -1,5 +1,5 @@
 {
-  "name": "SASA — Stakeholder Intelligence & Voice",
+  "name": "SASA Compliance",
   "short_name": "SASA",
   "description": "Stakeholder register, engagement, grievances and reporting for infrastructure and extractive projects.",
   "start_url": "/dashboard",
@@ -7,7 +7,7 @@
   "display": "standalone",
   "orientation": "portrait-primary",
   "background_color": "#f7f7f5",
-  "theme_color": "#0b2028",
+  "theme_color": "#15243a",
   "categories": ["business", "productivity", "utilities"],
   "icons": [
     { "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },

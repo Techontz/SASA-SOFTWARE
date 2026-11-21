@@ -17,12 +17,12 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: {
-    default: "SASA",
-    template: "%s · SASA",
+    default: "SASA Compliance",
+    template: "%s · SASA Compliance",
   },
   description:
     "Stakeholder register, engagement planning and logging, commitments, grievance management with SLA and escalation, and reporting from live data.",
-  applicationName: "SASA",
+  applicationName: "SASA Compliance",
   manifest: "/manifest.webmanifest",
   appleWebApp: {
     capable: true,

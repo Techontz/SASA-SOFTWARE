@@ -25,12 +25,13 @@ test.describe("signing in", () => {
     await expect(page.getByText("What is happening on this project?")).toBeVisible();
   });
 
-  test("a visitor lands on the public page, and both calls to action lead to sign-in", async ({ page }) => {
+  test("a visitor lands on the public page: Get started shows the plans, Log in leads to sign-in", async ({ page }) => {
     await page.goto("/");
     await expect(page.getByRole("heading", { level: 1 })).toContainText("Every stakeholder voice");
 
     await page.getByRole("link", { name: /Get started/ }).first().click();
-    await expect(page).toHaveURL(/\/sign-in$/);
+    await expect(page).toHaveURL(/\/pricing$/);
+    await expect(page.getByRole("heading", { level: 1 })).toContainText("Choose the plan");
 
     await page.goto("/");
     await page.getByRole("link", { name: /Log in/ }).last().click();

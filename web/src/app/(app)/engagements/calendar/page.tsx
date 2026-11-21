@@ -84,7 +84,7 @@ export default function EngagementCalendarPage() {
             <div className="hidden md:block">
               <div className="grid grid-cols-7 border-b border-hairline bg-surface-sunken">
                 {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((day) => (
-                  <div key={day} className="px-3 py-2 text-center text-xs font-semibold uppercase tracking-wide text-ink-500">
+                  <div key={day} className="px-3 py-2 text-center text-[0.8125rem] font-medium text-ink-500">
                     {day}
                   </div>
                 ))}

@@ -169,17 +169,12 @@ function QuickActionGrid({ actions }: { actions: typeof QUICK_ACTIONS }) {
           <Link
             key={action.href}
             href={action.href}
-            className={cn(
-              "group flex items-start gap-3.5 rounded-xl border p-4 transition-all duration-[var(--duration-base)] hover:-translate-y-0.5 hover:shadow-[var(--shadow-card)]",
-              action.tone === "accent"
-                ? "border-accent-200 bg-accent-50 hover:border-accent-400"
-                : "border-hairline bg-surface hover:border-brand-300",
-            )}
+            className="sasa-card sasa-card-interactive group flex items-start gap-3.5 p-4"
           >
             <span
               className={cn(
-                "flex h-10 w-10 shrink-0 items-center justify-center rounded-lg",
-                action.tone === "accent" ? "bg-accent-solid text-white" : "bg-brand-100 text-brand-700",
+                "flex h-10 w-10 shrink-0 items-center justify-center rounded-xl",
+                action.tone === "accent" ? "bg-accent-solid text-on-primary" : "bg-brand-50 text-brand-600",
               )}
             >
               <Icon className="h-5 w-5" aria-hidden />
@@ -223,9 +218,9 @@ function WorkHome({ greeting, quickActions }: { greeting: string; quickActions: 
                 <Link
                   key={area.href}
                   href={area.href}
-                  className="group flex items-center gap-3.5 rounded-xl border border-hairline bg-surface p-4 transition-all duration-[var(--duration-base)] hover:-translate-y-0.5 hover:border-brand-300 hover:shadow-[var(--shadow-card)]"
+                  className="sasa-card sasa-card-interactive group flex items-center gap-3.5 p-4"
                 >
-                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-brand-100 text-brand-700">
+                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-50 text-brand-600">
                     <Icon className="h-5 w-5" aria-hidden />
                   </span>
                   <span className="min-w-0 flex-1">

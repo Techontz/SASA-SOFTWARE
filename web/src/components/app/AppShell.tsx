@@ -3,6 +3,7 @@
 import {
   Check,
   ChevronDown,
+  FolderKanban,
   LogOut,
   Menu,
   Plus,
@@ -25,6 +26,7 @@ import {
   type NavItem,
 } from "@/lib/navigation";
 import { cn, initials } from "@/lib/utils";
+import { LogoMark } from "@/components/marketing/Brand";
 import { useSession } from "@/providers/SessionProvider";
 
 export function AppShell({ children }: { children: ReactNode }) {
@@ -62,11 +64,8 @@ export function AppShell({ children }: { children: ReactNode }) {
       <div className="flex">
         {/* ------------------------------ desktop sidebar ------------------ */}
         {/* Tablet gets an icon rail; a laptop and up gets the full sidebar. */}
-        <aside className="sticky top-0 hidden h-dvh w-[4.75rem] shrink-0 flex-col border-r border-chrome-line bg-chrome md:flex lg:w-[17rem]">
+        <aside className="sasa-sidebar sticky top-0 hidden h-dvh w-[4.75rem] shrink-0 flex-col border-r border-chrome-line bg-chrome md:flex lg:w-[16.5rem]">
           <SidebarBrand />
-          <div className="hidden lg:block">
-            <ProjectSwitcher />
-          </div>
 
           <nav className="flex-1 overflow-y-auto overflow-x-hidden px-3 pb-4" aria-label="Main">
             {PRIMARY_NAVIGATION.map((group) => {
@@ -77,13 +76,13 @@ export function AppShell({ children }: { children: ReactNode }) {
                 <div key={group.label ?? "primary"} className="mb-5">
                   {group.label ? (
                     <>
-                      <p className="hidden px-3 pb-2 pt-2 text-[0.6875rem] font-semibold uppercase tracking-[0.1em] text-chrome-subtle lg:block">
+                      <p className="hidden px-3 pb-1.5 pt-2 text-xs font-semibold text-chrome-subtle lg:block">
                         {group.label}
                       </p>
                       <div className="mx-auto mb-3 mt-1 h-px w-8 bg-chrome-line lg:hidden" aria-hidden />
                     </>
                   ) : null}
-                  <ul className="space-y-1">
+                  <ul className="space-y-0.5">
                     {items.map((item) => {
                       const active = isActivePath(pathname, item.href);
                       const Icon = item.icon;
@@ -95,24 +94,16 @@ export function AppShell({ children }: { children: ReactNode }) {
                             aria-current={active ? "page" : undefined}
                             title={item.label}
                             className={cn(
-                              "group relative flex items-center justify-center gap-3 rounded-[var(--radius-md)] px-3 py-2.5 text-sm font-medium transition-[background-color,color] duration-[var(--duration-base)] lg:justify-start",
+                              "group relative flex items-center justify-center gap-3 rounded-[0.625rem] px-3 py-2 text-[0.9375rem] transition-[background-color,color] duration-[var(--duration-base)] lg:justify-start",
                               active
-                                ? "bg-chrome-raised text-chrome-fg"
-                                : "text-chrome-muted hover:bg-chrome-raised/70 hover:text-chrome-fg",
+                                ? "bg-chrome-raised font-semibold text-chrome-fg"
+                                : "font-medium text-chrome-muted hover:bg-chrome-raised/60 hover:text-chrome-fg",
                             )}
                           >
-                            {/* The active marker: a short bar on the leading edge. */}
-                            <span
-                              className={cn(
-                                "absolute left-0 top-1/2 h-5 w-[3px] -translate-y-1/2 rounded-r-full bg-accent-300 transition-opacity duration-[var(--duration-base)]",
-                                active ? "opacity-100" : "opacity-0",
-                              )}
-                              aria-hidden
-                            />
                             <Icon
                               className={cn(
                                 "h-[18px] w-[18px] shrink-0 transition-colors",
-                                active ? "text-accent-300" : "text-chrome-subtle group-hover:text-chrome-fg",
+                                active ? "text-accent-300" : "text-chrome-accent",
                               )}
                               aria-hidden
                             />
@@ -143,8 +134,14 @@ export function AppShell({ children }: { children: ReactNode }) {
                 <Menu className="h-5 w-5" aria-hidden />
               </button>
 
-              <div className="min-w-0 flex-1 md:max-w-[14rem] lg:hidden">
+              <div className="min-w-0 flex-1 md:hidden">
                 <MobileProjectLabel />
+              </div>
+
+              {/* The project is the context for everything on the page, so it
+                  sits at the head of the page, not in the menu. */}
+              <div className="hidden shrink-0 md:block">
+                <ProjectSwitcher />
               </div>
 
               <div className="hidden min-w-0 flex-1 md:block">
@@ -226,7 +223,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       {navOpen ? (
         <div className="fixed inset-0 z-[70] md:hidden">
           <div className="animate-fade-in sasa-scrim absolute inset-0" onClick={() => setNavOpen(false)} aria-hidden />
-          <div className="animate-slide-in-right absolute inset-y-0 right-0 flex w-[19rem] max-w-[85vw] flex-col bg-chrome">
+          <div className="sasa-sidebar animate-slide-in-right absolute inset-y-0 right-0 flex w-[19rem] max-w-[85vw] flex-col bg-chrome">
             <div className="flex items-center justify-between px-4 py-4">
               <SidebarBrand compact />
               <button
@@ -238,7 +235,6 @@ export function AppShell({ children }: { children: ReactNode }) {
                 <X className="h-5 w-5" aria-hidden />
               </button>
             </div>
-            <ProjectSwitcher />
             <nav className="flex-1 overflow-y-auto px-3 pb-4" aria-label="Main">
               {PRIMARY_NAVIGATION.map((group) => {
                 const items = shown(group.items);
@@ -247,7 +243,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                 return (
                   <div key={group.label ?? "primary"} className="mb-5">
                     {group.label ? (
-                      <p className="px-3 pb-2 pt-2 text-[0.6875rem] font-semibold uppercase tracking-[0.09em] text-chrome-subtle">
+                      <p className="px-3 pb-1.5 pt-2 text-xs font-semibold text-chrome-subtle">
                         {group.label}
                       </p>
                     ) : null}
@@ -276,7 +272,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                 );
               })}
 
-              <div className="mb-5 border-t border-brand-900 pt-4">
+              <div className="mb-5 border-t border-chrome-line pt-4">
                 <ul className="space-y-0.5">
                   {SECONDARY_LINKS.filter(allowed).map((item) => {
                     const Icon = item.icon;
@@ -284,7 +280,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                       <li key={item.href}>
                         <Link
                           href={item.href}
-                          className="flex items-center gap-3 rounded-lg px-3 py-3 text-[0.9375rem] font-medium text-chrome-muted transition hover:bg-chrome-900"
+                          className="flex items-center gap-3 rounded-lg px-3 py-3 text-[0.9375rem] font-medium text-chrome-muted transition hover:bg-chrome-raised hover:text-chrome-fg"
                         >
                           <Icon className="h-5 w-5 shrink-0" aria-hidden />
                           {item.label}
@@ -313,14 +309,13 @@ function SidebarBrand({ compact }: { compact?: boolean }) {
   return (
     <Link
       href="/dashboard"
-      className={cn("flex items-center gap-3", compact ? "" : "justify-center px-3 py-5 lg:justify-start lg:px-5")}
-      aria-label="SASA home"
+      className={cn("flex items-center gap-3", compact ? "" : "justify-center px-3 pb-6 pt-6 lg:justify-start lg:px-6")}
+      aria-label="SASA Compliance home"
     >
-      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[var(--radius-md)] bg-accent-solid text-base font-bold text-on-primary shadow-[var(--shadow-button)]">
-        S
-      </span>
-      <span className={cn("text-[1.0625rem] font-semibold tracking-tight text-white", compact ? "" : "hidden lg:inline")}>
-        SASA
+      <LogoMark className="h-9 w-9" />
+      <span className={cn("flex-col leading-none", compact ? "flex" : "hidden lg:flex")}>
+        <span className="text-[1.125rem] font-bold tracking-[-0.025em] text-chrome-fg">SASA</span>
+        <span className="mt-[0.3rem] text-[0.5625rem] font-semibold uppercase tracking-[0.3em] text-chrome-muted">Compliance</span>
       </span>
     </Link>
   );
@@ -334,31 +329,38 @@ function ProjectSwitcher() {
    * The switcher exists to change tenant scope. Someone on a single project has
    * nothing to switch to, so the box would only be noise in the sidebar.
    */
-  if (!project || projects.length < 2) return null;
+  if (!project) return null;
+
+  const label = (
+    <>
+      <FolderKanban className="h-4 w-4 shrink-0 text-brand-700" aria-hidden />
+      <span className="max-w-[11rem] truncate text-sm font-semibold text-ink-900 xl:max-w-[16rem]">{project.name}</span>
+    </>
+  );
+
+  /* Someone on one project has nothing to switch to: the name is context only. */
+  if (projects.length < 2) {
+    return <span className="flex items-center gap-2 px-1" title={`${project.name} · ${project.role.name}`}>{label}</span>;
+  }
 
   return (
-    <div className="relative px-3 pb-4">
+    <div className="relative">
       <button
         type="button"
         onClick={() => setOpen((value) => !value)}
         aria-expanded={open}
-        className="flex w-full items-center gap-3 rounded-lg border border-chrome-line bg-chrome-raised px-3 py-2.5 text-left transition hover:border-chrome-accent/45"
+        aria-label={`Project: ${project.name}. Switch project`}
+        className="flex h-10 items-center gap-2 rounded-full bg-ink-100 pl-3.5 pr-3 transition-colors hover:bg-ink-200"
       >
-        <span className="min-w-0 flex-1">
-          <span className="block text-[0.6875rem] uppercase tracking-[0.08em] text-chrome-subtle">Project</span>
-          <span className="block truncate text-sm font-medium text-white">{project.name}</span>
-          <span className="block truncate text-xs text-chrome-muted">{project.role.name}</span>
-        </span>
-        <ChevronDown className={cn("h-4 w-4 shrink-0 text-chrome-muted transition", open && "rotate-180")} aria-hidden />
+        {label}
+        <ChevronDown className={cn("h-4 w-4 shrink-0 text-ink-500 transition", open && "rotate-180")} aria-hidden />
       </button>
 
       {open ? (
         <>
           <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} aria-hidden />
-          <div className="animate-fade-up absolute left-3 right-3 z-50 mt-1 overflow-hidden rounded-lg border border-hairline bg-surface p-1.5 shadow-[var(--shadow-overlay)]">
-            <p className="px-2.5 py-1.5 text-[0.6875rem] font-semibold uppercase tracking-[0.08em] text-ink-500">
-              Switch project
-            </p>
+          <div className="animate-fade-up absolute left-0 z-50 mt-2 w-80 overflow-hidden rounded-2xl border border-hairline bg-surface p-1.5 shadow-[var(--shadow-overlay)]">
+            <p className="px-3 py-2 text-xs font-semibold text-ink-500">Your projects</p>
             {projects.map((candidate) => (
               <button
                 key={candidate.id}
@@ -367,7 +369,7 @@ function ProjectSwitcher() {
                   void switchProject(candidate.id);
                   setOpen(false);
                 }}
-                className="flex w-full items-start gap-2 rounded-md px-2.5 py-2 text-left transition hover:bg-brand-50"
+                className="flex w-full items-start gap-2 rounded-xl px-3 py-2.5 text-left transition hover:bg-ink-100"
               >
                 <span className="min-w-0 flex-1">
                   <span className="block truncate text-sm font-medium text-ink-900">{candidate.name}</span>
@@ -409,7 +411,7 @@ function UserMenu() {
   if (!user) return null;
 
   return (
-    <div className="relative border-t border-brand-900 p-3">
+    <div className="relative border-t border-chrome-line p-3">
       <button
         type="button"
         onClick={() => setOpen((value) => !value)}
@@ -421,7 +423,7 @@ function UserMenu() {
           {initials(user.name)}
         </span>
         <span className="min-w-0 flex-1 md:hidden lg:block">
-          <span className="block truncate text-sm font-medium text-white">{user.name}</span>
+          <span className="block truncate text-sm font-medium text-chrome-fg">{user.name}</span>
           <span className="block truncate text-xs text-chrome-muted">{user.job_title ?? user.email}</span>
         </span>
         <ChevronDown className={cn("h-4 w-4 shrink-0 text-chrome-muted transition md:hidden lg:block", open && "rotate-180")} aria-hidden />

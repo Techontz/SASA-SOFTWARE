@@ -132,6 +132,9 @@ export async function attachEvidence(page: Page, name = "evidence.pdf") {
  * A mandatory field is one whose label carries the red asterisk.
  */
 export async function completeMandatoryFields(page: Page) {
+  // Checklists ("Stakeholders present") load their options after the form
+  // paints; reading the form before they arrive would miss them.
+  await page.waitForLoadState("networkidle");
   const fields = await page.evaluate(() =>
     [...document.querySelectorAll("label")]
       .filter((label) => label.querySelector("span.text-danger-500"))

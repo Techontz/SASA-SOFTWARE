@@ -343,7 +343,7 @@ function SlaSettings() {
             <thead>
               <tr className="border-b border-hairline bg-surface-sunken">
                 {["Clock", "Applies to", "Target", "Reminders at", ""].map((heading) => (
-                  <th key={heading} className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-ink-500">
+                  <th key={heading} className="px-5 py-3 text-left text-[0.8125rem] font-medium text-ink-500">
                     {heading}
                   </th>
                 ))}
